@@ -51,6 +51,8 @@
     EVENT(TAPE_LOST)  /*Tape Sensor triggered - White*/ \
     EVENT(BUMPED)  /* Bump sensors triggered - DO WE NEED UNBUMPED?*/ \
     EVENT(UNBUMPED) /* Unbumped a sensor */\
+    EVENT(TRACK_WIRE_FOUND) /* Track Wire Detected */ \
+    EVENT(TRACK_WIRE_LOST) /* Track Wire Was Detected, is now lost */ \
     
 // This turns the EVENT_NAMES list into an enum statement
 // To see how it expands, right-click -> navigate -> View macro expansion
@@ -74,11 +76,19 @@ static const char *EventNames[] = {
 
 /****************************************************************************/
 // This is the list of event checking functions
+<<<<<<< HEAD
 #define EVENT_CHECK_LIST  CheckTopTape ,        \
                           CheckLeftTape,        \
                           CheckRightTape,       \
                           CheckBumpers          \
 //CheckLauncherTape
+=======
+#define EVENT_CHECK_LIST  CheckTopTape , \
+                          CheckLeftTape, \
+                          CheckRightTape,  \
+                          CheckLauncherTape, \
+                          CheckTrackWire \
+>>>>>>> origin/master
 
 /****************************************************************************/
 // These are the definitions for the post functions to be executed when the
@@ -88,10 +98,17 @@ static const char *EventNames[] = {
 #define TIMER0_RESP_FUNC PostTimerService
 #define TIMER1_RESP_FUNC PostTimerService
 //user modifiable timers start below here
+<<<<<<< HEAD
 #define TIMER2_RESP_FUNC Post_R2_BJT2_HSM       // timer for...?!
 #define TIMER3_RESP_FUNC Post_R2_BJT2_HSM       // timer for...?!
 #define TIMER4_RESP_FUNC PostR2BumperService    // bumper service
 #define TIMER5_RESP_FUNC TIMER_UNUSED
+=======
+#define TIMER2_RESP_FUNC Post_R2_BJT2_HSM
+#define TIMER3_RESP_FUNC Post_R2_BJT2_HSM
+#define TIMER4_RESP_FUNC Post_R2_BJT2_HSM
+#define TIMER5_RESP_FUNC Post_R2_BJT2_HSM
+>>>>>>> origin/master
 #define TIMER6_RESP_FUNC TIMER_UNUSED
 #define TIMER7_RESP_FUNC TIMER_UNUSED
 #define TIMER8_RESP_FUNC TIMER_UNUSED

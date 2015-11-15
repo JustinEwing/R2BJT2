@@ -152,9 +152,11 @@ ES_Event Run_R2_BJT2_HSM(ES_Event ThisEvent) {
                 dbprintf("Entered %s\n", __FUNCTION__);
 
                 InitFindAmmoHSM();
+                InitFindPortalHSM();
 
                 // now put the machine into the actual initial state
-                nextState = FindAmmo;
+                //nextState = FindAmmo;
+                nextState = FindPortal; // Should be FindAmmo
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
             }
@@ -243,8 +245,7 @@ ES_Event Run_R2_BJT2_HSM(ES_Event ThisEvent) {
             break;
 
         case FindPortal: // example of a state without a sub-statemachine
-            //UNCOMMENT ONCE SUB HSM IS MADE
-            //ThisEvent = RunFindPortalHSM(ThisEvent); // run sub-state machine for this state
+            ThisEvent = RunFindPortalHSM(ThisEvent); // run sub-state machine for this state
             switch (ThisEvent.EventType) {
                 case ES_ENTRY:
                     // this is where you would put any actions associated with the

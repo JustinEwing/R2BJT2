@@ -208,7 +208,6 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
                         dbprintf("\n Backup Right. \n");
                         rightR2Motor(-15);
                         leftR2Motor(-35);
-
                         ES_Timer_InitTimer(BACKUP_TIMER, 400);
                         ThisEvent.EventType = ES_NO_EVENT;
                         break;
