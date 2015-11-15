@@ -348,13 +348,13 @@ uint8_t CheckBumpers(void) {
 
     //  2. Use IO_PortsReadPort to read the digital value of the left bumper
     //  3. Use |= to SET that value as the first bit in bump_state
-    BumperStates |= IO_PortsReadPort(LEFT_BUMPER_READ);
+    BumperStates = LEFT_BUMPER_READ;
     //  4. Bit shift that value into the second bit in bump_state
     BumperStates <<= SHIFT_LEFT_ONE;
 
     //  5. Use IO_PortsReadPort to read the digital value of the right bumper
     //  6. Use |= to SET that value as the first bit in bump_state
-    BumperStates |= IO_PortsReadPort(RIGHT_BUMPER_READ);
+    BumperStates |= RIGHT_BUMPER_READ;
 
     return BumperStates; // temp
 }

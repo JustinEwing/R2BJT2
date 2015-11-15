@@ -76,9 +76,9 @@ static const char *EventNames[] = {
 // This is the list of event checking functions
 #define EVENT_CHECK_LIST  CheckTopTape ,        \
                           CheckLeftTape,        \
-                          CheckRightTape        \
-                          //CheckLauncherTape
-                          //CheckBumpers
+                          CheckRightTape,       \
+                          CheckBumpers          \
+//CheckLauncherTape
 
 /****************************************************************************/
 // These are the definitions for the post functions to be executed when the
@@ -88,9 +88,9 @@ static const char *EventNames[] = {
 #define TIMER0_RESP_FUNC PostTimerService
 #define TIMER1_RESP_FUNC PostTimerService
 //user modifiable timers start below here
-#define TIMER2_RESP_FUNC Post_R2_BJT2_HSM   // timer for...?!
-#define TIMER3_RESP_FUNC Post_R2_BJT2_HSM   // timer for...?!
-#define TIMER4_RESP_FUNC TIMER_UNUSED
+#define TIMER2_RESP_FUNC Post_R2_BJT2_HSM       // timer for...?!
+#define TIMER3_RESP_FUNC Post_R2_BJT2_HSM       // timer for...?!
+#define TIMER4_RESP_FUNC PostR2BumperService    // bumper service
 #define TIMER5_RESP_FUNC TIMER_UNUSED
 #define TIMER6_RESP_FUNC TIMER_UNUSED
 #define TIMER7_RESP_FUNC TIMER_UNUSED
@@ -122,7 +122,7 @@ static const char *EventNames[] = {
 /****************************************************************************/
 // This macro determines that nuber of services that are *actually* used in
 // a particular application. It will vary in value from 1 to MAX_NUM_SERVICES
-#define NUM_SERVICES 3
+#define NUM_SERVICES 4
 
 /****************************************************************************/
 // These are the definitions for Service 0, the lowest priority service
@@ -173,11 +173,11 @@ static const char *EventNames[] = {
 // These are the definitions for Service 3
 #if NUM_SERVICES > 3
 // the header file with the public fuction prototypes
-#define SERV_3_HEADER "TestService.h"
+#define SERV_3_HEADER "R2BumperService.h"
 // the name of the Init function
-#define SERV_3_INIT TestServiceInit
+#define SERV_3_INIT InitR2BumperService
 // the name of the run function
-#define SERV_3_RUN TestServiceRun
+#define SERV_3_RUN RunR2BumperService
 // How big should this services Queue be?
 #define SERV_3_QUEUE_SIZE 3
 #endif

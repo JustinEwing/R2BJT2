@@ -11,7 +11,7 @@
 #include "ES_Configure.h"
 #include "ES_Framework.h"
 #include "BOARD.h"
-//#include "RoachFSM.h"
+#include "R2_BJT2_HSM.h"
 #include "R2BumperService.h"
 
 /*******************************************************************************
@@ -118,24 +118,24 @@ uint8_t PostR2BumperService(ES_Event ThisEvent) {
 ES_Event RunR2BumperService(ES_Event ThisEvent) {
     // This service is supposed to run because of a timeout event!
     // Posts events whenever the bumper's status changes
-
+    
     ES_Event ReturnEvent;
     ES_Event BumpEvent;
     ReturnEvent.EventType = ES_NO_EVENT; // assume no errors
 
     if (ThisEvent.EventType == ES_TIMEOUT) {
-
         uint8_t bump_state = CheckBumpers();
 
         // Debugging printf
-        // printf("After Bit Test: %x\n", (bump_state & FIRST_BIT));
+        //printf("After Bit Test: %x\n", (bump_state & SECOND_BIT));
 
         // Left Bumper Buffer Reading
-        FrontLeftBumper |= ((bump_state & FIRST_BIT) >> 1);
         FrontLeftBumper <<= SHIFT_LEFT_ONE;
+        FrontLeftBumper |= ((bump_state & SECOND_BIT)>>1);
+        //printf("FrontLeftBumper: %x\n", FrontLeftBumper);
         // Left Bumper Buffer Reading
-        FrontRightBumper |= (bump_state & SECOND_BIT);
         FrontRightBumper <<= SHIFT_LEFT_ONE;
+        FrontRightBumper |= (bump_state & FIRST_BIT);
 
         // Left Bumper Test - BUMPED check
         if ((FrontLeftBumper == ALL_BITS)
@@ -176,14 +176,14 @@ ES_Event RunR2BumperService(ES_Event ThisEvent) {
 
         // Reset the Timer
         // Initialize R2BumperService Timer to 5 Milliseconds
-        ES_Timer_InitTimer(R2_BUMPER_TIMER, FIVE_MILLISECONDS); // Set Timer3 to 5 milliseconds
+        ES_Timer_InitTimer(R2_BUMPER_TIMER, FIVE_MILLISECONDS); // Set Timer4 to 5 milliseconds
 
     }
 
     if (ThisEvent.EventType == ES_INIT)// only respond to ES_Init
     {
         // Initialize R2BumperService Timer to 5 Milliseconds
-        ES_Timer_InitTimer(R2_BUMPER_TIMER, FIVE_MILLISECONDS); // Set Timer3 to 5 milliseconds
+        ES_Timer_InitTimer(R2_BUMPER_TIMER, FIVE_MILLISECONDS); // Set Timer4 to 5 milliseconds
     }
 
     return ReturnEvent;

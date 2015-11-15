@@ -26,6 +26,10 @@ typedef enum {
     WAS_BUMPED, WAS_UNBUMPED
 } bumpstate_t;
 
+typedef enum {
+    LEFT_BUMPER, RIGHT_BUMPER
+} bumper;
+
 /*******************************************************************************
  * PUBLIC FUNCTION PROTOTYPES                                                  *
  ******************************************************************************/
@@ -44,7 +48,7 @@ typedef enum {
 uint8_t InitR2BumperService(uint8_t Priority);
 
 /**
- * @Function PostR2Service(ES_Event ThisEvent)
+ * @Function PostR2BumperService(ES_Event ThisEvent)
  * @param ThisEvent - the event (type and param) to be posted to queue
  * @return TRUE or FALSE
  * @brief This function is a wrapper to the queue posting function, and its name
@@ -55,7 +59,7 @@ uint8_t InitR2BumperService(uint8_t Priority);
 uint8_t PostR2BumperService(ES_Event ThisEvent);
 
 /**
- * @Function RunR2Service(ES_Event ThisEvent)
+ * @Function RunR2BumperService(ES_Event ThisEvent)
  * @param ThisEvent - the event (type and param) to be responded.
  * @return Event - return event (type and param), in general should be ES_NO_EVENT
  * @brief This function is where you implement the whole of the service,
