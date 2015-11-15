@@ -12,6 +12,7 @@ void main(void)
 {
     ES_Return_t ErrorType;
 
+    // Hardware initialization function calls
     BOARD_Init();
     SERIAL_Init();
     initMotors();
@@ -24,8 +25,6 @@ void main(void)
     printf("using the 2nd Generation Events & Services Framework\n");
 
 
-//     Your hardware initialization function calls go here
-//
 //     now initialize the Events and Services Framework and start it running
     ErrorType = ES_Initialize();
     printf("Error type: %d\n",ErrorType);

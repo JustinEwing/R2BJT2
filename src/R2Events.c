@@ -29,7 +29,7 @@ unsigned int wait = 0;
 #define TOP_TAPE_PIN       AD_PORTV8 // Should be PortV5
 #define LEFT_TAPE_PIN      AD_PORTV6
 #define RIGHT_TAPE_PIN     AD_PORTV7
-#define LAUNCHER_TAPE_PIN  AD_PORTV8
+#define LAUNCHER_TAPE_PIN  AD_PORTV8 // Needs to be changed
 
 
 #define TEST_TAPE_SENSOR      TOP_TAPE_PIN

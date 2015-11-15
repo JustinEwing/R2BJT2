@@ -17,7 +17,7 @@
 /*******************************************************************************
  * MODULE #DEFINES                                                             *
  ******************************************************************************/
-#define ROACH_BUMPER_TIMER 4
+#define R2_BUMPER_TIMER 4
 #define FIVE_MILLISECONDS 5
 
 // Need 4 checking masks
@@ -107,7 +107,7 @@ uint8_t PostR2BumperService(ES_Event ThisEvent) {
 }
 
 /**
- * @Function RunR2Service(ES_Event ThisEvent)
+ * @Function RunR2BumperService(ES_Event ThisEvent)
  * @param ThisEvent - the event (type and param) to be responded.
  * @return Event - return event (type and param), in general should be ES_NO_EVENT
  * @brief This function is where you implement the whole of the service,
@@ -131,24 +131,26 @@ ES_Event RunR2BumperService(ES_Event ThisEvent) {
         // printf("After Bit Test: %x\n", (bump_state & FIRST_BIT));
 
         // Left Bumper Buffer Reading
+        FrontLeftBumper |= ((bump_state & FIRST_BIT) >> 1);
         FrontLeftBumper <<= SHIFT_LEFT_ONE;
-        FrontLeftBumper |= (bump_state & FIRST_BIT);
         // Left Bumper Buffer Reading
+        FrontRightBumper |= (bump_state & SECOND_BIT);
         FrontRightBumper <<= SHIFT_LEFT_ONE;
-        FrontRightBumper |= ((bump_state & SECOND_BIT) >> 1);
 
         // Left Bumper Test - BUMPED check
         if ((FrontLeftBumper == ALL_BITS)
                 && (PreviousFLState == WAS_UNBUMPED)) {
             BumpEvent.EventType = BUMPED;
-            BumpEvent.EventParam = (uint16_t) bump_state;
+            //BumpEvent.EventParam = (uint16_t) bump_state;
+            BumpEvent.EventParam = LEFT_BUMPER;
             Post_R2_BJT2_HSM(BumpEvent);
             PreviousFLState = WAS_BUMPED;
         }            // Left Bumper Test - UNBUMPED check
         else if ((FrontLeftBumper == ZERO_BITS)
                 && (PreviousFLState == WAS_BUMPED)) {
             BumpEvent.EventType = UNBUMPED;
-            BumpEvent.EventParam = (uint16_t) bump_state;
+            //BumpEvent.EventParam = (uint16_t) bump_state;
+            BumpEvent.EventParam = LEFT_BUMPER;
             Post_R2_BJT2_HSM(BumpEvent);
             PreviousFLState = WAS_UNBUMPED;
         }
@@ -157,7 +159,8 @@ ES_Event RunR2BumperService(ES_Event ThisEvent) {
         if ((FrontRightBumper == ALL_BITS)
                 && (PreviousFRState == WAS_UNBUMPED)) {
             BumpEvent.EventType = BUMPED;
-            BumpEvent.EventParam = (uint16_t) bump_state;
+            //BumpEvent.EventParam = (uint16_t) bump_state;
+            BumpEvent.EventParam = RIGHT_BUMPER;
             Post_R2_BJT2_HSM(BumpEvent);
             PreviousFRState = WAS_BUMPED;
         }
@@ -165,21 +168,22 @@ ES_Event RunR2BumperService(ES_Event ThisEvent) {
         else if ((FrontRightBumper == ZERO_BITS)
                 && (PreviousFRState == WAS_BUMPED)) {
             BumpEvent.EventType = UNBUMPED;
-            BumpEvent.EventParam = (uint16_t) bump_state;
+            //BumpEvent.EventParam = (uint16_t) bump_state;
+            BumpEvent.EventParam = RIGHT_BUMPER;
             Post_R2_BJT2_HSM(BumpEvent);
             PreviousFRState = WAS_UNBUMPED;
         }
 
         // Reset the Timer
         // Initialize R2BumperService Timer to 5 Milliseconds
-        ES_Timer_InitTimer(ROACH_BUMPER_TIMER, FIVE_MILLISECONDS); // Set Timer3 to 5 milliseconds
+        ES_Timer_InitTimer(R2_BUMPER_TIMER, FIVE_MILLISECONDS); // Set Timer3 to 5 milliseconds
 
     }
 
     if (ThisEvent.EventType == ES_INIT)// only respond to ES_Init
     {
         // Initialize R2BumperService Timer to 5 Milliseconds
-        ES_Timer_InitTimer(ROACH_BUMPER_TIMER, FIVE_MILLISECONDS); // Set Timer3 to 5 milliseconds
+        ES_Timer_InitTimer(R2_BUMPER_TIMER, FIVE_MILLISECONDS); // Set Timer3 to 5 milliseconds
     }
 
     return ReturnEvent;

@@ -159,7 +159,7 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
             }
             break;
 
-        case TurnLeft: // in the first state, replace this with correct names
+        case TurnLeft:
             if (ThisEvent.EventType != ES_NO_EVENT) { // An event is still active
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
@@ -185,16 +185,22 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
                                 break;
                             default: break;
                         }
-
-                        break;
-                        default: // all unhandled events pass the event back up to the next level
                         break;
                     }
+
+                    case BUMPED:
+                        nextState = Backup;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;
+
+                    default: // all unhandled events pass the event back up to the next level
+                        break;
                 }
             }
             break;
 
-        case Backup: // If current state is state OtherState
+        case Backup:
             //ThisEvent = RunTemplateSubHSM(ThisEvent); // run sub-state machine for this state
             if (ThisEvent.EventType != ES_NO_EVENT) { // An event is active
                 switch (ThisEvent.EventType) {
@@ -227,7 +233,7 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
             break;
 
 
-        case TapeTest: // example of a state without a sub-statemachine
+        case TapeTest:
             switch (ThisEvent.EventType) {
                 case ES_ENTRY:
                     rightR2Motor(-15);
@@ -248,7 +254,7 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
             }
             break; //End of TapeTest
 
-        case KeepTurning: // example of a state without a sub-statemachine
+        case KeepTurning:
             switch (ThisEvent.EventType) {
                 case ES_ENTRY:
                     rightR2Motor(15);
@@ -270,7 +276,7 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
             }
             break;
 
-        case FoundT: // example of a state without a sub-statemachine
+        case FoundT:
             switch (ThisEvent.EventType) {
                 case ES_ENTRY:
                     ES_Timer_InitTimer(BACKUP_TIMER, 2000);
@@ -278,17 +284,17 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
                     break;
 
                 case TAPE_FOUND:
-                switch (ThisEvent.EventParam) {
-                    case TOP_TAPE_SENSOR:
-                    case RIGHT_TAPE_SENSOR:
-                        rightR2Motor(25);
-                        leftR2Motor(25);
-                        nextState = FoundT;
-                        makeTransition = TRUE;
-                        ThisEvent.EventType = ES_NO_EVENT;
-                        break;
-                }
-                break;
+                    switch (ThisEvent.EventParam) {
+                        case TOP_TAPE_SENSOR:
+                        case RIGHT_TAPE_SENSOR:
+                            rightR2Motor(25);
+                            leftR2Motor(25);
+                            nextState = FoundT;
+                            makeTransition = TRUE;
+                            ThisEvent.EventType = ES_NO_EVENT;
+                            break;
+                    }
+                    break;
 
                 case TAPE_LOST:
                     switch (ThisEvent.EventParam) {
@@ -310,7 +316,7 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
 
                     }
                     break;
-    
+
 
                 case ES_TIMEOUT:
                     rightR2Motor(0);

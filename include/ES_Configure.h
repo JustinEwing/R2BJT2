@@ -74,10 +74,11 @@ static const char *EventNames[] = {
 
 /****************************************************************************/
 // This is the list of event checking functions
-#define EVENT_CHECK_LIST  CheckTopTape , \
-                          CheckLeftTape, \
-                          CheckRightTape //, \
-                          //CheckLauncherTape \
+#define EVENT_CHECK_LIST  CheckTopTape ,        \
+                          CheckLeftTape,        \
+                          CheckRightTape        \
+                          //CheckLauncherTape
+                          //CheckBumpers
 
 /****************************************************************************/
 // These are the definitions for the post functions to be executed when the
@@ -87,8 +88,8 @@ static const char *EventNames[] = {
 #define TIMER0_RESP_FUNC PostTimerService
 #define TIMER1_RESP_FUNC PostTimerService
 //user modifiable timers start below here
-#define TIMER2_RESP_FUNC Post_R2_BJT2_HSM
-#define TIMER3_RESP_FUNC Post_R2_BJT2_HSM
+#define TIMER2_RESP_FUNC Post_R2_BJT2_HSM   // timer for...?!
+#define TIMER3_RESP_FUNC Post_R2_BJT2_HSM   // timer for...?!
 #define TIMER4_RESP_FUNC TIMER_UNUSED
 #define TIMER5_RESP_FUNC TIMER_UNUSED
 #define TIMER6_RESP_FUNC TIMER_UNUSED
