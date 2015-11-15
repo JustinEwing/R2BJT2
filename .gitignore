@@ -51,3 +51,5 @@ nbproject/Makefile-genesis.properties
 dist/default/production/R2_BJT2.production.hex
 *.mk
 nbproject/Package-default.bash
+*.o
+*.o
