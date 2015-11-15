@@ -29,7 +29,6 @@ unsigned int wait = 0;
 #define RIGHT_TAPE_PIN     AD_PORTV7
 #define LAUNCHER_TAPE_PIN  AD_PORTV8
 
-
 #define TEST_TAPE_SENSOR      TOP_TAPE_PIN
 
 // Analog to Digital Conversion
@@ -54,14 +53,14 @@ typedef enum {
 
 /* @Function CheckTopTape
  * @Param void
- * @Return uint8_t so that the ES_Framework can call it
+ * @Return ES_Event with status of event checkers
  * @Author Daniel Ruatta, 11.12/2015
  * @Brief
- * 1. Gets a Tape Reading for the Top Tape Sensor
+ * 1. Gets a Tape Reading for the all the tape sensots
  * 2. Checks if this reading has passed its next
  * Hysteresis Threshold
- * 3. If so, post an event to the TapeSensorHSM
- * 4. Return TRUE if an event has been posted, FALSE otherwise
+ * 3. If so, post an event to the R2Events
+ * 4. Return status of Tape Detectors in EventParam
  */
 ES_Event CheckTapeReading() {
     dbprintf("Entered %s\n", __FUNCTION__);
@@ -142,190 +141,7 @@ ES_Event CheckTapeReading() {
     return thisEvent;
 }
 
-/* @Function CheckLeftTape
- * @Param void
- * @Return uint8_t so that the ES_Framework can call it
- * @Author Daniel Ruatta, 11.12/2015
- * @Brief
- * 1. Gets a Tape Reading for the Left Tape Sensor
- * 2. Checks if this reading has passed its next
- * Hysteresis Threshold
- * 3. If so, post an event to the TapeSensorHSM
- * 4. Return TRUE if an event has been posted, FALSE otherwise
- */
-//uint8_t CheckLeftTape(void) {
-//    /***************** Declarations ****************/
-//    // We assume the bot starts in a white area, hence BLACK_TO_WHITE
-//    static tapestate_t PrevTapeState = BLACK_TO_WHITE;
-//
-//    // The New Tape State, which should be initialized to the current PrevTapeState
-//    // That way, its value will update at the beginning of every Check()
-//    tapestate_t NewTapeState = PrevTapeState; // Temp value
-//
-//    // TapeReading, to be given a value with ReadTape()
-//    uint16_t TapeReading;
-//    // thisEvent, which will be posted to the HSM on a TAPE_FOUND or
-//    //TAPE_LOST event
-//    ES_Event thisEvent;
-//    // returnVal, which will be used by the ES_Framework to see if this event
-//    // posted an event. We assume no event initially happens, hence FALSE
-//    uint8_t returnVal = FALSE;
-//
-//    // Read Left Tape Sensor
-//    TapeReading = AD_ReadADPin(LEFT_TAPE_PIN);
-//
-//    // Case: Tape Found
-//    if ((PrevTapeState == BLACK_TO_WHITE) &&
-//            (TapeReading > BLACK_HYSTERESIS) &&
-//            (TapeReading < ROOM_LIGHT_LEVEL)) {
-//        thisEvent.EventType = TAPE_FOUND;
-//        thisEvent.EventParam = LEFT_TAPE_SENSOR;
-//        Post_R2_BJT2_HSM(thisEvent);
-//        NewTapeState = WHITE_TO_BLACK;
-//        returnVal = TRUE;
-//
-//    }
-//
-//    // Case: Tape Lost
-//    if ((PrevTapeState == WHITE_TO_BLACK) &&
-//            (TapeReading < WHITE_HYSTERESIS)) {
-//        thisEvent.EventType = TAPE_LOST;
-//        thisEvent.EventParam = LEFT_TAPE_SENSOR;
-//        Post_R2_BJT2_HSM(thisEvent);
-//        NewTapeState = BLACK_TO_WHITE;
-//        returnVal = TRUE;
-//    }
-//
-//    // PrevTapeState updated with NewTapeState
-//    PrevTapeState = NewTapeState;
-//    // Return TRUE if an event has been detected and posted
-//    // FALSE otherwise
-//    return returnVal;
-//}
-//
-///* @Function CheckRightTape
-// * @Param void
-// * @Return uint8_t so that the ES_Framework can call it
-// * @Author Daniel Ruatta, 11.12/2015
-// * @Brief
-// * 1. Gets a Tape Reading for the Left Tape Sensor
-// * 2. Checks if this reading has passed its next
-// * Hysteresis Threshold
-// * 3. If so, post an event to the TapeSensorHSM
-// * 4. Return TRUE if an event has been posted, FALSE otherwise
-// */
-//uint8_t CheckRightTape(void) {
-//    /***************** Declarations ****************/
-//    // We assume the bot starts in a white area, hence BLACK_TO_WHITE
-//    static tapestate_t PrevTapeState = BLACK_TO_WHITE;
-//
-//    // The New Tape State, which should be initialized to the current PrevTapeState
-//    // That way, its value will update at the beginning of every Check()
-//    tapestate_t NewTapeState = PrevTapeState; // Temp value
-//
-//    // TapeReading, to be given a value with ReadTape()
-//    uint16_t TapeReading;
-//    // thisEvent, which will be posted to the HSM on a TAPE_FOUND or
-//    //TAPE_LOST event
-//    ES_Event thisEvent;
-//    // returnVal, which will be used by the ES_Framework to see if this event
-//    // posted an event. We assume no event initially happens, hence FALSE
-//    uint8_t returnVal = FALSE;
-//
-//    // Read Left Tape Sensor
-//    TapeReading = AD_ReadADPin(RIGHT_TAPE_PIN);
-//
-//    // Case: Tape Found
-//    if ((PrevTapeState == BLACK_TO_WHITE) &&
-//            (TapeReading > BLACK_HYSTERESIS) &&
-//            (TapeReading < ROOM_LIGHT_LEVEL)) {
-//        thisEvent.EventType = TAPE_FOUND;
-//        thisEvent.EventParam = RIGHT_TAPE_SENSOR;
-//        Post_R2_BJT2_HSM(thisEvent);
-//        NewTapeState = WHITE_TO_BLACK;
-//        returnVal = TRUE;
-//
-//    }
-//
-//    // Case: Tape Lost
-//    if ((PrevTapeState == WHITE_TO_BLACK) &&
-//            (TapeReading < WHITE_HYSTERESIS)) {
-//        thisEvent.EventType = TAPE_LOST;
-//        thisEvent.EventParam = RIGHT_TAPE_SENSOR;
-//        Post_R2_BJT2_HSM(thisEvent);
-//        NewTapeState = BLACK_TO_WHITE;
-//        returnVal = TRUE;
-//    }
-//
-//    // PrevTapeState updated with NewTapeState
-//    PrevTapeState = NewTapeState;
-//    // Return TRUE if an event has been detected and posted
-//    // FALSE otherwise
-//    return returnVal;
-//}
-//
-///**************************************************************************
-// * @Function CheckLauncherTape
-// * @Param void
-// * @Return uint8_t so that the ES_Framework can call it
-// * @Author Daniel Ruatta, 11.12/2015
-// * @Brief
-// * 1. Gets a Tape Reading for the Launcher Tape Sensor
-// * 2. Checks if this reading has passed its next
-// * Hysteresis Threshold
-// * 3. If so, post an event to the TapeSensorHSM
-// * 4. Return TRUE if an event has been posted, FALSE otherwise
-// */
-//uint8_t CheckLauncherTape(void) {
-//    /***************** Declarations ****************/
-//    // We assume the bot starts in a white area, hence BLACK_TO_WHITE
-//    static tapestate_t PrevTapeState = BLACK_TO_WHITE;
-//
-//    // The New Tape State, which should be initialized to the current PrevTapeState
-//    // That way, its value will update at the beginning of every Check()
-//    tapestate_t NewTapeState = PrevTapeState; // Temp value
-//
-//    // TapeReading, to be given a value with ReadTape()
-//    uint16_t TapeReading;
-//    // thisEvent, which will be posted to the HSM on a TAPE_FOUND or
-//    //TAPE_LOST event
-//    ES_Event thisEvent;
-//    // returnVal, which will be used by the ES_Framework to see if this event
-//    // posted an event. We assume no event initially happens, hence FALSE
-//    uint8_t returnVal = FALSE;
-//
-//    // Read Left Tape Sensor
-//    TapeReading = AD_ReadADPin(LAUNCHER_TAPE_PIN);
-//
-//    // Case: Tape Found
-//    if ((PrevTapeState == BLACK_TO_WHITE) &&
-//            (TapeReading > BLACK_HYSTERESIS) &&
-//            (TapeReading < ROOM_LIGHT_LEVEL)) {
-//        thisEvent.EventType = TAPE_FOUND;
-//        thisEvent.EventParam = LAUNCHER_TAPE_SENSOR;
-//        Post_R2_BJT2_HSM(thisEvent);
-//        NewTapeState = WHITE_TO_BLACK;
-//        returnVal = TRUE;
-//
-//    }
-//
-//    // Case: Tape Lost
-//    if ((PrevTapeState == WHITE_TO_BLACK) &&
-//            (TapeReading < WHITE_HYSTERESIS)) {
-//        thisEvent.EventType = TAPE_LOST;
-//        thisEvent.EventParam = LAUNCHER_TAPE_SENSOR;
-//        Post_R2_BJT2_HSM(thisEvent);
-//        NewTapeState = BLACK_TO_WHITE;
-//        returnVal = TRUE;
-//    }
-//
-//    // PrevTapeState updated with NewTapeState
-//    PrevTapeState = NewTapeState;
-//    // Return TRUE if an event has been detected and posted
-//    // FALSE otherwise
-//    return returnVal;
-//}
-//
+
 ///*************************************************************
 // * @Function InitTape()
 // * @Param void

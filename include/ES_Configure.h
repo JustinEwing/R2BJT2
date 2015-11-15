@@ -76,8 +76,9 @@ static const char *EventNames[] = {
 
 /****************************************************************************/
 // This is the list of event checking functions
-#define EVENT_CHECK_LIST  CheckTape ,  \
-                          CheckBumpers \
+#define EVENT_CHECK_LIST  CheckBumpers, \
+                          CheckTape ,  \
+                          
 
 
 /****************************************************************************/
@@ -88,9 +89,9 @@ static const char *EventNames[] = {
 #define TIMER0_RESP_FUNC PostTimerService
 #define TIMER1_RESP_FUNC PostTimerService
 //user modifiable timers start below here
-#define TIMER2_RESP_FUNC Post_R2_BJT2_HSM
-#define TIMER3_RESP_FUNC Post_R2_BJT2_HSM
-#define TIMER4_RESP_FUNC Post_R2_BJT2_HSM
+#define TIMER2_RESP_FUNC Post_R2_BJT2_HSM  //These are for?
+#define TIMER3_RESP_FUNC Post_R2_BJT2_HSM  //These are for?
+#define TIMER4_RESP_FUNC PostR2BumperService
 #define TIMER5_RESP_FUNC Post_R2_BJT2_HSM
 #define TIMER6_RESP_FUNC TIMER_UNUSED
 #define TIMER7_RESP_FUNC TIMER_UNUSED
@@ -110,7 +111,8 @@ static const char *EventNames[] = {
 // definitions for the response functions to make it easire to check that
 // the timer number matches where the timer event will be routed
 
-#define FANCY_ROACH_TIMER 2 /*make sure this is enabled above and posting to the correct state machine*/
+#define FANCY_ROACH_TIMER 2 /*Yo, fuck this timer */
+#define R2_BUMPER_TIMER 4   //This is for the Bumper Service
 
 
 /****************************************************************************/

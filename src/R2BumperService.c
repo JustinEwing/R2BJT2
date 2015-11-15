@@ -17,7 +17,7 @@
 /*******************************************************************************
  * MODULE #DEFINES                                                             *
  ******************************************************************************/
-#define R2_BUMPER_TIMER 4
+
 #define FIVE_MILLISECONDS 5
 
 // Need 4 checking masks
@@ -35,6 +35,15 @@
 
 // Initialization
 #define INPUT 1
+
+//#define BUMPER_DEBUG_VERBOSE
+#ifdef BUMPER_DEBUG_VERBOSE
+#include "serial.h"
+#include <stdio.h>
+#define dbprintf(...) while(!IsTransmitEmpty()); printf(__VA_ARGS__)
+#else
+#define dbprintf(...)
+#endif
 
 
 /*******************************************************************************
@@ -76,6 +85,7 @@ unsigned char FrontRightBumper = 0; // Second Bit
  *        Returns TRUE if successful, FALSE otherwise
  * @author J. Edward Carryer, 2011.10.23 19:25 */
 uint8_t InitR2BumperService(uint8_t Priority) {
+    dbprintf("Entered %s\n", __FUNCTION__);
     ES_Event ThisEvent;
 
     MyPriority = Priority;
@@ -116,6 +126,7 @@ uint8_t PostR2BumperService(ES_Event ThisEvent) {
  *       Returns ES_NO_EVENT if the event have been "consumed." 
  * @author J. Edward Carryer, 2011.10.23 19:25 */
 ES_Event RunR2BumperService(ES_Event ThisEvent) {
+    dbprintf("Entered %s\n", __FUNCTION__);
     // This service is supposed to run because of a timeout event!
     // Posts events whenever the bumper's status changes
     
@@ -185,7 +196,7 @@ ES_Event RunR2BumperService(ES_Event ThisEvent) {
         // Initialize R2BumperService Timer to 5 Milliseconds
         ES_Timer_InitTimer(R2_BUMPER_TIMER, FIVE_MILLISECONDS); // Set Timer4 to 5 milliseconds
     }
-
+    dbprintf("Exiting %s\n", __FUNCTION__);
     return ReturnEvent;
 }
 

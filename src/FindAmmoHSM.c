@@ -64,20 +64,8 @@ static const char *StateNames[] = {
 #define dbprintf(...)
 #endif
 
-// Motor Speeds
-#define FULL_SPEED_FORWARD 60
-#define HALF_SPEED_FORWARD 30
-#define QUARTER_SPEED_FORWARD 10
-#define STOP 0
-#define QUARTER_SPEED_BACKWARD -10
-#define HALF_SPEED_BACKWARD -30
-#define FULL_SPEED_BACKWARD -60
-
 // Timers
 #define BACKUP_TIMER 3 // Timer3 - Confirm with ES_Config before use
-#define HALF_SECOND 500
-#define ONE_SECOND 1000 // Back up for one second, then continue turning
-#define TWO_SECONDS 2000 // Back up for two seconds, then continue turning
 /*******************************************************************************
  * PRIVATE FUNCTION PROTOTYPES                                                 *
  ******************************************************************************/
@@ -141,6 +129,7 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
 
     uint8_t makeTransition = FALSE; // use to flag transition
     FindAmmoState_t nextState; // <- change type to correct enum
+    uint16_t param = ThisEvent.EventParam;  //make typing easier, maybe use typedef?
 
     ES_Tattle(); // trace call stack
 
@@ -164,29 +153,27 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
                         dbprintf("\n TurnLeft: Motors on. \n");
-                        rightR2Motor(35); // for testing
-                        leftR2Motor(35); // for testing
+                        rightR2Motor(25); // for testing
+                        leftR2Motor(25); // for testing
 
                         ThisEvent.EventType = ES_NO_EVENT;
                         break;
 
-                    case TAPE_FOUND:
-                    {
-                        switch (ThisEvent.EventParam) {
-                            case TOP_TAPE_SENSOR:
+                    case TAPE_FOUND:        
+                        if(param & TOP_TAPE_SENSOR){
                                 nextState = Backup;
                                 makeTransition = TRUE;
                                 ThisEvent.EventType = ES_NO_EVENT;
-                                break;
-                            case RIGHT_TAPE_SENSOR:
-                                nextState = TapeTest;
-                                makeTransition = TRUE;
-                                ThisEvent.EventType = ES_NO_EVENT;
-                                break;
-                            default: break;
                         }
+//                            case RIGHT_TAPE_SENSOR:
+//                                nextState = TapeTest;
+//                                makeTransition = TRUE;
+//                                ThisEvent.EventType = ES_NO_EVENT;
+//                                break;
+//                            default: break;
+                        
                         break;
-                    }
+                   
 
                     case BUMPED:
                         nextState = Backup;
@@ -208,7 +195,7 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
                         dbprintf("\n Backup Right. \n");
                         rightR2Motor(-15);
                         leftR2Motor(-35);
-                        ES_Timer_InitTimer(BACKUP_TIMER, 400);
+                        ES_Timer_InitTimer(BACKUP_TIMER, 250);
                         ThisEvent.EventType = ES_NO_EVENT;
                         break;
 

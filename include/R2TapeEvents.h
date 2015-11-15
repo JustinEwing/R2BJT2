@@ -17,18 +17,23 @@
 #define LAUNCHER_TAPE_SENSOR  (1<<3)
 
 /*
- * File:   TapeSensorFrameworkEvents.h
+ * File:   TapeSensorEvents.h
  * Author: Daniel Ruatta
  *
  * Created on 11/11/2015
  *
- * Tape Sensors will be read in one at a time in their corresponding
- * CheckTape functions (example: CheckTopTape). Each of these
+ * Tape Sensors will be read in one at a time.Each of these
  * functions will use Hysteresis thresholds and previous Tape States
  * to determine if tape has been lost (TAPE_LOST) or found
- * (TAPE_FOUND). If so, it will post these events, along with an
- * integer param (example: TOP_TAPE_SENSOR) to the framework. There
- * will be four tape checking events.
+ * (TAPE_FOUND). If so, it will post an event, along with an
+ * integer param (example: TOP_TAPE_SENSOR) to the framework.
+ * Each bit position represnts the state of each tape detector
+ * in EventParam
+ * 0001 - Top   Tape Sensor
+ * 0010 - Left  Tape Sensor
+ * 0100 - Right Tape Sensor
+ * 1000 - Launcher Tape Sensor
+ * These correspond to the #defines above.
  *
  * Note that these event checkers, like all others,
  * require Init code. This is located at the bottom of
@@ -36,7 +41,7 @@
  */
 
 
-/* @Function CheckTopTape
+/* @Function CheckTapeReading
  * @Param void
  * @Return uint8_t so that the ES_Framework can call it
  * @Author Daniel Ruatta, 11.12/2015
@@ -49,61 +54,6 @@
  */
 ES_Event CheckTapeReading();
 
-/**************************************************************************
- * @Function CheckTopTape
- * @Param void
- * @Return uint8_t so that the ES_Framework can call it
- * @Author Daniel Ruatta, 11.12/2015
- * @Brief
- * 1. Gets a Tape Reading for the Top Tape Sensor
- * 2. Checks if this reading has passed its next
- * Hysteresis Threshold
- * 3. If so, post an event to the TapeSensorHSM
- * 4. Return TRUE if an event has been posted, FALSE otherwise
- */
-uint8_t CheckTopTape(void);
-
-/**************************************************************************
- * @Function CheckLeftTape
- * @Param void
- * @Return uint8_t so that the ES_Framework can call it
- * @Author Daniel Ruatta, 11.12/2015
- * @Brief
- * 1. Gets a Tape Reading for the Left Tape Sensor
- * 2. Checks if this reading has passed its next
- * Hysteresis Threshold
- * 3. If so, post an event to the TapeSensorHSM
- * 4. Return TRUE if an event has been posted, FALSE otherwise
- */
-uint8_t CheckLeftTape(void);
-
-/***************************************************************************
- * @Function CheckRightTape
- * @Param void
- * @Return uint8_t so that the ES_Framework can call it
- * @Author Daniel Ruatta, 11.12/2015
- * @Brief
- * 1. Gets a Tape Reading for the Right Tape Sensor
- * 2. Checks if this reading has passed its next
- * Hysteresis Threshold
- * 3. If so, post an event to the TapeSensorHSM
- * 4. Return TRUE if an event has been posted, FALSE otherwise
- */
-uint8_t CheckRightTape(void);
-
-/**************************************************************************
- * @Function CheckLauncherTape
- * @Param void
- * @Return uint8_t so that the ES_Framework can call it
- * @Author Daniel Ruatta, 11.12/2015
- * @Brief
- * 1. Gets a Tape Reading for the Launcher Tape Sensor
- * 2. Checks if this reading has passed its next
- * Hysteresis Threshold
- * 3. If so, post an event to the TapeSensorHSM
- * 4. Return TRUE if an event has been posted, FALSE otherwise
- */
-uint8_t CheckLauncherTape(void);
 
 /*************************************************************
  * @Function InitTape()

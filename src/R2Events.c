@@ -17,6 +17,15 @@
 #define RIGHT_BUMPER_READ PORTY04_BIT // Pin Y04 Read
 
 
+//#define EVENTS_DEBUG_VERBOSE
+#ifdef EVENTS_DEBUG_VERBOSE
+#include "serial.h"
+#include <stdio.h>
+#define dbprintf(...) while(!IsTransmitEmpty()); printf(__VA_ARGS__)
+#else
+#define dbprintf(...)
+#endif
+
 /*******************************************************************
  * @Function CheckBumps
  * @Param void
@@ -34,6 +43,7 @@
  * @Usage To be called within BumperService
  */
 uint8_t CheckBumpers(void) {
+    dbprintf("Entered %s\n", __FUNCTION__);
     //      1. Create a uint8_t to store their combined state
     uint8_t BumperStates;
 
@@ -52,7 +62,7 @@ uint8_t CheckBumpers(void) {
 
 
 uint8_t CheckTape(void){
-
+    dbprintf("Entered %s\n", __FUNCTION__);
     /***************** Declarations ****************/
     // thisEvent, which will be posted to the HSM on a TAPE_FOUND or
     //TAPE_LOST event
