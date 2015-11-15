@@ -47,9 +47,10 @@
     EVENT(ES_TIMERACTIVE)  /* signals that a timer has become active */ \
     EVENT(ES_TIMERSTOPPED)  /* signals that a timer has stopped*/ \
     /* User-defined events start here */ \
-    EVENT(BUMPED)  /* Bump sensors triggered*/ \
     EVENT(TAPE_FOUND)  /*Tape Sensor triggered - Black*/ \
     EVENT(TAPE_LOST)  /*Tape Sensor triggered - White*/ \
+    EVENT(BUMPED)  /* Bump sensors triggered - DO WE NEED UNBUMPED?*/ \
+    EVENT(UNBUMPED) /* Unbumped a sensor */\
     
 // This turns the EVENT_NAMES list into an enum statement
 // To see how it expands, right-click -> navigate -> View macro expansion

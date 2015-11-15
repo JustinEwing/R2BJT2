@@ -19,6 +19,7 @@
       <itemPath>include/pwm.h</itemPath>
       <itemPath>include/serial.h</itemPath>
       <itemPath>include/R2Events.h</itemPath>
+      <itemPath>include/R2BumperService.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -42,6 +43,7 @@
       <itemPath>src/pwm.c</itemPath>
       <itemPath>src/serial.c</itemPath>
       <itemPath>src/R2Events.c</itemPath>
+      <itemPath>src/R2BumperService.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"

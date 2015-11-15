@@ -16,6 +16,7 @@ void main(void)
     SERIAL_Init();
     initMotors();
     InitTape();
+    InitBumpers();
     // When doing testing, it is usefull to annouce just which program
     // is running.
     

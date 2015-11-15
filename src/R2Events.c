@@ -41,6 +41,17 @@ unsigned int wait = 0;
 // Hysteresis Cap
 #define ROOM_LIGHT_LEVEL 1023
 
+/******************************* #defines ****************************/
+
+
+#define LEFT_BUMPER_READ PORTY03_BIT // Pin Y03 Read
+#define RIGHT_BUMPER_READ PORTY04_BIT // Pin Y04 Read
+
+
+// Bit shifting
+#define SHIFT_LEFT_ONE 1
+
+
 typedef enum {
     BLACK_TO_WHITE, WHITE_TO_BLACK
 } tapestate_t;
@@ -313,4 +324,37 @@ uint8_t InitTape(void) {
             LEFT_TAPE_PIN |
             RIGHT_TAPE_PIN |
             LAUNCHER_TAPE_PIN);
+}
+
+/*******************************************************************
+ * @Function CheckBumps
+ * @Param void
+ * @Return 2-bit value representing the bumpers in following order:
+ *  1. FrontLeft
+ *  2. FrontRight
+ * @Author Daniel Ruatta, 11/13/2015
+ * @Brief Returns the state of the two bumpers:
+ * 1. Create a uint8_t to store their combined state
+ * 2. Use IO_PortsReadPort to read the digital value of the left bumper
+ * 3. Use |= to SET that value as the first bit in bump_state
+ * 4. Bit shift that value into the second bit in bump_state
+ * 5. Use IO_PortsReadPort to read the digital value of the right bumper
+ * 6. Use |= to SET that value as the first bit in bump_state
+ * @Usage To be called within BumperService
+ */
+uint8_t CheckBumpers(void) {
+    //      1. Create a uint8_t to store their combined state
+    uint8_t BumperStates;
+
+    //  2. Use IO_PortsReadPort to read the digital value of the left bumper
+    //  3. Use |= to SET that value as the first bit in bump_state
+    BumperStates |= IO_PortsReadPort(LEFT_BUMPER_READ);
+    //  4. Bit shift that value into the second bit in bump_state
+    BumperStates <<= SHIFT_LEFT_ONE;
+
+    //  5. Use IO_PortsReadPort to read the digital value of the right bumper
+    //  6. Use |= to SET that value as the first bit in bump_state
+    BumperStates |= IO_PortsReadPort(RIGHT_BUMPER_READ);
+
+    return BumperStates; // temp
 }
