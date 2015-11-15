@@ -8,7 +8,7 @@
 #ifndef R2_EVENTS_H
 #define	R2_EVENTS_H
 
-#include "AD.h"
+#include "TrackWireEvents.h"
 
 // Tape Sensors
 #define TOP_TAPE_SENSOR       (1<<0) // Should be PortV5

@@ -32,15 +32,18 @@
 #include "BOARD.h"
 #include "R2_BJT2_HSM.h"
 #include "FindPortalHSM.h"
+#include "R2Events.h"
+#include <stdio.h>
 
 /*******************************************************************************
  * MODULE #DEFINES                                                             *
  ******************************************************************************/
 #define LIST_OF_FindPortal_STATES(STATE) \
-        STATE(InitPSubState) \
-        STATE(SubFirst) /*Make sure state names are unique in their hierachy*/ \
-        STATE(SubNext)       \
-        STATE(SubAnother)  \
+        STATE(InitFindPortal)  \
+        STATE(PortalTurnLeft)  \
+        STATE(PortalBackUp)    \
+        STATE(EnterPortal)     \
+        STATE(PortalStop)      \
 
 #define ENUM_FORM(STATE) STATE, //Enums are reprinted verbatim and comma'd
 typedef enum {
@@ -52,6 +55,14 @@ static const char *StateNames[] = {
     LIST_OF_FindPortal_STATES(STRING_FORM)
 };
 
+
+// Timers
+#define BACKUP_TIMER 3 // Timer3 - Confirm with ES_Config before use
+#define FIND_PORTAL_TIMER 5 // Timer5 - Confirm with ES_Config before use
+#define HALF_SECOND 500
+#define ONE_SECOND 1000 // Back up for one second, then continue turning
+#define TWO_SECONDS 2000 // Back up for two seconds, then continue turning
+#define FIVE_SECONDS 5000 // Five seconds, for testing spinning bot after FOUND_PORTAL
 
 /*******************************************************************************
  * PRIVATE FUNCTION PROTOTYPES                                                 *
@@ -65,7 +76,7 @@ static const char *StateNames[] = {
 /* You will need MyPriority and the state variable; you may need others as well.
  * The type of state variable should match that of enum in header file. */
 
-static FindPortalState_t CurrentState = InitPSubState;   // <- change name to match ENUM
+static FindPortalState_t CurrentState = InitFindPortal; // <- change name to match ENUM
 static uint8_t MyPriority;
 
 
@@ -87,7 +98,7 @@ uint8_t InitFindPortalHSM(void)
 {
      ES_Event returnEvent;
 
-    CurrentState = InitPSubState;
+    CurrentState = InitFindPortal;
     returnEvent = RunFindPortalHSM(INIT_EVENT);
     if (returnEvent.EventType == ES_NO_EVENT) {
         return TRUE;
@@ -118,106 +129,201 @@ ES_Event RunFindPortalHSM(ES_Event ThisEvent)
     ES_Tattle(); // trace call stack
 
     switch (CurrentState) {
-    case InitPSubState: // If current state is initial Psedudo State
-        if (ThisEvent.EventType == ES_INIT)// only respond to ES_Init
-        {
-            // this is where you would put any actions associated with the
-            // transition from the initial pseudo-state into the actual
-            // initial state
-
-            // now put the machine into the actual initial state
-            nextState = SubFirst;
-            makeTransition = TRUE;
-            ThisEvent.EventType = ES_NO_EVENT;
-        }
-        break;
-
-    case SubFirst: // in the first state, replace this with correct names
-        if (ThisEvent.EventType != ES_NO_EVENT) { // An event is still active
-            switch (ThisEvent.EventType) {
-            case ES_ENTRY:
+        case InitFindPortal: // If current state is initial Psedudo State
+            if (ThisEvent.EventType == ES_INIT)// only respond to ES_Init
+            {
                 // this is where you would put any actions associated with the
-                // entry to this state
-                break;
+                // transition from the initial pseudo-state into the actual
+                // initial state
 
-            case ES_EXIT:
-                // this is where you would put any actions associated with the
-                // exit from this state
-                break;
+                // now put the machine into the actual initial state
 
-            case ES_KEYINPUT:
-                // this is an example where the state does NOT transition
-                // do things you need to do in this state
-                // event consumed
-                ThisEvent.EventType = ES_NO_EVENT;
-                break;
+                //Debugging printf
+                printf("\n. Exiting Init. Should enter TurnLeft. \n");
 
-            case ES_TIMEOUT:
-                // create the case statement for all other events that you are
-                // interested in responding to.
-                nextState = SubAnother;
+                nextState = PortalTurnLeft; // For testing. Normally is TurnLeft
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
-                break;
-
-            default: // all unhandled events pass the event back up to the next level
-                break;
             }
-        }
-        break;
+            break;
 
-    case SubNext: // If current state is state OtherState
-        ThisEvent = RunFindPortalHSM(ThisEvent); // run sub-state machine for this state
-        if (ThisEvent.EventType != ES_NO_EVENT) { // An event is active
+    case PortalTurnLeft: // in the first state, replace this with correct names
+            if (ThisEvent.EventType != ES_NO_EVENT) { // An event is still active
+                switch (ThisEvent.EventType) {
+                    case ES_ENTRY:
+                        //Debugging printf
+                        printf("\n. Entered TurnLeft. \n");
+
+                        // NEED TO SET MOTOR SPEEDS
+                        rightR2Motor(40); // for testing
+                        leftR2Motor(25); // for testing
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;
+
+
+                    case TRACK_WIRE_FOUND:
+                        // Debugging printf
+                        printf("\n Exiting TurnLeft: TRACK_WIRE_FOUND."
+                                " Should enter EnterPortal. \n");
+
+                        nextState = EnterPortal;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;
+
+                    case BUMPED:
+                        // Debugging printf
+                        printf("\n Exiting TurnLeft: BUMPED."
+                                " Should enter BackUp. \n");
+
+                        nextState = PortalBackUp;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;
+
+                    case TAPE_FOUND:
+                        // Debugging printf
+                        printf("\n Exiting TurnLeft: TAPE_FOUND."
+                                " Should enter BackUp. \n");
+
+                        nextState = PortalBackUp;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;
+
+//                case ES_TIMEOUT:
+//                     create the case statement for all other events that you are
+//                     interested in responding to.
+//                    nextState = BackUp;
+//                    makeTransition = TRUE;
+//                    ThisEvent.EventType = ES_NO_EVENT;
+//                    break;
+
+                    default: // all unhandled events pass the event back up to the next level
+                        break;
+                }
+            }
+            break;
+
+         case PortalBackUp: // If current state is state OtherState
+            if (ThisEvent.EventType != ES_NO_EVENT) { // An event is active
+                switch (ThisEvent.EventType) {
+                    case ES_ENTRY:
+                        // this is where you would put any actions associated with the
+                        // entry to this state
+
+                        //Debugging printf
+                        printf("\n. Entered Backup. "
+                                "Intializing BACKUP_TIMER.\n");
+
+                        // NEED TO SET MOTOR SPEEDS
+                        rightR2Motor(-5); // for testing
+                        leftR2Motor(-5); // for testing
+
+                        ES_Timer_InitTimer(BACKUP_TIMER, FIVE_SECONDS); // for testing.
+                        // Should be HALF_SECOND
+
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;
+
+
+                    case TRACK_WIRE_FOUND:
+                        // Debugging printf
+                        printf("\n Exiting PortalBackUp: TRACK_WIRE_FOUND."
+                                " Should enter EnterPortal. \n");
+
+                        nextState = EnterPortal;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;
+
+                        // Commented out for testing
+                    case ES_TIMEOUT:
+                        // create the case statement for all other events that you are
+                        // interested in responding to. This does a transition
+
+                        //Debugging printf
+                        printf("\n Backup: ES_TIMEOUT."
+                                "Should enter TurnLeft. \n");
+
+                        nextState = PortalTurnLeft;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;
+
+                    default: // all unhandled events pass the event back up to the next level
+                        break;
+                }
+            }
+            break;
+
+    case EnterPortal: // example of a state without a sub-statemachine
             switch (ThisEvent.EventType) {
-            case ES_ENTRY:
-                // this is where you would put any actions associated with the
-                // entry to this state
-                break;
+                case ES_ENTRY:
+                    // this is where you would put any actions associated with the
+                    // entry to this state
 
-            case ES_EXIT:
-                // this is where you would put any actions associated with the
-                // exit from this state
-                break;
+                    //Debugging printf
+                    printf("\n Entered EnterPortal. \n");
 
-            case ES_TIMEOUT:
-                // create the case statement for all other events that you are
-                // interested in responding to. This does a transition
-                nextState = SubAnother;
-                makeTransition = TRUE;
-                ThisEvent.EventType = ES_NO_EVENT;
-                break;
+                    // NEED TO SET MOTOR SPEEDS
+                    // Same as TurnLeft, but spinning for testing
+                    rightR2Motor(30); // for testing
+                    leftR2Motor(0); // for testing
 
-            default: // all unhandled events pass the event back up to the next level
-                break;
+                    // ALSO NEED A TIMER
+                    ES_Timer_InitTimer(FIND_PORTAL_TIMER, FIVE_SECONDS);
+
+                    ThisEvent.EventType = ES_NO_EVENT;
+
+                    break;
+
+                    /* Case ES_EXIT for debugging */
+                    //                case ES_EXIT:
+                    //                    // this is where you would put any actions associated with the
+                    //                    // exit from this state
+                    //
+                    //                    //Debugging printf
+                    //                    printf("\n EnterPortal: ES_EXIT. \n");
+                    //                    break;
+
+                case ES_TIMEOUT: // Currently the FOUND paramenter is an ES_TIMEOUT
+                    // create the case statement for all other events that you are
+                    // interested in responding to. This one does a transition
+
+                    //Debugging printf
+                    printf("\n EnterPortal: ES_TIMEOUT."
+                            "Should enter Stop. \n");
+
+                    nextState = PortalStop;
+                    makeTransition = TRUE;
+                    ThisEvent.EventType = ES_NO_EVENT;
+                    break;
+
+                default: // all unhandled events pass the event back up to the next level
+                    break;
             }
-        }
-        break;
-
-    case SubAnother: // example of a state without a sub-statemachine
-        switch (ThisEvent.EventType) {
-        case ES_ENTRY:
-            // this is where you would put any actions associated with the
-            // entry to this state
             break;
 
-        case ES_EXIT:
-            // this is where you would put any actions associated with the
-            // exit from this state
+        case PortalStop: // example of a state without a sub-statemachine
+            switch (ThisEvent.EventType) {
+                case ES_ENTRY:
+                    // this is where you would put any actions associated with the
+                    // entry to this state
+
+                    //Debugging printf
+                    printf("\n Entered Stop. \n");
+
+                    // NEED TO SET MOTOR SPEEDS TO ZERO
+                    rightR2Motor(0); // for testing
+                    leftR2Motor(0); // for testing
+                    break;
+
+                default: // all unhandled events pass the event back up to the next level
+                    break;
+            }
             break;
 
-        case ES_TIMEOUT:
-            // create the case statement for all other events that you are
-            // interested in responding to. This one does a transition
-            nextState = SubFirst;
-            makeTransition = TRUE;
-            ThisEvent.EventType = ES_NO_EVENT;
-            break;
-
-        default: // all unhandled events pass the event back up to the next level
-            break;
-        }
-        break;
 
     default: // all unhandled states fall into here
         break;

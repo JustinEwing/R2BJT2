@@ -41,3 +41,13 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+*.d
+*.o
+*.mk
+*.mk
+*.mk
+nbproject/Makefile-genesis.properties
+*.elf
+dist/default/production/R2_BJT2.production.hex
+*.mk
+nbproject/Package-default.bash
