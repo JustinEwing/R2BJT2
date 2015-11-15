@@ -20,7 +20,7 @@
  * 11/07/11 11:26 jec      made the queue static
  * 10/30/11 17:59 jec      fixed references to CurrentEvent in RunTemplateSM()
  * 10/23/11 18:20 jec      began conversion from SMTemplate.c (02/20/07 rev)
-*/
+ */
 
 
 /*******************************************************************************
@@ -37,12 +37,15 @@
  * MODULE #DEFINES                                                             *
  ******************************************************************************/
 #define LIST_OF_FindOpponent_STATES(STATE) \
-        STATE(InitPSubState) \
-        STATE(SubFirst) /*Make sure state names are unique in their hierachy*/ \
-        STATE(SubNext)       \
-        STATE(SubAnother)  \
+        STATE(InitFindOpponentState)    \
+        STATE(HitCenter) \
+        STATE(WallRide) /*Make sure state names are unique in their hierachy*/ \
+        STATE(Reverse)       \
+        STATE(LookForEnemy)       \
+        STATE(EliminateEnemy)  \
 
 #define ENUM_FORM(STATE) STATE, //Enums are reprinted verbatim and comma'd
+
 typedef enum {
     LIST_OF_FindOpponent_STATES(ENUM_FORM)
 } FindOpponentState_t;
@@ -52,6 +55,29 @@ static const char *StateNames[] = {
     LIST_OF_FindOpponent_STATES(STRING_FORM)
 };
 
+//#define FINDOPPONENT_HSM_DEBUG_VERBOSE
+#ifdef FINDOPPONENET_HSM_DEBUG_VERBOSE
+#include "serial.h"
+#include <stdio.h>
+#define dbprintf(...) while(!IsTransmitEmpty()); printf(__VA_ARGS__)
+#else
+#define dbprintf(...)
+#endif
+
+// Motor Speeds
+#define FULL_SPEED_FORWARD 60
+#define HALF_SPEED_FORWARD 30
+#define QUARTER_SPEED_FORWARD 10
+#define STOP 0
+#define QUARTER_SPEED_BACKWARD -10
+#define HALF_SPEED_BACKWARD -30
+#define FULL_SPEED_BACKWARD -60
+
+// Timers
+#define FIND_OPPONENT_TIMER 4 // Timer3 - Confirm with ES_Config before use
+#define HALF_SECOND 500
+#define ONE_SECOND 1000 // Back up for one second, then continue turning
+#define TWO_SECONDS 2000 // Back up for two seconds, then continue turning
 
 /*******************************************************************************
  * PRIVATE FUNCTION PROTOTYPES                                                 *
@@ -65,7 +91,7 @@ static const char *StateNames[] = {
 /* You will need MyPriority and the state variable; you may need others as well.
  * The type of state variable should match that of enum in header file. */
 
-static FindOpponentState_t CurrentState = InitPSubState;   // <- change name to match ENUM
+static FindOpponentState_t CurrentState = HitCenter; // <- change name to match ENUM
 static uint8_t MyPriority;
 
 
@@ -74,7 +100,7 @@ static uint8_t MyPriority;
  ******************************************************************************/
 
 /**
- * @Function InitTemplateSubHSM(uint8_t Priority)
+ * @Function InitFindOpponentHSM(uint8_t Priority)
  * @param Priority - internal variable to track which event queue to use
  * @return TRUE or FALSE
  * @brief This will get called by the framework at the beginning of the code
@@ -83,11 +109,10 @@ static uint8_t MyPriority;
  *        to rename this to something appropriate.
  *        Returns TRUE if successful, FALSE otherwise
  * @author J. Edward Carryer, 2011.10.23 19:25 */
-uint8_t InitFindOpponentHSM(void)
-{
-     ES_Event returnEvent;
+uint8_t InitFindOpponentHSM(void) {
+    ES_Event returnEvent;
 
-    CurrentState = InitPSubState;
+    CurrentState = InitFindOpponentState;
     returnEvent = RunFindOpponentHSM(INIT_EVENT);
     if (returnEvent.EventType == ES_NO_EVENT) {
         return TRUE;
@@ -110,124 +135,207 @@ uint8_t InitFindOpponentHSM(void)
  *       not consumed as these need to pass pack to the higher level state machine.
  * @author J. Edward Carryer, 2011.10.23 19:25
  * @author Gabriel H Elkaim, 2011.10.23 19:25 */
-ES_Event RunFindOpponentHSM(ES_Event ThisEvent)
-{
+ES_Event RunFindOpponentHSM(ES_Event ThisEvent) {
     uint8_t makeTransition = FALSE; // use to flag transition
-    FindOpponentState_t nextState;      // <- change type to correct enum
+    FindOpponentState_t nextState;
 
     ES_Tattle(); // trace call stack
 
     switch (CurrentState) {
-    case InitPSubState: // If current state is initial Psedudo State
-        if (ThisEvent.EventType == ES_INIT)// only respond to ES_Init
-        {
-            // this is where you would put any actions associated with the
-            // transition from the initial pseudo-state into the actual
-            // initial state
-
-            // now put the machine into the actual initial state
-            nextState = SubFirst;
-            makeTransition = TRUE;
-            ThisEvent.EventType = ES_NO_EVENT;
-        }
-        break;
-
-    case SubFirst: // in the first state, replace this with correct names
-        if (ThisEvent.EventType != ES_NO_EVENT) { // An event is still active
-            switch (ThisEvent.EventType) {
-            case ES_ENTRY:
+        case InitFindOpponentState: // If current state is initial Psedudo State
+            if (ThisEvent.EventType == ES_INIT)// only respond to ES_Init
+            {
                 // this is where you would put any actions associated with the
-                // entry to this state
-                break;
+                // transition from the initial pseudo-state into the actual
+                // initial state
 
-            case ES_EXIT:
-                // this is where you would put any actions associated with the
-                // exit from this state
-                break;
-
-            case ES_KEYINPUT:
-                // this is an example where the state does NOT transition
-                // do things you need to do in this state
-                // event consumed
-                ThisEvent.EventType = ES_NO_EVENT;
-                break;
-
-            case ES_TIMEOUT:
-                // create the case statement for all other events that you are
-                // interested in responding to.
-                nextState = SubAnother;
+                // now put the machine into the actual initial state
+                nextState = HitCenter;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
-                break;
-
-            default: // all unhandled events pass the event back up to the next level
-                break;
             }
-        }
-        break;
+            break;
 
-    case SubNext: // If current state is state OtherState
-        ThisEvent = RunFindOpponentHSM(ThisEvent); // run sub-state machine for this state
-        if (ThisEvent.EventType != ES_NO_EVENT) { // An event is active
+        case HitCenter:
+            // This state assumes we have just collected ammo and that
+            // we are still positioned directly in front of the ammo dump
+            if (ThisEvent.EventType != ES_NO_EVENT) { // An event is still active
+                switch (ThisEvent.EventType) {
+                    case ES_ENTRY:
+                        dbprintf("\n Tunring around to hit center. \n");
+                        // being used for 180 degree turn.
+                        ES_Timer_InitTimer(FIND_OPPONENT_TIMER, HALF_SECOND);
+                        rightR2Motor(-15);
+                        leftR2Motor(-50);
+                        break;
+
+                    case ES_EXIT:
+                        // this is where you would put any actions associated with the
+                        // exit from this state
+                        break;
+
+                    case BUMPED:
+                        // Transition to start wall following/looking for enemy
+                        // Q: what if this comes from hitting a roach?
+                        nextState = LookForEnemy;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;
+
+                    /*case BeaconDetected:
+                        nextState = EliminateEnemy;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;*/
+
+                    case ES_TIMEOUT:
+                        // drive forward until you hit the center obstacle
+                        rightR2Motor(50);
+                        leftR2Motor(50);
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+            break;
+
+        case WallRide:
+            ThisEvent = RunFindOpponentHSM(ThisEvent); // run sub-state machine for this state
+            if (ThisEvent.EventType != ES_NO_EVENT) { // An event is active
+                switch (ThisEvent.EventType) {
+                    case ES_ENTRY:
+                        // this is where you would put any actions associated with the
+                        // entry to this state
+                        break;
+
+                    case ES_EXIT:
+                        // this is where you would put any actions associated with the
+                        // exit from this state
+                        break;
+
+                    /*case BeaconDetected:
+                        nextState = EliminateEnemy;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;*/
+
+                    case ES_TIMEOUT:
+                        // create the case statement for all other events that you are
+                        // interested in responding to. This does a transition
+                        //nextState = Backup;
+                        //makeTransition = TRUE;
+                        //ThisEvent.EventType = ES_NO_EVENT;
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+            break;
+
+        case Reverse:
             switch (ThisEvent.EventType) {
-            case ES_ENTRY:
-                // this is where you would put any actions associated with the
-                // entry to this state
-                break;
+                case ES_ENTRY:
+                    dbprintf("\n Backup Right. \n");
+                    rightR2Motor(-15);
+                    leftR2Motor(-35);
+                    ES_Timer_InitTimer(FIND_OPPONENT_TIMER, 400);
+                    ThisEvent.EventType = ES_NO_EVENT;
+                    break;
 
-            case ES_EXIT:
-                // this is where you would put any actions associated with the
-                // exit from this state
-                break;
+                case ES_EXIT:
+                    // this is where you would put any actions associated with the
+                    // exit from this state
+                    break;
 
-            case ES_TIMEOUT:
-                // create the case statement for all other events that you are
-                // interested in responding to. This does a transition
-                nextState = SubAnother;
-                makeTransition = TRUE;
-                ThisEvent.EventType = ES_NO_EVENT;
-                break;
+                /*case BeaconDetected:
+                    nextState = EliminateEnemy;
+                    makeTransition = TRUE;
+                    ThisEvent.EventType = ES_NO_EVENT;
+                    break;*/
 
-            default: // all unhandled events pass the event back up to the next level
-                break;
+                case ES_TIMEOUT:
+                    nextState = LookForEnemy;
+                    makeTransition = TRUE;
+                    ThisEvent.EventType = ES_NO_EVENT;
+                    break;
+
+                default:
+                    break;
             }
-        }
-        break;
-
-    case SubAnother: // example of a state without a sub-statemachine
-        switch (ThisEvent.EventType) {
-        case ES_ENTRY:
-            // this is where you would put any actions associated with the
-            // entry to this state
             break;
 
-        case ES_EXIT:
-            // this is where you would put any actions associated with the
-            // exit from this state
+        case LookForEnemy:
+            switch (ThisEvent.EventType) {
+                case ES_ENTRY:
+                    dbprintf("\n Looking for the enemy. \n");
+                    rightR2Motor(-15); // tank turn rather slowly looking for opponent
+                    leftR2Motor(15);
+                    ES_Timer_InitTimer(FIND_OPPONENT_TIMER, TWO_SECONDS); // needs to make a 360 turn
+                    ThisEvent.EventType = ES_NO_EVENT;
+                    break;
+
+                case ES_EXIT:
+                    // this is where you would put any actions associated with the
+                    // exit from this state
+                    break;
+
+                /*case BeaconDetected:
+                    nextState = EliminateEnemy;
+                    makeTransition = TRUE;
+                    ThisEvent.EventType = ES_NO_EVENT;
+                    break;*/
+
+                case ES_TIMEOUT:
+                    nextState = LookForEnemy;
+                    makeTransition = TRUE;
+                    ThisEvent.EventType = ES_NO_EVENT;
+                    break;
+
+                default:
+                    break;
+            }
             break;
 
-        case ES_TIMEOUT:
-            // create the case statement for all other events that you are
-            // interested in responding to. This one does a transition
-            nextState = SubFirst;
-            makeTransition = TRUE;
-            ThisEvent.EventType = ES_NO_EVENT;
+        case EliminateEnemy:
+            // state objective: (drive closer to enemy?) shoot enemy
+            // TODO: need API for the ball loader/launcher
+            switch (ThisEvent.EventType) {
+                case ES_ENTRY:
+                    dbprintf("\n Going to kill enemy. \n");
+                    rightR2Motor(50);
+                    leftR2Motor(50);
+                    ES_Timer_InitTimer(FIND_OPPONENT_TIMER, TWO_SECONDS);
+                    ThisEvent.EventType = ES_NO_EVENT;
+                    break;
+
+                case ES_EXIT:
+                    // this is where you would put any actions associated with the
+                    // exit from this state
+                    break;
+
+                case ES_TIMEOUT:
+                    //nextState = SubFirst;
+                    //makeTransition = TRUE;
+                    //ThisEvent.EventType = ES_NO_EVENT;
+                    break;
+
+                default: // all unhandled events pass the event back up to the next level
+                    break;
+            }
             break;
 
-        default: // all unhandled events pass the event back up to the next level
+        default: // all unhandled states fall into here
             break;
-        }
-        break;
-
-    default: // all unhandled states fall into here
-        break;
     } // end switch on Current State
 
     if (makeTransition == TRUE) { // making a state transition, send EXIT and ENTRY
         // recursively call the current state with an exit event
-        RunFindOpponentHSM(EXIT_EVENT);   // <- rename to your own Run function
+        RunFindOpponentHSM(EXIT_EVENT); // <- rename to your own Run function
         CurrentState = nextState;
-        RunFindOpponentHSM(ENTRY_EVENT);  // <- rename to your own Run function
+        RunFindOpponentHSM(ENTRY_EVENT); // <- rename to your own Run function
     }
 
     ES_Tail(); // trace call stack end
@@ -245,11 +353,10 @@ ES_Event RunFindOpponentHSM(ES_Event ThisEvent)
  ******************************************************************************/
 
 #ifdef FindOpponentHSM_TEST // <-- change this name and define it in your MPLAB-X
-                        //     project to run the test harness
+//     project to run the test harness
 #include <stdio.h>
 
-void main(void)
-{
+void main(void) {
     ES_Return_t ErrorType;
     BOARD_Init();
     // When doing testing, it is useful to annouce just which program
@@ -272,15 +379,15 @@ void main(void)
     //
 
     switch (ErrorType) {
-    case FailedPointer:
-        printf("Failed on NULL pointer");
-        break;
-    case FailedInit:
-        printf("Failed Initialization");
-        break;
-    default:
-        printf("Other Failure");
-        break;
+        case FailedPointer:
+            printf("Failed on NULL pointer");
+            break;
+        case FailedInit:
+            printf("Failed Initialization");
+            break;
+        default:
+            printf("Other Failure");
+            break;
     }
 
     while (1) {

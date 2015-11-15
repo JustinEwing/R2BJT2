@@ -76,8 +76,8 @@ static const char *EventNames[] = {
 
 /****************************************************************************/
 // This is the list of event checking functions
-#define EVENT_CHECK_LIST  CheckTape ,        \
-                          CheckBumpers          \
+#define EVENT_CHECK_LIST  CheckTape ,  \
+                          CheckBumpers \
 
 
 /****************************************************************************/
