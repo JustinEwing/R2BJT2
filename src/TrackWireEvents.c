@@ -17,7 +17,7 @@
 // Hysteresis Cap
 #define HYSTERESIS_CAP 1023
 
-//#define TRACKWIRE_DEBUG_VERBOSE
+#define TRACKWIRE_DEBUG_VERBOSE
 #ifdef TRACKWIRE_DEBUG_VERBOSE
 #include "serial.h"
 #include <stdio.h>
@@ -59,12 +59,14 @@ ES_Event CheckTrackWire(void) {
     for (sensor = 1; sensor != MAX_SENSORS; sensor << 1) {
         switch (sensor) {
             case RIGHT_TRACKWIRE_SENSOR:
-                dbprintf("Reading Right trackwire\n");
-                TrackWireReading = AD_ReadADPin(RIGHT_TRACK_PIN);
+                //dbprintf("Reading Right trackwire\n");
+                TrackWireReading = AD_ReadADPin(RIGHT_TRACK_PIN);//might be best to
+                //just read as a digital pin 
+                dbprintf("TrackWire Sensor %d\n", TrackWireReading);
                 TrackSensor = RIGHT_TRACKWIRE_SENSOR;
                 break;
             case LEFT_TRACKWIRE_SENSOR:
-                dbprintf("Reading Left trackwire\n");
+                //dbprintf("Reading Left trackwire\n");
                 TrackWireReading = AD_ReadADPin(LEFT_TRACK_PIN);
                 TrackSensor = LEFT_TRACKWIRE_SENSOR;
                 break;
@@ -85,11 +87,10 @@ ES_Event CheckTrackWire(void) {
         if ((PrevTrackWireState == TRACK_WIRE_LOCATED) &&
                 (TrackWireReading < TRACK_WIRE_LOST_HYSTERESIS)) {
             thisEvent.EventType = TRACK_WIRE_LOST;
-            thisEvent.EventParam |= TrackSensor;
+            thisEvent.EventParam &= ~TrackSensor;
             Post_R2_BJT2_HSM(thisEvent);
             NewTrackWireState = TRACK_WIRE_LOST;
         }
-        //}
 
         // Case: Beacon Located
         if ((PrevTrackWireState == TRACK_WIRE_SEARCHING) &&
@@ -133,5 +134,5 @@ ES_Event CheckTrackWire(void) {
  */
 
 uint8_t InitTrackWire() {
-    return AD_AddPins(LEFT_TRACK_PIN | RIGHT_TRACK_PIN);
+    return 0;
 }

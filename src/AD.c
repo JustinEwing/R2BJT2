@@ -36,7 +36,7 @@
 #define BAT_VOLTAGE_LOCKOUT 263
 #define BAT_VOLTAGE_NO_BAT 169
 
-//#define AD_DEBUG_VERBOSE
+#define AD_DEBUG_VERBOSE
 #ifdef AD_DEBUG_VERBOSE
 #include "serial.h"
 #define dbprintf(...) while(!IsTransmitEmpty()); printf(__VA_ARGS__)
