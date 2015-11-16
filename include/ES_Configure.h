@@ -112,6 +112,7 @@ static const char *EventNames[] = {
 // the timer number matches where the timer event will be routed
 
 #define FANCY_ROACH_TIMER 2 /*Yo, fuck this timer */
+#define BACKUP_TIMER 3      //backup timer used in FindAmmo
 #define R2_BUMPER_TIMER 4   //This is for the Bumper Service
 
 

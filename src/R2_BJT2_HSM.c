@@ -42,7 +42,7 @@ static const char *StateNames[] = {
     LIST_OF_HSM_STATES(STRING_FORM)
 };
 
-#define HSM_DEBUG_VERBOSE
+//#define HSM_DEBUG_VERBOSE
 #ifdef HSM_DEBUG_VERBOSE
 #include "serial.h"
 #include <stdio.h>
@@ -152,7 +152,7 @@ ES_Event Run_R2_BJT2_HSM(ES_Event ThisEvent) {
                 dbprintf("Entered %s\n", __FUNCTION__);
 
                 InitFindAmmoHSM();
-                InitFindPortalHSM();
+                //InitFindPortalHSM();
 
                 // now put the machine into the actual initial state
                 //nextState = FindAmmo;
@@ -163,9 +163,7 @@ ES_Event Run_R2_BJT2_HSM(ES_Event ThisEvent) {
             break;
 
         case FindAmmo: // in the first state, replace this with correct names
-            // run sub-state machine for this state
-            //NOTE: the SubState Machine runs and responds to events before anything in the this
-            //state machine does
+
             ThisEvent = RunFindAmmoHSM(ThisEvent);
             if (ThisEvent.EventType != ES_NO_EVENT) { // An event is still active
                 switch (ThisEvent.EventType) {

@@ -23,7 +23,6 @@
 // Need 4 checking masks
 #define FIRST_BIT (0x1)
 #define SECOND_BIT (0x2)
-#define SHIFT_LEFT_ONE 1
 
 // Also need a final checking mask to see if a bumper is pressed by a human
 #define ALL_BITS (0xff)
@@ -66,9 +65,10 @@ static bumpstate_t PreviousFRState = WAS_UNBUMPED;
 
 static uint8_t MyPriority;
 
-// Endianness is Last Bit<->First Bit: Ex) Last: 100001 First
-unsigned char FrontLeftBumper = 0; // First Bit
-unsigned char FrontRightBumper = 0; // Second Bit
+static unsigned char FrontLeftBumper = 0; // First Bit
+static unsigned char FrontRightBumper = 0; // Second Bit
+
+
 
 /*******************************************************************************
  * PUBLIC FUNCTIONS                                                            *
@@ -126,6 +126,8 @@ uint8_t PostR2BumperService(ES_Event ThisEvent) {
  *       Returns ES_NO_EVENT if the event have been "consumed." 
  * @author J. Edward Carryer, 2011.10.23 19:25 */
 ES_Event RunR2BumperService(ES_Event ThisEvent) {
+    // Endianness is Last Bit<->First Bit: Ex) Last: 100001 First
+
     dbprintf("Entered %s\n", __FUNCTION__);
     // This service is supposed to run because of a timeout event!
     // Posts events whenever the bumper's status changes
@@ -141,11 +143,11 @@ ES_Event RunR2BumperService(ES_Event ThisEvent) {
         //printf("After Bit Test: %x\n", (bump_state & SECOND_BIT));
 
         // Left Bumper Buffer Reading
-        FrontLeftBumper <<= SHIFT_LEFT_ONE;
+        FrontLeftBumper <<= 1;
         FrontLeftBumper |= ((bump_state & SECOND_BIT)>>1);
         //printf("FrontLeftBumper: %x\n", FrontLeftBumper);
         // Left Bumper Buffer Reading
-        FrontRightBumper <<= SHIFT_LEFT_ONE;
+        FrontRightBumper <<= 1;
         FrontRightBumper |= (bump_state & FIRST_BIT);
 
         // Left Bumper Test - BUMPED check
