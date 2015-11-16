@@ -65,6 +65,9 @@ static bumpstate_t PreviousFRState = WAS_UNBUMPED;
 
 static uint8_t MyPriority;
 
+static unsigned char FrontLeftBumper = 0; // First Bit
+static unsigned char FrontRightBumper = 0; // Second Bit
+
 
 
 /*******************************************************************************
@@ -124,8 +127,6 @@ uint8_t PostR2BumperService(ES_Event ThisEvent) {
  * @author J. Edward Carryer, 2011.10.23 19:25 */
 ES_Event RunR2BumperService(ES_Event ThisEvent) {
     // Endianness is Last Bit<->First Bit: Ex) Last: 100001 First
-    unsigned char FrontLeftBumper = 0; // First Bit
-    unsigned char FrontRightBumper = 0; // Second Bit
 
     dbprintf("Entered %s\n", __FUNCTION__);
     // This service is supposed to run because of a timeout event!
