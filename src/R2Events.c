@@ -79,6 +79,7 @@ uint8_t CheckTape(void){
         returnVal = TRUE;
     }
 
+    dbprintf("Exit %s\n", __FUNCTION__);
     return returnVal;
 }
 
