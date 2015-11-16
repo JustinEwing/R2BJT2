@@ -65,7 +65,7 @@ typedef enum {
 ES_Event CheckTapeReading() {
     dbprintf("Entered %s\n", __FUNCTION__);
      /***************** Declarations ****************/
-   #define MAX_SENSORS (1<<4)
+   #define MAX_SENSORS (1<<5)
 
     // We assume the bot starts in a white area, hence BLACK_TO_WHITE
     static tapestate_t PrevTapeState = BLACK_TO_WHITE;
@@ -83,13 +83,18 @@ ES_Event CheckTapeReading() {
      ES_Event thisEvent;
 
      thisEvent.EventType = ES_NO_EVENT;
+     thisEvent.EventParam = 0;
+
+     //if there aren't new values, just return
+     if(!AD_IsNewDataReady())
+         return thisEvent;
 
      // The New Tape State, which should be initialized to the current PrevTapeState
     // That way, its value will update at the beginning of every Check()
     tapestate_t NewTapeState = PrevTapeState; // Temp value
 
 
-    for(sensor=1; sensor != MAX_SENSORS; sensor = sensor<<1){
+    for(sensor=0x1; sensor != MAX_SENSORS; sensor = sensor<<1){
         switch(sensor){
             case TOP_TAPE_SENSOR:
                 dbprintf("Reading Top Sensor\n");

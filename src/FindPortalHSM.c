@@ -55,6 +55,14 @@ static const char *StateNames[] = {
     LIST_OF_FindPortal_STATES(STRING_FORM)
 };
 
+//#define FINDPORTAL_HSM_DEBUG_VERBOSE
+#ifdef FINDPORTAL_HSM_DEBUG_VERBOSE
+#include "serial.h"
+#include <stdio.h>
+#define dbprintf(...) while(!IsTransmitEmpty()); printf(__VA_ARGS__)
+#else
+#define dbprintf(...)
+#endif
 
 // Timers
 #define BACKUP_TIMER 3 // Timer3 - Confirm with ES_Config before use
@@ -63,6 +71,10 @@ static const char *StateNames[] = {
 #define ONE_SECOND 1000 // Back up for one second, then continue turning
 #define TWO_SECONDS 2000 // Back up for two seconds, then continue turning
 #define FIVE_SECONDS 5000 // Five seconds, for testing spinning bot after FOUND_PORTAL
+
+#define SECONDS(X) (X*1000) /*Convienent Macro when you need multiple different
+                             seconds values*/
+
 
 /*******************************************************************************
  * PRIVATE FUNCTION PROTOTYPES                                                 *
@@ -138,9 +150,6 @@ ES_Event RunFindPortalHSM(ES_Event ThisEvent)
 
                 // now put the machine into the actual initial state
 
-                //Debugging printf
-                printf("\n. Exiting Init. Should enter TurnLeft. \n");
-
                 nextState = PortalTurnLeft; // For testing. Normally is TurnLeft
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
@@ -151,9 +160,6 @@ ES_Event RunFindPortalHSM(ES_Event ThisEvent)
             if (ThisEvent.EventType != ES_NO_EVENT) { // An event is still active
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
-                        //Debugging printf
-                        printf("\n. Entered TurnLeft. \n");
-
                         // NEED TO SET MOTOR SPEEDS
                         rightR2Motor(40); // for testing
                         leftR2Motor(25); // for testing
@@ -163,7 +169,7 @@ ES_Event RunFindPortalHSM(ES_Event ThisEvent)
 
                     case TRACK_WIRE_FOUND:
                         // Debugging printf
-                        printf("\n Exiting TurnLeft: TRACK_WIRE_FOUND."
+                        dbprintf("\n Exiting TurnLeft: TRACK_WIRE_FOUND."
                                 " Should enter EnterPortal. \n");
 
                         nextState = EnterPortal;
@@ -173,7 +179,7 @@ ES_Event RunFindPortalHSM(ES_Event ThisEvent)
 
                     case BUMPED:
                         // Debugging printf
-                        printf("\n Exiting TurnLeft: BUMPED."
+                        dbprintf("\n Exiting TurnLeft: BUMPED."
                                 " Should enter BackUp. \n");
 
                         nextState = PortalBackUp;
@@ -183,7 +189,7 @@ ES_Event RunFindPortalHSM(ES_Event ThisEvent)
 
                     case TAPE_FOUND:
                         // Debugging printf
-                        printf("\n Exiting TurnLeft: TAPE_FOUND."
+                        dbprintf("\n Exiting TurnLeft: TAPE_FOUND."
                                 " Should enter BackUp. \n");
 
                         nextState = PortalBackUp;
@@ -213,7 +219,7 @@ ES_Event RunFindPortalHSM(ES_Event ThisEvent)
                         // entry to this state
 
                         //Debugging printf
-                        printf("\n. Entered Backup. "
+                        dbprintf("\n. Entered Backup. "
                                 "Intializing BACKUP_TIMER.\n");
 
                         // NEED TO SET MOTOR SPEEDS
@@ -229,7 +235,7 @@ ES_Event RunFindPortalHSM(ES_Event ThisEvent)
 
                     case TRACK_WIRE_FOUND:
                         // Debugging printf
-                        printf("\n Exiting PortalBackUp: TRACK_WIRE_FOUND."
+                        dbprintf("\n Exiting PortalBackUp: TRACK_WIRE_FOUND."
                                 " Should enter EnterPortal. \n");
 
                         nextState = EnterPortal;
@@ -243,7 +249,7 @@ ES_Event RunFindPortalHSM(ES_Event ThisEvent)
                         // interested in responding to. This does a transition
 
                         //Debugging printf
-                        printf("\n Backup: ES_TIMEOUT."
+                        dbprintf("\n Backup: ES_TIMEOUT."
                                 "Should enter TurnLeft. \n");
 
                         nextState = PortalTurnLeft;
@@ -264,7 +270,7 @@ ES_Event RunFindPortalHSM(ES_Event ThisEvent)
                     // entry to this state
 
                     //Debugging printf
-                    printf("\n Entered EnterPortal. \n");
+                    dbprintf("\n Entered EnterPortal. \n");
 
                     // NEED TO SET MOTOR SPEEDS
                     // Same as TurnLeft, but spinning for testing
@@ -292,7 +298,7 @@ ES_Event RunFindPortalHSM(ES_Event ThisEvent)
                     // interested in responding to. This one does a transition
 
                     //Debugging printf
-                    printf("\n EnterPortal: ES_TIMEOUT."
+                    dbprintf("\n EnterPortal: ES_TIMEOUT."
                             "Should enter Stop. \n");
 
                     nextState = PortalStop;
@@ -312,7 +318,7 @@ ES_Event RunFindPortalHSM(ES_Event ThisEvent)
                     // entry to this state
 
                     //Debugging printf
-                    printf("\n Entered Stop. \n");
+                    dbprintf("\n Entered Stop. \n");
 
                     // NEED TO SET MOTOR SPEEDS TO ZERO
                     rightR2Motor(0); // for testing

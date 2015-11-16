@@ -39,6 +39,7 @@
 #define LIST_OF_FindAmmo_STATES(STATE) \
         STATE(InitFindAmmoState) \
         STATE(TurnLeft)     \
+        STATE(TurnRight)     \
         STATE(Backup)       \
         STATE(TapeTest)     \
         STATE(KeepTurning)  \
@@ -64,8 +65,6 @@ static const char *StateNames[] = {
 #define dbprintf(...)
 #endif
 
-// Timers
-#define BACKUP_TIMER 3 // Timer3 - Confirm with ES_Config before use
 /*******************************************************************************
  * PRIVATE FUNCTION PROTOTYPES                                                 *
  ******************************************************************************/
@@ -152,40 +151,73 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
             if (ThisEvent.EventType != ES_NO_EVENT) { // An event is still active
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
-                        dbprintf("\n TurnLeft: Motors on. \n");
-                        rightR2Motor(25); // for testing
-                        leftR2Motor(25); // for testing
+                        rightR2Motor(30); // for testing
+                        leftR2Motor(30); // for testing
 
                         ThisEvent.EventType = ES_NO_EVENT;
                         break;
 
-                    case TAPE_FOUND:        
+                    case TAPE_FOUND:
                         if(param & TOP_TAPE_SENSOR){
-                                nextState = Backup;
-                                makeTransition = TRUE;
-                                ThisEvent.EventType = ES_NO_EVENT;
+                            nextState = Backup;
+                            makeTransition = TRUE;
+                            ThisEvent.EventType = ES_NO_EVENT;
+                            break;
                         }
-//                            case RIGHT_TAPE_SENSOR:
-//                                nextState = TapeTest;
-//                                makeTransition = TRUE;
-//                                ThisEvent.EventType = ES_NO_EVENT;
-//                                break;
-//                            default: break;
-                        
-                        break;
-                   
+                        else if (param & RIGHT_TAPE_SENSOR){
+                            nextState = TapeTest;
+                            makeTransition = TRUE;
+                            ThisEvent.EventType = ES_NO_EVENT;
+                            break;
+                        }
 
-                    case BUMPED:
-                        nextState = Backup;
-                        makeTransition = TRUE;
-                        ThisEvent.EventType = ES_NO_EVENT;
-                        break;
+                        case BUMPED:
+                            nextState = Backup;
+                            makeTransition = TRUE;
+                            ThisEvent.EventType = ES_NO_EVENT;
+                            break;
 
-                    default: // all unhandled events pass the event back up to the next level
+                    default: 
                         break;
                 }
             }
             break;
+
+//        case TurnRight:
+//            if (ThisEvent.EventType != ES_NO_EVENT) { // An event is still active
+//                switch (ThisEvent.EventType) {
+//                    case ES_ENTRY:
+//                        rightR2Motor(30); // for testing
+//                        leftR2Motor(30); // for testing
+//
+//                        ThisEvent.EventType = ES_NO_EVENT;
+//                        break;
+//
+//                    case TAPE_FOUND:
+//                        if(param & TOP_TAPE_SENSOR){
+//                                nextState = Backup;
+//                                makeTransition = TRUE;
+//                                ThisEvent.EventType = ES_NO_EVENT;
+//                        }
+//    //                            case RIGHT_TAPE_SENSOR:
+//    //                                nextState = TapeTest;
+//    //                                makeTransition = TRUE;
+//    //                                ThisEvent.EventType = ES_NO_EVENT;
+//    //                                break;
+//    //                            default: break;
+//                        break;
+//
+//                    case BUMPED:
+//                        nextState = Backup;
+//                        makeTransition = TRUE;
+//                        ThisEvent.EventType = ES_NO_EVENT;
+//                        break;
+//
+//                    default: // all unhandled events pass the event back up to the next level
+//                        break;
+//                }
+//            }
+//        break;
 
         case Backup:
             //ThisEvent = RunTemplateSubHSM(ThisEvent); // run sub-state machine for this state
@@ -193,30 +225,24 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
                         dbprintf("\n Backup Right. \n");
-                        rightR2Motor(-15);
-                        leftR2Motor(-35);
-                        ES_Timer_InitTimer(BACKUP_TIMER, 250);
+                        rightR2Motor(-10);
+                        leftR2Motor(-40);
+                        ES_Timer_InitTimer(BACKUP_TIMER, 100);
                         ThisEvent.EventType = ES_NO_EVENT;
                         break;
 
                     case ES_TIMEOUT:
-                        // create the case statement for all other events that you are
-                        // interested in responding to. This does a transition
-
                         nextState = TurnLeft;
                         makeTransition = TRUE;
                         ThisEvent.EventType = ES_NO_EVENT;
                         break;
-                    case ES_EXIT:
-                        // this is where you would put any actions associated with the
-                        // exit from this state
-                        break;
-
                     default: // all unhandled events pass the event back up to the next level
                         break;
                 }
             }
             break;
+
+
 
 
         case TapeTest:
