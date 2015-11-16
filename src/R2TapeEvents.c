@@ -68,7 +68,7 @@ typedef enum {
 ES_Event CheckTapeReading() {
     dbprintf("Entered %s\n", __FUNCTION__);
      /***************** Declarations ****************/
-   #define MAX_SENSORS (1<<5)
+   #define MAX_SENSORS (1<<4)
 
     // We assume the bot starts in a white area, hence BLACK_TO_WHITE
     static tapestate_t PrevTapeState = BLACK_TO_WHITE;
