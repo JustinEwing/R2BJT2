@@ -29,6 +29,9 @@ unsigned int wait = 0;
 #define RIGHT_TAPE_PIN     AD_PORTV7
 #define LAUNCHER_TAPE_PIN  AD_PORTV8
 
+#define RIGHT_TRACK_PIN AD_PORTW3
+#define LEFT_TRACK_PIN AD_PORTW4
+
 #define TEST_TAPE_SENSOR      TOP_TAPE_PIN
 
 // Analog to Digital Conversion
@@ -164,5 +167,5 @@ uint8_t InitTape(void) {
     return AD_AddPins(TOP_TAPE_PIN |
             LEFT_TAPE_PIN |
             RIGHT_TAPE_PIN |
-            LAUNCHER_TAPE_PIN);
+            LAUNCHER_TAPE_PIN | LEFT_TRACK_PIN | RIGHT_TRACK_PIN);
 }
