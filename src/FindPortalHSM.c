@@ -20,8 +20,7 @@
  * 11/07/11 11:26 jec      made the queue static
  * 10/30/11 17:59 jec      fixed references to CurrentEvent in RunTemplateSM()
  * 10/23/11 18:20 jec      began conversion from SMTemplate.c (02/20/07 rev)
-*/
-
+ */
 
 /*******************************************************************************
  * MODULE #INCLUDE                                                             *
@@ -46,6 +45,7 @@
         STATE(PortalStop)      \
 
 #define ENUM_FORM(STATE) STATE, //Enums are reprinted verbatim and comma'd
+
 typedef enum {
     LIST_OF_FindPortal_STATES(ENUM_FORM)
 } FindPortalState_t;
@@ -55,6 +55,14 @@ static const char *StateNames[] = {
     LIST_OF_FindPortal_STATES(STRING_FORM)
 };
 
+//#define FINDPORTAL_HSM_DEBUG_VERBOSE
+#ifdef FINDPORTAL_HSM_DEBUG_VERBOSE
+#include "serial.h"
+#include <stdio.h>
+#define dbprintf(...) while(!IsTransmitEmpty()); printf(__VA_ARGS__)
+#else
+#define dbprintf(...)
+#endif
 
 // Timers
 #define BACKUP_TIMER 3 // Timer3 - Confirm with ES_Config before use
@@ -94,9 +102,8 @@ static uint8_t MyPriority;
  *        to rename this to something appropriate.
  *        Returns TRUE if successful, FALSE otherwise
  * @author J. Edward Carryer, 2011.10.23 19:25 */
-uint8_t InitFindPortalHSM(void)
-{
-     ES_Event returnEvent;
+uint8_t InitFindPortalHSM(void) {
+    ES_Event returnEvent;
 
     CurrentState = InitFindPortal;
     returnEvent = RunFindPortalHSM(INIT_EVENT);
@@ -121,25 +128,16 @@ uint8_t InitFindPortalHSM(void)
  *       not consumed as these need to pass pack to the higher level state machine.
  * @author J. Edward Carryer, 2011.10.23 19:25
  * @author Gabriel H Elkaim, 2011.10.23 19:25 */
-ES_Event RunFindPortalHSM(ES_Event ThisEvent)
-{
+ES_Event RunFindPortalHSM(ES_Event ThisEvent) {
     uint8_t makeTransition = FALSE; // use to flag transition
-    FindPortalState_t nextState;      // <- change type to correct enum
+    FindPortalState_t nextState; // <- change type to correct enum
 
     ES_Tattle(); // trace call stack
 
     switch (CurrentState) {
-        case InitFindPortal: // If current state is initial Psedudo State
-            if (ThisEvent.EventType == ES_INIT)// only respond to ES_Init
-            {
-                // this is where you would put any actions associated with the
-                // transition from the initial pseudo-state into the actual
-                // initial state
-
-                // now put the machine into the actual initial state
-
-                //Debugging printf
-                printf("\n. Exiting Init. Should enter TurnLeft. \n");
+        case InitFindPortal:
+            if (ThisEvent.EventType == ES_INIT) {
+                dbprintf("\n. Exiting Init. Should enter TurnLeft. \n");
 
                 nextState = PortalTurnLeft; // For testing. Normally is TurnLeft
                 makeTransition = TRUE;
@@ -147,12 +145,11 @@ ES_Event RunFindPortalHSM(ES_Event ThisEvent)
             }
             break;
 
-    case PortalTurnLeft: // in the first state, replace this with correct names
-            if (ThisEvent.EventType != ES_NO_EVENT) { // An event is still active
+        case PortalTurnLeft:
+            if (ThisEvent.EventType != ES_NO_EVENT) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
-                        //Debugging printf
-                        printf("\n. Entered TurnLeft. \n");
+                        dbprintf("\n. Entered TurnLeft. \n");
 
                         // NEED TO SET MOTOR SPEEDS
                         rightR2Motor(40); // for testing
@@ -162,8 +159,7 @@ ES_Event RunFindPortalHSM(ES_Event ThisEvent)
 
 
                     case TRACK_WIRE_FOUND:
-                        // Debugging printf
-                        printf("\n Exiting TurnLeft: TRACK_WIRE_FOUND."
+                        dbprintf("\n Exiting TurnLeft: TRACK_WIRE_FOUND."
                                 " Should enter EnterPortal. \n");
 
                         nextState = EnterPortal;
@@ -172,8 +168,7 @@ ES_Event RunFindPortalHSM(ES_Event ThisEvent)
                         break;
 
                     case BUMPED:
-                        // Debugging printf
-                        printf("\n Exiting TurnLeft: BUMPED."
+                        dbprintf("\n Exiting TurnLeft: BUMPED."
                                 " Should enter BackUp. \n");
 
                         nextState = PortalBackUp;
@@ -182,8 +177,7 @@ ES_Event RunFindPortalHSM(ES_Event ThisEvent)
                         break;
 
                     case TAPE_FOUND:
-                        // Debugging printf
-                        printf("\n Exiting TurnLeft: TAPE_FOUND."
+                        dbprintf("\n Exiting TurnLeft: TAPE_FOUND."
                                 " Should enter BackUp. \n");
 
                         nextState = PortalBackUp;
@@ -191,13 +185,13 @@ ES_Event RunFindPortalHSM(ES_Event ThisEvent)
                         ThisEvent.EventType = ES_NO_EVENT;
                         break;
 
-//                case ES_TIMEOUT:
-//                     create the case statement for all other events that you are
-//                     interested in responding to.
-//                    nextState = BackUp;
-//                    makeTransition = TRUE;
-//                    ThisEvent.EventType = ES_NO_EVENT;
-//                    break;
+                        //                case ES_TIMEOUT:
+                        //                     create the case statement for all other events that you are
+                        //                     interested in responding to.
+                        //                    nextState = BackUp;
+                        //                    makeTransition = TRUE;
+                        //                    ThisEvent.EventType = ES_NO_EVENT;
+                        //                    break;
 
                     default: // all unhandled events pass the event back up to the next level
                         break;
@@ -205,15 +199,11 @@ ES_Event RunFindPortalHSM(ES_Event ThisEvent)
             }
             break;
 
-         case PortalBackUp: // If current state is state OtherState
-            if (ThisEvent.EventType != ES_NO_EVENT) { // An event is active
+        case PortalBackUp:
+            if (ThisEvent.EventType != ES_NO_EVENT) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
-                        // this is where you would put any actions associated with the
-                        // entry to this state
-
-                        //Debugging printf
-                        printf("\n. Entered Backup. "
+                        dbprintf("\n. Entered Backup. "
                                 "Intializing BACKUP_TIMER.\n");
 
                         // NEED TO SET MOTOR SPEEDS
@@ -228,8 +218,7 @@ ES_Event RunFindPortalHSM(ES_Event ThisEvent)
 
 
                     case TRACK_WIRE_FOUND:
-                        // Debugging printf
-                        printf("\n Exiting PortalBackUp: TRACK_WIRE_FOUND."
+                        dbprintf("\n Exiting PortalBackUp: TRACK_WIRE_FOUND."
                                 " Should enter EnterPortal. \n");
 
                         nextState = EnterPortal;
@@ -239,11 +228,7 @@ ES_Event RunFindPortalHSM(ES_Event ThisEvent)
 
                         // Commented out for testing
                     case ES_TIMEOUT:
-                        // create the case statement for all other events that you are
-                        // interested in responding to. This does a transition
-
-                        //Debugging printf
-                        printf("\n Backup: ES_TIMEOUT."
+                        dbprintf("\n Backup: ES_TIMEOUT."
                                 "Should enter TurnLeft. \n");
 
                         nextState = PortalTurnLeft;
@@ -257,15 +242,10 @@ ES_Event RunFindPortalHSM(ES_Event ThisEvent)
             }
             break;
 
-    case EnterPortal: // example of a state without a sub-statemachine
+        case EnterPortal:
             switch (ThisEvent.EventType) {
                 case ES_ENTRY:
-                    // this is where you would put any actions associated with the
-                    // entry to this state
-
-                    //Debugging printf
-                    printf("\n Entered EnterPortal. \n");
-
+                    dbprintf("\n Entered EnterPortal. \n");
                     // NEED TO SET MOTOR SPEEDS
                     // Same as TurnLeft, but spinning for testing
                     rightR2Motor(30); // for testing
@@ -273,9 +253,7 @@ ES_Event RunFindPortalHSM(ES_Event ThisEvent)
 
                     // ALSO NEED A TIMER
                     ES_Timer_InitTimer(FIND_PORTAL_TIMER, FIVE_SECONDS);
-
                     ThisEvent.EventType = ES_NO_EVENT;
-
                     break;
 
                     /* Case ES_EXIT for debugging */
@@ -291,8 +269,7 @@ ES_Event RunFindPortalHSM(ES_Event ThisEvent)
                     // create the case statement for all other events that you are
                     // interested in responding to. This one does a transition
 
-                    //Debugging printf
-                    printf("\n EnterPortal: ES_TIMEOUT."
+                    dbprintf("\n EnterPortal: ES_TIMEOUT."
                             "Should enter Stop. \n");
 
                     nextState = PortalStop;
@@ -300,19 +277,15 @@ ES_Event RunFindPortalHSM(ES_Event ThisEvent)
                     ThisEvent.EventType = ES_NO_EVENT;
                     break;
 
-                default: // all unhandled events pass the event back up to the next level
+                default:
                     break;
             }
             break;
 
-        case PortalStop: // example of a state without a sub-statemachine
+        case PortalStop:
             switch (ThisEvent.EventType) {
                 case ES_ENTRY:
-                    // this is where you would put any actions associated with the
-                    // entry to this state
-
-                    //Debugging printf
-                    printf("\n Entered Stop. \n");
+                    dbprintf("\n Entered PortalStop. \n");
 
                     // NEED TO SET MOTOR SPEEDS TO ZERO
                     rightR2Motor(0); // for testing
@@ -325,15 +298,15 @@ ES_Event RunFindPortalHSM(ES_Event ThisEvent)
             break;
 
 
-    default: // all unhandled states fall into here
-        break;
+        default: // all unhandled states fall into here
+            break;
     } // end switch on Current State
 
     if (makeTransition == TRUE) { // making a state transition, send EXIT and ENTRY
         // recursively call the current state with an exit event
-        RunFindPortalHSM(EXIT_EVENT);   // <- rename to your own Run function
+        RunFindPortalHSM(EXIT_EVENT);
         CurrentState = nextState;
-        RunFindPortalHSM(ENTRY_EVENT);  // <- rename to your own Run function
+        RunFindPortalHSM(ENTRY_EVENT);
     }
 
     ES_Tail(); // trace call stack end
@@ -351,11 +324,10 @@ ES_Event RunFindPortalHSM(ES_Event ThisEvent)
  ******************************************************************************/
 
 #ifdef FindPortalHSM_TEST // <-- change this name and define it in your MPLAB-X
-                        //     project to run the test harness
+//     project to run the test harness
 #include <stdio.h>
 
-void main(void)
-{
+void main(void) {
     ES_Return_t ErrorType;
     BOARD_Init();
     // When doing testing, it is useful to annouce just which program
@@ -378,15 +350,15 @@ void main(void)
     //
 
     switch (ErrorType) {
-    case FailedPointer:
-        printf("Failed on NULL pointer");
-        break;
-    case FailedInit:
-        printf("Failed Initialization");
-        break;
-    default:
-        printf("Other Failure");
-        break;
+        case FailedPointer:
+            printf("Failed on NULL pointer");
+            break;
+        case FailedInit:
+            printf("Failed Initialization");
+            break;
+        default:
+            printf("Other Failure");
+            break;
     }
 
     while (1) {

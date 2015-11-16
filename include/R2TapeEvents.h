@@ -16,6 +16,7 @@
 #define RIGHT_TAPE_SENSOR     (1<<2)
 #define LAUNCHER_TAPE_SENSOR  (1<<3)
 
+
 /*
  * File:   TapeSensorEvents.h
  * Author: Daniel Ruatta

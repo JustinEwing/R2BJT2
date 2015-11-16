@@ -64,8 +64,8 @@ typedef enum {
  */
 ES_Event CheckTapeReading() {
     dbprintf("Entered %s\n", __FUNCTION__);
-     /***************** Declarations ****************/
-   #define MAX_SENSORS (1<<4)
+    /***************** Declarations ****************/
+#define MAX_SENSORS (1<<4)
 
     // We assume the bot starts in a white area, hence BLACK_TO_WHITE
     static tapestate_t PrevTapeState = BLACK_TO_WHITE;
@@ -78,19 +78,19 @@ ES_Event CheckTapeReading() {
     //for the sensor loop
     uint8_t sensor;
 
-     // thisEvent, which will be posted to the HSM on a TAPE_FOUND or
+    // thisEvent, which will be posted to the HSM on a TAPE_FOUND or
     //TAPE_LOST event
-     ES_Event thisEvent;
+    ES_Event thisEvent;
 
-     thisEvent.EventType = ES_NO_EVENT;
+    thisEvent.EventType = ES_NO_EVENT;
 
-     // The New Tape State, which should be initialized to the current PrevTapeState
+    // The New Tape State, which should be initialized to the current PrevTapeState
     // That way, its value will update at the beginning of every Check()
     tapestate_t NewTapeState = PrevTapeState; // Temp value
 
 
-    for(sensor=1; sensor != MAX_SENSORS; sensor = sensor<<1){
-        switch(sensor){
+    for (sensor = 1; sensor != MAX_SENSORS; sensor = sensor << 1) {
+        switch (sensor) {
             case TOP_TAPE_SENSOR:
                 dbprintf("Reading Top Sensor\n");
                 TapeReading = AD_ReadADPin(TOP_TAPE_PIN);
@@ -111,7 +111,7 @@ ES_Event CheckTapeReading() {
                 TapeSensor = LAUNCHER_TAPE_SENSOR;
                 break;
             default: break;
-            }
+        }
 
         // Case: Tape Found
         if ((PrevTapeState == BLACK_TO_WHITE) &&

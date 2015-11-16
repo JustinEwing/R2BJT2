@@ -209,6 +209,7 @@ ES_Event Run_R2_BJT2_HSM(ES_Event ThisEvent) {
 
             //Note: this is currently running the same substate machine for both states
             //usually you want to use two Different ones
+            ThisEvent = RunFindOpponentHSM(ThisEvent);
             if (ThisEvent.EventType != ES_NO_EVENT) { // An event is active
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:

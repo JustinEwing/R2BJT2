@@ -17,6 +17,12 @@
 #ifndef TrackWireEVENTS_H
 #define	TrackWireEVENTS_H
 
+#include "R2Events.h"
+
+// trackwire sensors
+#define RIGHT_TRACKWIRE_SENSOR       (1<<0)
+#define LEFT_TRACKWIRE_SENSOR      (1<<1)
+
 /**************************************************************************
  * @Function CheckTrackWire
  * @Param void
@@ -29,7 +35,7 @@
  * 3. If so, post an event to the TrackWireHSM
  * 4. Return TRUE if an event has been posted, FALSE otherwise
  */
-uint8_t CheckTrackWire(void);
+ES_Event CheckTrackWire(void);
 
 /*************************************************************
  * @Function InitTrackWire()

@@ -91,7 +91,7 @@ static const char *StateNames[] = {
 /* You will need MyPriority and the state variable; you may need others as well.
  * The type of state variable should match that of enum in header file. */
 
-static FindOpponentState_t CurrentState = HitCenter; // <- change name to match ENUM
+static FindOpponentState_t CurrentState = InitFindOpponentState;
 static uint8_t MyPriority;
 
 
@@ -135,6 +135,10 @@ uint8_t InitFindOpponentHSM(void) {
  *       not consumed as these need to pass pack to the higher level state machine.
  * @author J. Edward Carryer, 2011.10.23 19:25
  * @author Gabriel H Elkaim, 2011.10.23 19:25 */
+
+
+// TODO: Need to integrate beacon events -> beacon detected & beacon lost
+
 ES_Event RunFindOpponentHSM(ES_Event ThisEvent) {
     uint8_t makeTransition = FALSE; // use to flag transition
     FindOpponentState_t nextState;
@@ -143,13 +147,7 @@ ES_Event RunFindOpponentHSM(ES_Event ThisEvent) {
 
     switch (CurrentState) {
         case InitFindOpponentState: // If current state is initial Psedudo State
-            if (ThisEvent.EventType == ES_INIT)// only respond to ES_Init
-            {
-                // this is where you would put any actions associated with the
-                // transition from the initial pseudo-state into the actual
-                // initial state
-
-                // now put the machine into the actual initial state
+            if (ThisEvent.EventType == ES_INIT) {
                 nextState = HitCenter;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
@@ -159,7 +157,7 @@ ES_Event RunFindOpponentHSM(ES_Event ThisEvent) {
         case HitCenter:
             // This state assumes we have just collected ammo and that
             // we are still positioned directly in front of the ammo dump
-            if (ThisEvent.EventType != ES_NO_EVENT) { // An event is still active
+            if (ThisEvent.EventType != ES_NO_EVENT) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
                         dbprintf("\n Tunring around to hit center. \n");
@@ -170,8 +168,6 @@ ES_Event RunFindOpponentHSM(ES_Event ThisEvent) {
                         break;
 
                     case ES_EXIT:
-                        // this is where you would put any actions associated with the
-                        // exit from this state
                         break;
 
                     case BUMPED:
@@ -182,11 +178,13 @@ ES_Event RunFindOpponentHSM(ES_Event ThisEvent) {
                         ThisEvent.EventType = ES_NO_EVENT;
                         break;
 
-                    /*case BeaconDetected:
-                        nextState = EliminateEnemy;
-                        makeTransition = TRUE;
-                        ThisEvent.EventType = ES_NO_EVENT;
-                        break;*/
+                        /*case BeaconDetected:
+                            rightR2Motor(0);  // STOP!
+                            leftR2Motor(0);
+                            nextState = EliminateEnemy;
+                            makeTransition = TRUE;
+                            ThisEvent.EventType = ES_NO_EVENT;
+                            break;*/
 
                     case ES_TIMEOUT:
                         // drive forward until you hit the center obstacle
@@ -202,12 +200,15 @@ ES_Event RunFindOpponentHSM(ES_Event ThisEvent) {
             break;
 
         case WallRide:
-            ThisEvent = RunFindOpponentHSM(ThisEvent); // run sub-state machine for this state
-            if (ThisEvent.EventType != ES_NO_EVENT) { // An event is active
+            // State objective: try to wall follow arround the center obstacle
+            if (ThisEvent.EventType != ES_NO_EVENT) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
-                        // this is where you would put any actions associated with the
-                        // entry to this state
+                        dbprintf("\n WallRide: Motors on. \n");
+                        // need a sharp enough left turn to go around obstacle
+                        rightR2Motor(25);
+                        leftR2Motor(25);
+                        ThisEvent.EventType = ES_NO_EVENT;
                         break;
 
                     case ES_EXIT:
@@ -215,11 +216,20 @@ ES_Event RunFindOpponentHSM(ES_Event ThisEvent) {
                         // exit from this state
                         break;
 
-                    /*case BeaconDetected:
-                        nextState = EliminateEnemy;
+                    case BUMPED:
+                        nextState = Reverse;
                         makeTransition = TRUE;
                         ThisEvent.EventType = ES_NO_EVENT;
-                        break;*/
+                        break;
+
+
+                        /*case BeaconDetected:
+                            rightR2Motor(0);  // STOP!
+                            leftR2Motor(0);
+                            nextState = EliminateEnemy;
+                            makeTransition = TRUE;
+                            ThisEvent.EventType = ES_NO_EVENT;
+                            break;*/
 
                     case ES_TIMEOUT:
                         // create the case statement for all other events that you are
@@ -250,11 +260,13 @@ ES_Event RunFindOpponentHSM(ES_Event ThisEvent) {
                     // exit from this state
                     break;
 
-                /*case BeaconDetected:
-                    nextState = EliminateEnemy;
-                    makeTransition = TRUE;
-                    ThisEvent.EventType = ES_NO_EVENT;
-                    break;*/
+                    /*case BeaconDetected:
+                        rightR2Motor(0);  // STOP!
+                        leftR2Motor(0);
+                        nextState = EliminateEnemy;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;*/
 
                 case ES_TIMEOUT:
                     nextState = LookForEnemy;
@@ -268,6 +280,8 @@ ES_Event RunFindOpponentHSM(ES_Event ThisEvent) {
             break;
 
         case LookForEnemy:
+            // State objective: Makes 360 degree turn scanning for opponent.
+            // slower turn should increase resolution...
             switch (ThisEvent.EventType) {
                 case ES_ENTRY:
                     dbprintf("\n Looking for the enemy. \n");
@@ -282,14 +296,17 @@ ES_Event RunFindOpponentHSM(ES_Event ThisEvent) {
                     // exit from this state
                     break;
 
-                /*case BeaconDetected:
-                    nextState = EliminateEnemy;
-                    makeTransition = TRUE;
-                    ThisEvent.EventType = ES_NO_EVENT;
-                    break;*/
+                    /*case BeaconDetected:
+                        rightR2Motor(0);  // STOP!
+                        leftR2Motor(0);
+                        nextState = EliminateEnemy;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;*/
 
                 case ES_TIMEOUT:
-                    nextState = LookForEnemy;
+                    // Didn't find opponent, move farther along on the wall
+                    nextState = WallRide;
                     makeTransition = TRUE;
                     ThisEvent.EventType = ES_NO_EVENT;
                     break;
@@ -307,6 +324,7 @@ ES_Event RunFindOpponentHSM(ES_Event ThisEvent) {
                     dbprintf("\n Going to kill enemy. \n");
                     rightR2Motor(50);
                     leftR2Motor(50);
+                    // Drive forward a little to get closer
                     ES_Timer_InitTimer(FIND_OPPONENT_TIMER, TWO_SECONDS);
                     ThisEvent.EventType = ES_NO_EVENT;
                     break;
@@ -316,10 +334,22 @@ ES_Event RunFindOpponentHSM(ES_Event ThisEvent) {
                     // exit from this state
                     break;
 
+                    /*case BeaconLost:
+                          // Lost the beacon, try to find it again
+                          // Note: might need a HadOpponent state or something along those
+                          //      lines to optimize so we don't try going all the way around
+                          //      the field again trying to find the opponent
+                          rightR2Motor(0);  // STOP!
+                          leftR2Motor(0);
+                          nextState = LookForEnemy;
+                          makeTransition = TRUE;
+                          ThisEvent.EventType = ES_NO_EVENT;
+                          break;*/
+
                 case ES_TIMEOUT:
-                    //nextState = SubFirst;
-                    //makeTransition = TRUE;
-                    //ThisEvent.EventType = ES_NO_EVENT;
+                    // If we made it here, we should still have the beacon in sight
+                    // and be close enough to shoot
+                    // FireAway();
                     break;
 
                 default: // all unhandled events pass the event back up to the next level
