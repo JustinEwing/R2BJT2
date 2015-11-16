@@ -225,9 +225,9 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
                         dbprintf("\n Backup Right. \n");
-                        rightR2Motor(-20);
+                        rightR2Motor(-30);
                         leftR2Motor(-40);
-                        ES_Timer_InitTimer(BACKUP_TIMER, 100);
+                        ES_Timer_InitTimer(BACKUP_TIMER, 150);
                         ThisEvent.EventType = ES_NO_EVENT;
                         break;
 
@@ -248,9 +248,9 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
             switch (ThisEvent.EventType) {
                 case ES_ENTRY:
                     dbprintf("\n Backup Right. \n");
-                    rightR2Motor(-10);
-                    leftR2Motor(-30);
-                    ES_Timer_InitTimer(BACKUP_TIMER, 250);
+                    rightR2Motor(-20);
+                    leftR2Motor(-35);
+                    ES_Timer_InitTimer(BACKUP_TIMER, 400);
                     ThisEvent.EventType = ES_NO_EVENT;
                     break;
 
@@ -273,16 +273,13 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
                     break;
 
                 case TAPE_FOUND:
-                    switch (ThisEvent.EventParam) {
-                        case TOP_TAPE_SENSOR:
+                    if(param & TOP_TAPE_SENSOR){
                             nextState = KeepTurning;
                             makeTransition = TRUE;
                             ThisEvent.EventType = ES_NO_EVENT;
                             break;
-                        default: break;
                     }
-                default: // all unhandled events pass the event back up to the next level
-                    break;
+                default: break;
             }
             break; //End of TapeTest
 
@@ -294,12 +291,10 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
                     break;
 
                 case TAPE_FOUND:
-                    switch (ThisEvent.EventParam) {
-                        case LEFT_TAPE_SENSOR:
+                    if(param & LEFT_TAPE_SENSOR){
                             nextState = FoundT;
                             makeTransition = TRUE;
                             ThisEvent.EventType = ES_NO_EVENT;
-                            break;
                     }
                     break;
 
@@ -362,8 +357,7 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
             }
             break;
 
-        default: // all unhandled states fall into here
-            break;
+        default: break;
     } // end switch on Current State
 
     if (makeTransition == TRUE) { // making a state transition, send EXIT and ENTRY
