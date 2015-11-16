@@ -35,7 +35,7 @@
  * 3. If so, post an event to the TrackWireHSM
  * 4. Return TRUE if an event has been posted, FALSE otherwise
  */
-ES_Event CheckTrackWire(void);
+ES_Event ReadTrackWire(void);
 
 /*************************************************************
  * @Function InitTrackWire()

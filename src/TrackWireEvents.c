@@ -1,4 +1,4 @@
-
+ 
 #include "ES_Configure.h"
 #include "ES_Framework.h"
 #include "TrackWireEvents.h"
@@ -42,7 +42,7 @@ typedef enum {
  * 3. If so, post an event to the TrackWireHSM
  * 4. Return TRUE if an event has been posted, FALSE otherwise
  */
-ES_Event CheckTrackWire(void) {
+ES_Event ReadTrackWire(void) {
     /***************** Declarations ****************/
 #define MAX_SENSORS (1<<2)
 

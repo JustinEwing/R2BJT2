@@ -81,3 +81,24 @@ uint8_t CheckTape(void){
 
     return returnVal;
 }
+
+uint8_t CheckTrackWire(void){
+    dbprintf("Entered %s\n", __FUNCTION__);
+    /***************** Declarations ****************/
+    // thisEvent, which will be posted to the HSM on a TAPE_FOUND or
+    //TAPE_LOST event
+    ES_Event thisEvent;
+
+    // returnVal, which will be used by the ES_Framework to see if this event
+    // posted an event. We assume no event initially happens, hence FALSE
+    uint8_t returnVal = FALSE;
+
+    thisEvent = CheckTapeReading();
+
+    //If an event has happened.
+    if(thisEvent.EventType != ES_NO_EVENT) {
+        returnVal = TRUE;
+    }
+
+    return returnVal;
+}

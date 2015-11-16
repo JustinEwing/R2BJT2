@@ -33,5 +33,7 @@ uint8_t CheckBumpers(void);
 
 uint8_t CheckTape(void);
 
-#endif	/* ROACHFRAMEWORKEVENTS_H */
+uint8_t CheckTrackWire(void);
+
+#endif	/* R2EVENTS_H */
 
