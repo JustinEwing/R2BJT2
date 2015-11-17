@@ -8,15 +8,7 @@
 #ifndef R2BEACONEVENTS_H
 #define	R2BEACONEVENTS_H
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+#include "ES_Configure.h"
 
-uint8_t InitBeacon(void) {
-
-
-#ifdef	__cplusplus
-}
-#endif
 
 #endif	/* R2BEACONEVENTS_H */

@@ -6,14 +6,14 @@
 #include "ES_Framework.h"
 #include "BOARD.h"
 #include "R2_BJT2_HSM.h"
-#include "R2BumperService.h"
+#include "R2BeaconEvents.h"
 
 
 /*******************************************************************************
  * MODULE #DEFINES                                                             *
  ******************************************************************************/
-#define BEACON_INIT PORTY03_TRIS //Need to change
-#define INPUT 1
+#define BEACON_PORT PORTZ //Need to change
+#define BEACON_PIN PIN7
 
 //#define BEACON_DEBUG_VERBOSE
 #ifdef BEACON_DEBUG_VERBOSE
@@ -25,6 +25,6 @@
 #endif
 
 
-uint8_t InitBeacon(void) {
-    return IO_PortsSetPortInputs(BEACON_INIT, INPUT);
+uint8_t CheckBeaconReading(void){
+    return 0;
 }

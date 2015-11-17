@@ -2,10 +2,6 @@
 #include "ES_Configure.h"
 #include "ES_Framework.h"
 #include "R2Events.h"
-
-#include <BOARD.h>
-#include "ES_Configure.h"
-#include "ES_Framework.h"
 #include "R2_BJT2_HSM.h"
 #include "IO_Ports.h"
 
@@ -15,6 +11,16 @@
 
 #define LEFT_BUMPER_READ PORTY03_BIT // Pin Y03 Read
 #define RIGHT_BUMPER_READ PORTY04_BIT // Pin Y04 Read
+
+#define BEACON_PORT PORTY //used for init
+#define BEACON_PIN PIN5
+#define BEACON_READ PORTY05_BIT
+
+typedef enum {
+    WAS_FOUND, WAS_LOST
+} beaconstate_t;
+
+static beaconstate_t PrevBeaconState = WAS_LOST;
 
 
 //#define EVENTS_DEBUG_VERBOSE
@@ -57,11 +63,10 @@ uint8_t CheckBumpers(void) {
     //  6. Use |= to SET that value as the first bit in bump_state
     BumperStates |= RIGHT_BUMPER_READ;
 
-    return BumperStates; // temp
+    return BumperStates;
 }
 
-
-uint8_t CheckTape(void){
+uint8_t CheckTape(void) {
     dbprintf("Entered %s\n", __FUNCTION__);
     /***************** Declarations ****************/
     // thisEvent, which will be posted to the HSM on a TAPE_FOUND or
@@ -75,7 +80,7 @@ uint8_t CheckTape(void){
     thisEvent = CheckTapeReading();
 
     //If an event has happened.
-    if(thisEvent.EventType != ES_NO_EVENT) {
+    if (thisEvent.EventType != ES_NO_EVENT) {
         returnVal = TRUE;
     }
 
@@ -83,7 +88,7 @@ uint8_t CheckTape(void){
     return returnVal;
 }
 
-uint8_t CheckTrackWire(void){
+uint8_t CheckTrackWire(void) {
     dbprintf("Entered %s\n", __FUNCTION__);
     /***************** Declarations ****************/
     // thisEvent, which will be posted to the HSM on a TAPE_FOUND or
@@ -94,20 +99,37 @@ uint8_t CheckTrackWire(void){
     // posted an event. We assume no event initially happens, hence FALSE
     uint8_t returnVal = FALSE;
 
-    thisEvent = CheckTapeReading();
+    //thisEvent = CheckTapeReading();
 
     //If an event has happened.
-    if(thisEvent.EventType != ES_NO_EVENT) {
+    if (thisEvent.EventType != ES_NO_EVENT) {
         returnVal = TRUE;
     }
 
     return returnVal;
 }
 
-uint8_t CheckBeacon(void){
+uint8_t CheckBeacon(void) {
     dbprintf("Entered %s\n", __FUNCTION__);
     ES_Event thisEvent;
     uint8_t returnVal = FALSE;
-
+    if (BEACON_READ && (PrevBeaconState == WAS_LOST)) {
+        dbprintf("Found da beacon\n");
+        PrevBeaconState = WAS_FOUND;
+        thisEvent.EventType = BEACON_FOUND;
+        thisEvent.EventParam = 1;
+        Post_R2_BJT2_HSM(thisEvent);
+        returnVal = TRUE;
+    } else if (~BEACON_READ && (PrevBeaconState == WAS_FOUND)) {
+        dbprintf("Lost da beacon\n");
+        PrevBeaconState = WAS_LOST;
+        thisEvent.EventType = BEACON_LOST;
+        thisEvent.EventParam = 0;
+        Post_R2_BJT2_HSM(thisEvent);
+    }
     return returnVal;
+}
+
+uint8_t InitBeacon(void) {
+    return IO_PortsSetPortInputs(BEACON_PORT, BEACON_PIN);
 }

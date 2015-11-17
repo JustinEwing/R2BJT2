@@ -18,6 +18,7 @@ void main(void)
     initMotors();
     InitTape();
     InitBumpers();
+    InitBeacon();
     // When doing testing, it is usefull to annouce just which program
     // is running.
     

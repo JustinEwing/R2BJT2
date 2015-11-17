@@ -10,6 +10,7 @@
 
 #include "TrackWireEvents.h"
 #include "R2TapeEvents.h"
+//#include "R2BeaconEvents.h"
 
 
 /*******************************************************************
@@ -29,7 +30,6 @@
  * @Usage To be called within BumperService
  */
 uint8_t CheckBumpers(void);
-
 
 uint8_t CheckTape(void);
 

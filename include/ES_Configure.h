@@ -53,6 +53,8 @@
     EVENT(UNBUMPED) /* Unbumped a sensor */\
     EVENT(TRACK_WIRE_FOUND) /* Track Wire Detected */ \
     EVENT(TRACK_WIRE_LOST) /* Track Wire Was Detected, is now lost */ \
+    EVENT(BEACON_FOUND) \
+    EVENT(BEACON_LOST)  \
     
 // This turns the EVENT_NAMES list into an enum statement
 // To see how it expands, right-click -> navigate -> View macro expansion
@@ -79,6 +81,7 @@ static const char *EventNames[] = {
 #define EVENT_CHECK_LIST  CheckBumpers, \
                           CheckTape ,  \
                           CheckTrackWire, \
+                          CheckBeacon \
                           
 
 

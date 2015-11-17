@@ -175,13 +175,13 @@ ES_Event RunFindOpponentHSM(ES_Event ThisEvent) {
                         ThisEvent.EventType = ES_NO_EVENT;
                         break;
 
-                        /*case BeaconDetected:
-                            rightR2Motor(0);  // STOP!
-                            leftR2Motor(0);
-                            nextState = EliminateEnemy;
-                            makeTransition = TRUE;
-                            ThisEvent.EventType = ES_NO_EVENT;
-                            break;*/
+                    case BEACON_FOUND:
+                        rightR2Motor(0); // STOP!
+                        leftR2Motor(0);
+                        nextState = EliminateEnemy;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;
 
                     case ES_TIMEOUT:
                         // drive forward until you hit the center obstacle
