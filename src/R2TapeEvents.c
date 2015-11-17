@@ -68,7 +68,7 @@ typedef enum {
 ES_Event CheckTapeReading() {
     dbprintf("Entered %s\n", __FUNCTION__);
      /***************** Declarations ****************/
-   #define MAX_SENSORS (1<<4)
+   #define MAX_SENSORS (1<<3)
 
     // We assume the bot starts in a white area, hence BLACK_TO_WHITE
     static tapestate_t PrevTapeState = BLACK_TO_WHITE;
@@ -139,12 +139,15 @@ ES_Event CheckTapeReading() {
             Post_R2_BJT2_HSM(thisEvent);
             NewTapeState = BLACK_TO_WHITE;
         }
+
+        dbprintf("EventParam: %x TapeSensor %x not TapeSensor: %x\n",
+        thisEvent.EventParam, TapeSensor, ~TapeSensor);
     }
+    
 
     // PrevTapeState updated with NewTapeState
     PrevTapeState = NewTapeState;
 
-    dbprintf("Exiting %s\n", __FUNCTION__);
     // return Event to event checker
     return thisEvent;
 }

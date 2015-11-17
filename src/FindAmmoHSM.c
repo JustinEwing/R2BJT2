@@ -275,7 +275,7 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
                         rightR2Motor(-15);
-                        leftR2Motor(20);
+                        leftR2Motor(35);
                         break;
 
                     case TAPE_FOUND:
@@ -315,14 +315,14 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
 
                 case TAPE_LOST:
                     if (param & TOP_TAPE_SENSOR) {
-                        rightR2Motor(-15);
-                        leftR2Motor(15);
+                        rightR2Motor(-20);
+                        leftR2Motor(20);
                         nextState = FoundT;
                         makeTransition = TRUE;
                         ThisEvent.EventType = ES_NO_EVENT;
                     } else if (param & RIGHT_TAPE_SENSOR) {
-                        rightR2Motor(15);
-                        leftR2Motor(-15);
+                        rightR2Motor(20);
+                        leftR2Motor(20);
                         nextState = FoundT;
                         makeTransition = TRUE;
                         ThisEvent.EventType = ES_NO_EVENT;
