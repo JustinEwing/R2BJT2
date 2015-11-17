@@ -184,7 +184,7 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
                         rightR2Motor(20); // for testing
-                        leftR2Motor(35); // for testing
+                        leftR2Motor(30); // for testing
                         break;
 
                     case TAPE_FOUND:
@@ -236,7 +236,7 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
                         rightR2Motor(-20);
-                        leftR2Motor(-45);
+                        leftR2Motor(-50);
                         ES_Timer_InitTimer(BACKUP_TIMER, 300);
                         break;
 
@@ -306,8 +306,8 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
 
                     case TAPE_FOUND:
                         if (param & TOP_TAPE_SENSOR) {
-                            rightR2Motor(15);
-                            leftR2Motor(15);
+//                            rightR2Motor(15);
+//                            leftR2Motor(15);
                             nextState = FoundT;
                             makeTransition = TRUE;
                             ThisEvent.EventType = ES_NO_EVENT;
@@ -324,17 +324,18 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
                             makeTransition = TRUE;
                             ThisEvent.EventType = ES_NO_EVENT;
                         }
+                        break;
 
                     case TAPE_LOST:
                         if (~param & LEFT_TAPE_SENSOR) {
-                            rightR2Motor(15);
-                            leftR2Motor(15);
+                            rightR2Motor(10);
+                            leftR2Motor(20);
                             nextState = FoundT;
                             makeTransition = TRUE;
                             ThisEvent.EventType = ES_NO_EVENT;
                         } else if (~param & RIGHT_TAPE_SENSOR) {
-                            rightR2Motor(15);
-                            leftR2Motor(15);
+                            rightR2Motor(20);
+                            leftR2Motor(10);
                             nextState = FoundT;
                             makeTransition = TRUE;
                             ThisEvent.EventType = ES_NO_EVENT;
