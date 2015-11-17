@@ -35,5 +35,7 @@ uint8_t CheckTape(void);
 
 uint8_t CheckTrackWire(void);
 
+uint8_t CheckBeacon(void);
+
 #endif	/* R2EVENTS_H */
 

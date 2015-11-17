@@ -103,3 +103,11 @@ uint8_t CheckTrackWire(void){
 
     return returnVal;
 }
+
+uint8_t CheckBeacon(void){
+    dbprintf("Entered %s\n", __FUNCTION__);
+    ES_Event thisEvent;
+    uint8_t returnVal = FALSE;
+
+    return returnVal;
+}
