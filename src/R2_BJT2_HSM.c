@@ -157,7 +157,7 @@ ES_Event Run_R2_BJT2_HSM(ES_Event ThisEvent) {
 
                 // now put the machine into the actual initial state
                 //nextState = FindAmmo;
-                nextState = FindOpponent; // Should be FindAmmo
+                nextState = FindAmmo; // Should be FindAmmo
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
             }
