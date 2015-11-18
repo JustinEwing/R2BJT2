@@ -52,7 +52,9 @@
     EVENT(BUMPED)  /* Bump sensors triggered - DO WE NEED UNBUMPED?*/ \
     EVENT(UNBUMPED) /* Unbumped a sensor */\
     EVENT(TRACK_WIRE_FOUND) /* Track Wire Detected */ \
-    EVENT(TRACK_WIRE_LOST) /* Track Wire Was Detected, is now lost */ \
+    EVENT(TRACK_WIRE_LOST) /* Track Wire Was Detected, is now lost -- Not needed?? */ \
+    EVENT(BEACON_FOUND) \
+    EVENT(BEACON_LOST)  \
     
 // This turns the EVENT_NAMES list into an enum statement
 // To see how it expands, right-click -> navigate -> View macro expansion
@@ -77,9 +79,9 @@ static const char *EventNames[] = {
 /****************************************************************************/
 // This is the list of event checking functions
 #define EVENT_CHECK_LIST  CheckBumpers, \
-                          CheckTape ,  \
                           CheckTrackWire, \
-                          
+                          CheckBeacon, \
+                          CheckTape \
 
 
 /****************************************************************************/
@@ -94,7 +96,7 @@ static const char *EventNames[] = {
 #define TIMER3_RESP_FUNC Post_R2_BJT2_HSM  //These are for?
 #define TIMER4_RESP_FUNC PostR2BumperService
 #define TIMER5_RESP_FUNC Post_R2_BJT2_HSM
-#define TIMER6_RESP_FUNC TIMER_UNUSED
+#define TIMER6_RESP_FUNC Post_R2_BJT2_HSM
 #define TIMER7_RESP_FUNC TIMER_UNUSED
 #define TIMER8_RESP_FUNC TIMER_UNUSED
 #define TIMER9_RESP_FUNC TIMER_UNUSED

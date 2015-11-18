@@ -216,7 +216,8 @@ ES_Event RunR2BumperService(ES_Event ThisEvent) {
  * @Usage To be called in main() to initialize our bumpers
  */
 uint8_t InitBumpers(void) {
-    return IO_PortsSetPortInputs((LEFT_BUMPER_INIT | RIGHT_BUMPER_INIT), INPUT);
+    LEFT_BUMPER_INIT = INPUT;
+    RIGHT_BUMPER_INIT = INPUT;
 }
 
 /*******************************************************************************
