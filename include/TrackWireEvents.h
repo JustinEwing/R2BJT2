@@ -18,6 +18,10 @@
 #define	TrackWireEVENTS_H
 
 #include "R2Events.h"
+#include "AD.h"
+
+#define RIGHT_TRACK_PIN AD_PORTV4
+#define LEFT_TRACK_PIN AD_PORTV3
 
 // trackwire sensors
 #define RIGHT_TRACKWIRE_SENSOR       (1<<0)
@@ -37,20 +41,6 @@
  */
 ES_Event ReadTrackWire(void);
 
-/*************************************************************
- * @Function InitTrackWire()
- * @Param void
- * @Return uint8_t
- * @Author Daniel Ruatta, 11.13.2015
- * @Brief
- * - Calls AD_AddPins on the Track Wire pin V04
- * - Should return SUCCESS, assuming the IO_Ports were all set to INPUTS.
- * - Will return ERROR if any of the IO_Ports were not set to INPUTS.
- * @Usage
- * - To be called with the rest of our hardware initializations
- */
-
-uint8_t InitTrackWire();
 
 #endif	/* TrackWireEVENTS_H */
 

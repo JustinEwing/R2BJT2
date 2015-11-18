@@ -178,7 +178,7 @@ ES_Event RunFindOpponentHSM(ES_Event ThisEvent) {
                     case BEACON_FOUND:
                         rightR2Motor(0); // STOP!
                         leftR2Motor(0);
-                        nextState = HitCenter;
+                        nextState = EliminateEnemy;
                         makeTransition = TRUE;
                         ThisEvent.EventType = ES_NO_EVENT;
                         break;
@@ -220,20 +220,20 @@ ES_Event RunFindOpponentHSM(ES_Event ThisEvent) {
                         break;
 
 
-                        /*case BeaconDetected:
-                            rightR2Motor(0);  // STOP!
-                            leftR2Motor(0);
-                            nextState = EliminateEnemy;
-                            makeTransition = TRUE;
-                            ThisEvent.EventType = ES_NO_EVENT;
-                            break;*/
+                    case BEACON_FOUND:
+                        rightR2Motor(0); // STOP!
+                        leftR2Motor(0);
+                        nextState = EliminateEnemy;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;
 
                     case ES_TIMEOUT:
                         // create the case statement for all other events that you are
                         // interested in responding to. This does a transition
-                        //nextState = Backup;
-                        //makeTransition = TRUE;
-                        //ThisEvent.EventType = ES_NO_EVENT;
+                        nextState = Reverse;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
                         break;
 
                     default:
@@ -257,13 +257,13 @@ ES_Event RunFindOpponentHSM(ES_Event ThisEvent) {
                     // exit from this state
                     break;
 
-                    /*case BeaconDetected:
-                        rightR2Motor(0);  // STOP!
-                        leftR2Motor(0);
-                        nextState = EliminateEnemy;
-                        makeTransition = TRUE;
-                        ThisEvent.EventType = ES_NO_EVENT;
-                        break;*/
+                case BEACON_FOUND:
+                    rightR2Motor(0); // STOP!
+                    leftR2Motor(0);
+                    nextState = EliminateEnemy;
+                    makeTransition = TRUE;
+                    ThisEvent.EventType = ES_NO_EVENT;
+                    break;
 
                 case ES_TIMEOUT:
                     nextState = LookForEnemy;
@@ -293,13 +293,13 @@ ES_Event RunFindOpponentHSM(ES_Event ThisEvent) {
                     // exit from this state
                     break;
 
-                    /*case BeaconDetected:
-                        rightR2Motor(0);  // STOP!
-                        leftR2Motor(0);
-                        nextState = EliminateEnemy;
-                        makeTransition = TRUE;
-                        ThisEvent.EventType = ES_NO_EVENT;
-                        break;*/
+                case BEACON_FOUND:
+                    rightR2Motor(0); // STOP!
+                    leftR2Motor(0);
+                    nextState = EliminateEnemy;
+                    makeTransition = TRUE;
+                    ThisEvent.EventType = ES_NO_EVENT;
+                    break;
 
                 case ES_TIMEOUT:
                     // Didn't find opponent, move farther along on the wall
@@ -331,17 +331,17 @@ ES_Event RunFindOpponentHSM(ES_Event ThisEvent) {
                     // exit from this state
                     break;
 
-                    /*case BeaconLost:
-                          // Lost the beacon, try to find it again
-                          // Note: might need a HadOpponent state or something along those
-                          //      lines to optimize so we don't try going all the way around
-                          //      the field again trying to find the opponent
-                          rightR2Motor(0);  // STOP!
-                          leftR2Motor(0);
-                          nextState = LookForEnemy;
-                          makeTransition = TRUE;
-                          ThisEvent.EventType = ES_NO_EVENT;
-                          break;*/
+                case BEACON_LOST:
+                    // Lost the beacon, try to find it again
+                    // Note: might need a HadOpponent state or something along those
+                    //      lines to optimize so we don't try going all the way around
+                    //      the field again trying to find the opponent
+                    rightR2Motor(0); // STOP!
+                    leftR2Motor(0);
+                    nextState = LookForEnemy;
+                    makeTransition = TRUE;
+                    ThisEvent.EventType = ES_NO_EVENT;
+                    break;
 
                 case ES_TIMEOUT:
                     // If we made it here, we should still have the beacon in sight

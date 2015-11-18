@@ -10,7 +10,9 @@
 
 #include "TrackWireEvents.h"
 #include "R2TapeEvents.h"
-//#include "R2BeaconEvents.h"
+
+//#define RIGHT_TRACK_PIN AD_PORTV4
+//#define LEFT_TRACK_PIN AD_PORTV3
 
 
 /*******************************************************************
@@ -36,6 +38,10 @@ uint8_t CheckTape(void);
 uint8_t CheckTrackWire(void);
 
 uint8_t CheckBeacon(void);
+
+uint8_t InitBeacon(void);
+
+uint8_t InitTrackWire(void);
 
 #endif	/* R2EVENTS_H */
 

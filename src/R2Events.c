@@ -4,6 +4,7 @@
 #include "R2Events.h"
 #include "R2_BJT2_HSM.h"
 #include "IO_Ports.h"
+#include "AD.h"
 
 
 /******************************* Private #defines ****************************/
@@ -90,22 +91,13 @@ uint8_t CheckTape(void) {
 
 uint8_t CheckTrackWire(void) {
     dbprintf("Entered %s\n", __FUNCTION__);
-    /***************** Declarations ****************/
-    // thisEvent, which will be posted to the HSM on a TAPE_FOUND or
-    //TAPE_LOST event
-    ES_Event thisEvent;
-
-    // returnVal, which will be used by the ES_Framework to see if this event
-    // posted an event. We assume no event initially happens, hence FALSE
     uint8_t returnVal = FALSE;
-
-    //thisEvent = CheckTapeReading();
-
+    ES_Event thisEvent = ReadTrackWire();
     //If an event has happened.
     if (thisEvent.EventType != ES_NO_EVENT) {
         returnVal = TRUE;
+        Post_R2_BJT2_HSM(thisEvent);
     }
-
     return returnVal;
 }
 
@@ -136,4 +128,8 @@ uint8_t CheckBeacon(void) {
 
 uint8_t InitBeacon(void) {
     return IO_PortsSetPortInputs(BEACON_PORT, BEACON_PIN);
+}
+
+uint8_t InitTrackWire(void) {
+    return 0;// AD_AddPins(RIGHT_TRACK_PIN | LEFT_TRACK_PIN);
 }

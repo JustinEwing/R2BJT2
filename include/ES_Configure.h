@@ -52,7 +52,7 @@
     EVENT(BUMPED)  /* Bump sensors triggered - DO WE NEED UNBUMPED?*/ \
     EVENT(UNBUMPED) /* Unbumped a sensor */\
     EVENT(TRACK_WIRE_FOUND) /* Track Wire Detected */ \
-    EVENT(TRACK_WIRE_LOST) /* Track Wire Was Detected, is now lost */ \
+    EVENT(TRACK_WIRE_LOST) /* Track Wire Was Detected, is now lost -- Not needed?? */ \
     EVENT(BEACON_FOUND) \
     EVENT(BEACON_LOST)  \
     
@@ -79,10 +79,11 @@ static const char *EventNames[] = {
 /****************************************************************************/
 // This is the list of event checking functions
 #define EVENT_CHECK_LIST  CheckBumpers, \
-                          CheckTape ,  \
                           CheckTrackWire, \
                           CheckBeacon \
-                          
+
+
+//CheckTape ,  
 
 
 /****************************************************************************/
