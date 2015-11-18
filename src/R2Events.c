@@ -23,7 +23,7 @@ typedef enum {
 static beaconstate_t PrevBeaconState = WAS_LOST;
 
 
-//#define EVENTS_DEBUG_VERBOSE
+//define EVENTS_DEBUG_VERBOSE
 #ifdef EVENTS_DEBUG_VERBOSE
 #include "serial.h"
 #include <stdio.h>
@@ -113,14 +113,18 @@ uint8_t CheckBeacon(void) {
     dbprintf("Entered %s\n", __FUNCTION__);
     ES_Event thisEvent;
     uint8_t returnVal = FALSE;
-    if (BEACON_READ && (PrevBeaconState == WAS_LOST)) {
+    uint8_t beacon = BEACON_READ;
+    //printf("%d\n",beacon); // quick and dirty
+    
+    // NOTE: beacon detector circuit is active low
+    if (!beacon && (PrevBeaconState == WAS_LOST)) {
         dbprintf("Found da beacon\n");
         PrevBeaconState = WAS_FOUND;
         thisEvent.EventType = BEACON_FOUND;
         thisEvent.EventParam = 1;
         Post_R2_BJT2_HSM(thisEvent);
         returnVal = TRUE;
-    } else if (~BEACON_READ && (PrevBeaconState == WAS_FOUND)) {
+    } else if (beacon && (PrevBeaconState == WAS_FOUND)) {
         dbprintf("Lost da beacon\n");
         PrevBeaconState = WAS_LOST;
         thisEvent.EventType = BEACON_LOST;

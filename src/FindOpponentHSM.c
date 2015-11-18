@@ -178,7 +178,7 @@ ES_Event RunFindOpponentHSM(ES_Event ThisEvent) {
                     case BEACON_FOUND:
                         rightR2Motor(0); // STOP!
                         leftR2Motor(0);
-                        nextState = EliminateEnemy;
+                        nextState = HitCenter;
                         makeTransition = TRUE;
                         ThisEvent.EventType = ES_NO_EVENT;
                         break;
