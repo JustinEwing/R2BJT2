@@ -76,6 +76,7 @@ uint8_t CheckTape(void){
 
     //If an event has happened.
     if(thisEvent.EventType != ES_NO_EVENT) {
+        Post_R2_BJT2_HSM(thisEvent);
         returnVal = TRUE;
     }
 

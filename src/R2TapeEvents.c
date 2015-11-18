@@ -127,7 +127,7 @@ ES_Event CheckTapeReading() {
                 (TapeReading < ROOM_LIGHT_LEVEL)) {
             thisEvent.EventType = TAPE_FOUND;
             thisEvent.EventParam |= TapeSensor;
-            Post_R2_BJT2_HSM(thisEvent);
+            
             NewTapeState = WHITE_TO_BLACK;
         }
 
@@ -136,7 +136,6 @@ ES_Event CheckTapeReading() {
                 (TapeReading < WHITE_HYSTERESIS)) {
             thisEvent.EventType = TAPE_LOST;
             thisEvent.EventParam &= ~TapeSensor;
-            Post_R2_BJT2_HSM(thisEvent);
             NewTapeState = BLACK_TO_WHITE;
         }
     }
@@ -144,7 +143,6 @@ ES_Event CheckTapeReading() {
     // PrevTapeState updated with NewTapeState
     PrevTapeState = NewTapeState;
 
-    dbprintf("Exiting %s\n", __FUNCTION__);
     // return Event to event checker
     return thisEvent;
 }
