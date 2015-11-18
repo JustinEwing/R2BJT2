@@ -22,6 +22,7 @@
       <itemPath>include/R2BumperService.h</itemPath>
       <itemPath>include/TrackWireEvents.h</itemPath>
       <itemPath>include/R2TapeEvents.h</itemPath>
+      <itemPath>include/TapeFollowing.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -48,6 +49,7 @@
       <itemPath>src/R2BumperService.c</itemPath>
       <itemPath>src/TrackWireEvents.c</itemPath>
       <itemPath>src/R2TapeEvents.c</itemPath>
+      <itemPath>src/TapeFollowing.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"

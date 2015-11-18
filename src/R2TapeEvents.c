@@ -51,6 +51,8 @@ typedef enum {
     BLACK_TO_WHITE, WHITE_TO_BLACK
 } tapestate_t;
 
+
+
 /* @Function CheckTopTape
  * @Param void
  * @Return ES_Event with status of event checkers
