@@ -39,10 +39,10 @@ typedef enum {
  */
 ES_Event ReadTrackWire(void) {
     /***************** Declarations ****************/
-    static trackwirestate_t PrevLeftState    = TRACK_WIRE_SEARCHING;
-    static trackwirestate_t PrevRightState   = TRACK_WIRE_SEARCHING;
-    static trackwirestate_t NewLeftState     = TRACK_WIRE_SEARCHING;
-    static trackwirestate_t NewRightState    = TRACK_WIRE_SEARCHING;
+    static trackwirestate_t PrevLeftState = TRACK_WIRE_SEARCHING;
+    static trackwirestate_t PrevRightState = TRACK_WIRE_SEARCHING;
+    static trackwirestate_t NewLeftState = TRACK_WIRE_SEARCHING;
+    static trackwirestate_t NewRightState = TRACK_WIRE_SEARCHING;
     uint16_t LeftReading;
     uint16_t RightReading;
     uint8_t param = 0; // will have left track wire as the second bit and right
@@ -66,19 +66,18 @@ ES_Event ReadTrackWire(void) {
     }
 
     // Test Right
-//    if ((RightReading > TRACK_WIRE_FOUND_HYSTERESIS) &&
-//            (PrevRightState == TRACK_WIRE_SEARCHING)) { // Right Found
-//        NewRightState = TRACK_WIRE_LOCATED;
-//        param |= RIGHT_TRACKWIRE_SENSOR;
-//    } else if ((RightReading < TRACK_WIRE_LOST_HYSTERESIS) &&
-//            (PrevRightState == TRACK_WIRE_FOUND)) { // Right Lost
-//        NewRightState = TRACK_WIRE_SEARCHING;
-//    }
+    if ((RightReading > TRACK_WIRE_FOUND_HYSTERESIS) &&
+            (PrevRightState == TRACK_WIRE_SEARCHING)) { // Right Found
+        NewRightState = TRACK_WIRE_LOCATED;
+        param |= RIGHT_TRACKWIRE_SENSOR;
+    } else if ((RightReading < TRACK_WIRE_LOST_HYSTERESIS) &&
+            (PrevRightState == TRACK_WIRE_LOCATED)) { // Right Lost
+        NewRightState = TRACK_WIRE_SEARCHING;
+    }
 
     // Determine if there was an event
-
-    if (((param & LEFT_TRACKWIRE_SENSOR) && (PrevLeftState == TRACK_WIRE_SEARCHING))){// ||
-            //((param & RIGHT_TRACKWIRE_SENSOR) && (PrevRightState == TRACK_WIRE_SEARCHING))) {
+    if (((param & LEFT_TRACKWIRE_SENSOR) && (PrevLeftState == TRACK_WIRE_SEARCHING)) ||
+            ((param & RIGHT_TRACKWIRE_SENSOR) && (PrevRightState == TRACK_WIRE_SEARCHING))) {
         printf("PrevLState: %d\n", PrevLeftState);
         printf("NextLState: %d\n", NewLeftState);
         printf("Param: %d\n", param);
