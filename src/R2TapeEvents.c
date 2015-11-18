@@ -29,9 +29,6 @@ unsigned int wait = 0;
 #define RIGHT_TAPE_PIN     AD_PORTV7
 #define LAUNCHER_TAPE_PIN  AD_PORTV8
 
-#define RIGHT_TRACK_PIN AD_PORTW3
-#define LEFT_TRACK_PIN AD_PORTW4
-
 #define TEST_TAPE_SENSOR      TOP_TAPE_PIN
 
 // Analog to Digital Conversion
@@ -68,7 +65,7 @@ typedef enum {
 ES_Event CheckTapeReading() {
     dbprintf("Entered %s\n", __FUNCTION__);
      /***************** Declarations ****************/
-   #define MAX_SENSORS (1<<5)
+   #define MAX_SENSORS (1<<3)
 
     // We assume the bot starts in a white area, hence BLACK_TO_WHITE
     static tapestate_t PrevTapeState = BLACK_TO_WHITE;
@@ -138,7 +135,11 @@ ES_Event CheckTapeReading() {
             thisEvent.EventParam &= ~TapeSensor;
             NewTapeState = BLACK_TO_WHITE;
         }
+
+        dbprintf("EventParam: %x TapeSensor %x not TapeSensor: %x\n",
+        thisEvent.EventParam, TapeSensor, ~TapeSensor);
     }
+    
 
     // PrevTapeState updated with NewTapeState
     PrevTapeState = NewTapeState;
@@ -166,4 +167,5 @@ uint8_t InitTape(void) {
             LEFT_TAPE_PIN |
             RIGHT_TAPE_PIN |
             LAUNCHER_TAPE_PIN | LEFT_TRACK_PIN | RIGHT_TRACK_PIN);
+            //| RIGHT_TRACK_PIN | LEFT_TRACK_PIN);
 }

@@ -152,6 +152,7 @@ ES_Event Run_R2_BJT2_HSM(ES_Event ThisEvent) {
                 dbprintf("Entered %s\n", __FUNCTION__);
 
                 InitFindAmmoHSM();
+                InitFindOpponentHSM();
                 //InitFindPortalHSM();
 
                 // now put the machine into the actual initial state

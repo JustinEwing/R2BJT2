@@ -66,6 +66,8 @@ static const char *StateNames[] = {
 #define dbprintf(...)
 #endif
 
+
+
 /*******************************************************************************
  * PRIVATE FUNCTION PROTOTYPES                                                 *
  ******************************************************************************/
@@ -129,7 +131,7 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
 
     uint8_t makeTransition = FALSE; // use to flag transition
     FindAmmoState_t nextState; // <- change type to correct enum
-    uint16_t param = ThisEvent.EventParam;  //make typing easier, maybe use typedef?
+    uint16_t param = ThisEvent.EventParam; //make typing easier, maybe use typedef?
 
     ES_Tattle(); // trace call stack
 
@@ -137,10 +139,6 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
         case InitFindAmmoState: // If current state is initial Psedudo State
             if (ThisEvent.EventType == ES_INIT)// only respond to ES_Init
             {
-                // this is where you would put any actions associated with the
-                // transition from the initial pseudo-state into the actual
-                // initial state
-
                 // now put the machine into the actual initial state
                 nextState = TurnLeft;
                 makeTransition = TRUE;
@@ -149,86 +147,69 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
             break;
 
         case TurnLeft:
-            if (ThisEvent.EventType != ES_NO_EVENT) { // An event is still active
+            if (ThisEvent.EventType != ES_NO_EVENT) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
-                        rightR2Motor(30); // for testing
-                        leftR2Motor(30); // for testing
-
-                        ThisEvent.EventType = ES_NO_EVENT;
+                        rightR2Motor(35); // for testing
+                        leftR2Motor(25); // for testing
                         break;
 
                     case TAPE_FOUND:
-                        if(param & TOP_TAPE_SENSOR){
+                        if (param & TOP_TAPE_SENSOR) {
                             nextState = Backup;
                             makeTransition = TRUE;
                             ThisEvent.EventType = ES_NO_EVENT;
-                            break;
-                        }
-//                        else if (param & RIGHT_TAPE_SENSOR){
-//                            nextState = TapeTest;
-//                            makeTransition = TRUE;
-//                            ThisEvent.EventType = ES_NO_EVENT;
-//                            break;
-//                        }
-
-                        case BUMPED:
-                            nextState = BumpBackup;
-                            makeTransition = TRUE;
-                            ThisEvent.EventType = ES_NO_EVENT;
-                            break;
-
-                    default: 
-                        break;
-                }
-            }
-            break;
-
-        case TurnRight:
-            if (ThisEvent.EventType != ES_NO_EVENT) { // An event is still active
-                switch (ThisEvent.EventType) {
-                    case ES_ENTRY:
-                        rightR2Motor(25); // for testing
-                        leftR2Motor(35); // for testing
-
-                        ThisEvent.EventType = ES_NO_EVENT;
-                        break;
-
-                    case TAPE_FOUND:
-                        if(param & TOP_TAPE_SENSOR){
-                                nextState = Backup;
-                                makeTransition = TRUE;
-                                ThisEvent.EventType = ES_NO_EVENT;
-                        }
-                        else if(param & TOP_TAPE_SENSOR){
-                        nextState = TapeTest;
-                        makeTransition = TRUE;
-                        ThisEvent.EventType = ES_NO_EVENT;
                         }
                         break;
-
                     case BUMPED:
                         nextState = BumpBackup;
                         makeTransition = TRUE;
                         ThisEvent.EventType = ES_NO_EVENT;
                         break;
 
-                    default: // all unhandled events pass the event back up to the next level
-                        break;
+                    default: break;
                 }
             }
-        break;
+            break; //End of TurnLeft
+
+        case TurnRight:
+            if (ThisEvent.EventType != ES_NO_EVENT) { // An event is still active
+                switch (ThisEvent.EventType) {
+                    case ES_ENTRY:
+                        rightR2Motor(20); // for testing
+                        leftR2Motor(30); // for testing
+                        break;
+
+                    case TAPE_FOUND:
+                        if (param & TOP_TAPE_SENSOR) {
+                            nextState = BumpBackup;
+                            makeTransition = TRUE;
+                            ThisEvent.EventType = ES_NO_EVENT;
+                        } else if (param & RIGHT_TAPE_SENSOR) {
+                            nextState = TapeTest;
+                            makeTransition = TRUE;
+                            ThisEvent.EventType = ES_NO_EVENT;
+                        }
+                        break;
+                    case BUMPED:
+                        nextState = BumpBackup;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;
+
+                    default: break;
+                }
+            }
+            break; //End of TurnRight
 
         case Backup:
-            //ThisEvent = RunTemplateSubHSM(ThisEvent); // run sub-state machine for this state
             if (ThisEvent.EventType != ES_NO_EVENT) { // An event is active
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
                         dbprintf("\n Backup Right. \n");
-                        rightR2Motor(-30);
-                        leftR2Motor(-40);
+                        rightR2Motor(-10);
+                        leftR2Motor(-35);
                         ES_Timer_InitTimer(BACKUP_TIMER, 150);
-                        ThisEvent.EventType = ES_NO_EVENT;
                         break;
 
                     case ES_TIMEOUT:
@@ -236,126 +217,130 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
                         makeTransition = TRUE;
                         ThisEvent.EventType = ES_NO_EVENT;
                         break;
-                    default: // all unhandled events pass the event back up to the next level
+                    case ES_EXIT:
+                        rightR2Motor(100); // for testing
+                        leftR2Motor(100); // for testing
                         break;
+                    default: break;
                 }
             }
             break;
 
         case BumpBackup:
-        //ThisEvent = RunTemplateSubHSM(ThisEvent); // run sub-state machine for this state
-        if (ThisEvent.EventType != ES_NO_EVENT) { // An event is active
-            switch (ThisEvent.EventType) {
-                case ES_ENTRY:
-                    dbprintf("\n Backup Right. \n");
-                    rightR2Motor(-20);
-                    leftR2Motor(-35);
-                    ES_Timer_InitTimer(BACKUP_TIMER, 400);
-                    ThisEvent.EventType = ES_NO_EVENT;
-                    break;
+            if (ThisEvent.EventType != ES_NO_EVENT) { // An event is active
+                switch (ThisEvent.EventType) {
+                    case ES_ENTRY:
+                        rightR2Motor(-20);
+                        leftR2Motor(-45);
+                        ES_Timer_InitTimer(BACKUP_TIMER, 300);
+                        break;
 
-                case ES_TIMEOUT:
-                    nextState = TurnRight;
-                    makeTransition = TRUE;
-                    ThisEvent.EventType = ES_NO_EVENT;
-                    break;
-                default: // all unhandled events pass the event back up to the next level
-                    break;
+                    case ES_TIMEOUT:
+                        nextState = TurnRight;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;
+                    default: break;
+                }
             }
-        }
-        break;
+            break; //End of BumpBackup
 
         case TapeTest:
-            switch (ThisEvent.EventType) {
-                case ES_ENTRY:
-                    rightR2Motor(15);
-                    leftR2Motor(35);
-                    break;
+            if (ThisEvent.EventType != ES_NO_EVENT) { // An event is active
+                switch (ThisEvent.EventType) {
+                    case ES_ENTRY:
+                        rightR2Motor(-20);
+                        leftR2Motor(30);
+                        break;
 
-                case TAPE_FOUND:
-                    if(param & TOP_TAPE_SENSOR){
+                    case TAPE_FOUND:
+                        if (param & TOP_TAPE_SENSOR) {
                             nextState = KeepTurning;
                             makeTransition = TRUE;
                             ThisEvent.EventType = ES_NO_EVENT;
                             break;
-                    }
-                default: break;
+                        }
+                    default: break;
+                }
             }
             break; //End of TapeTest
 
         case KeepTurning:
-            switch (ThisEvent.EventType) {
-                case ES_ENTRY:
-                    rightR2Motor(18);
-                    leftR2Motor(25);
-                    break;
+            if (ThisEvent.EventType != ES_NO_EVENT) { // An event is active
+                switch (ThisEvent.EventType) {
+                    case ES_ENTRY:
+                        rightR2Motor(10);
+                        leftR2Motor(25);
+                        break;
 
-                case TAPE_FOUND:
-                    if(param & LEFT_TAPE_SENSOR){
-                            nextState = FoundT;
-                            makeTransition = TRUE;
-                            ThisEvent.EventType = ES_NO_EVENT;
-                    }
-                    break;
-
-                default: // all unhandled events pass the event back up to the next level
-                    break;
-            }
-            break;
-
-        case FoundT:
-            switch (ThisEvent.EventType) {
-                case ES_ENTRY:
-                    break;
-
-                case BUMPED:
-                    rightR2Motor(0);
-                    leftR2Motor(0);
-                    nextState;
-                    makeTransition = FALSE;
-                    ThisEvent.EventType = ES_NO_EVENT;
-                    break;
-
-                case TAPE_FOUND:
-                    switch (ThisEvent.EventParam) {
-                        if(param & TOP_TAPE_SENSOR | param & RIGHT_TAPE_SENSOR){
-                            rightR2Motor(25);
-                            leftR2Motor(25);
+                    case TAPE_FOUND:
+                        if (param & LEFT_TAPE_SENSOR) {
                             nextState = FoundT;
                             makeTransition = TRUE;
                             ThisEvent.EventType = ES_NO_EVENT;
                         }
-                    }
-                    break;
+                        break;
 
-                case TAPE_LOST:
-                    switch (ThisEvent.EventParam) {
-                         if(param & TOP_TAPE_SENSOR){
-                            rightR2Motor(-25);
+                    default: break;
+                }
+            }
+            break; //End of KeepTurning
+
+        case FoundT:
+            if (ThisEvent.EventType != ES_NO_EVENT) { // An event is active
+                switch (ThisEvent.EventType) {
+                    case ES_ENTRY:
+                        break;
+                    case BUMPED:
+                        rightR2Motor(0);
+                        leftR2Motor(0);
+                        nextState;
+                        makeTransition = FALSE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;
+
+                        //                    case TAPE_FOUND:
+                        //                        if (param & TOP_TAPE_SENSOR) {
+                        ////                            rightR2Motor(15);
+                        ////                            leftR2Motor(15);
+                        //                            nextState = FoundT;
+                        //                            makeTransition = TRUE;
+                        //                            ThisEvent.EventType = ES_NO_EVENT;
+                        //                        } else if (param & LEFT_TAPE_SENSOR) {
+                        //                            rightR2Motor(20);
+                        //                            leftR2Motor(-20);
+                        //                            nextState = FoundT;
+                        //                            makeTransition = TRUE;
+                        //                            ThisEvent.EventType = ES_NO_EVENT;
+                        //                        } else if (param & RIGHT_TAPE_SENSOR) {
+                        //                            rightR2Motor(-20);
+                        //                            leftR2Motor(20);
+                        //                            nextState = FoundT;
+                        //                            makeTransition = TRUE;
+                        //                            ThisEvent.EventType = ES_NO_EVENT;
+                        //                        }
+                        //                        break;
+
+                    case TAPE_LOST:
+                        if (~param & LEFT_TAPE_SENSOR) {
+                            rightR2Motor(10);
                             leftR2Motor(25);
                             nextState = FoundT;
                             makeTransition = TRUE;
                             ThisEvent.EventType = ES_NO_EVENT;
-                         }
-
-                         else if(param & RIGHT_TAPE_SENSOR){
+                        } else if (~param & RIGHT_TAPE_SENSOR) {
                             rightR2Motor(25);
-                            leftR2Motor(-25);
+                            leftR2Motor(10);
                             nextState = FoundT;
                             makeTransition = TRUE;
                             ThisEvent.EventType = ES_NO_EVENT;
-                         }
-                    }
-                    break;
+                        }
+                        break;
+                    default:break;
+                }
 
-
-                case ES_TIMEOUT:
-                    break;
-
-                default: // all unhandled events pass the event back up to the next level
-                    break;
             }
-            break;
+            break; //End of FoundT
 
         default: break;
     } // end switch on Current State

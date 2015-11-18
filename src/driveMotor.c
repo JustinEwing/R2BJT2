@@ -249,6 +249,16 @@ uint8_t leftR2Motor(char speed){
     return SUCCESS;
 }
 
+uint8_t R2Motors(char left, char right){
+    if(leftR2Motor(left) == ERROR)
+        return ERROR;
+    if(rightR2Motor(right) == ERROR)
+        return ERROR;
+
+    return SUCCESS;
+
+}
+
 /**
  * @Function R2_BJT2_BatteryVoltage(void)
  * @param None.

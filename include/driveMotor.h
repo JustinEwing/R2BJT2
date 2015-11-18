@@ -65,13 +65,25 @@ uint8_t motorSpeed(uint16_t, char);
 uint8_t rightR2Motor(char speed);
 
 /******************************************************
- *  Function: leftR2Motor(uint8_t)
+
+  *  Function: leftR2Motor(uint8_t)
  *
  * Protocol:
  * 1. Sets a speed based on battery voltage for each motor
  * 2. returns ERROR or SUCCESS based on SET_PWMDutyCycle
  */
 uint8_t leftR2Motor(char speed);
+
+/******************************************************
+ *  Function: leftR2Motor(uint8_t)
+ *
+ * Protocol:
+ * 1. Sets a speed based on battery voltage for each motor
+ * 2. returns ERROR or SUCCESS based on SET_PWMDutyCycle
+ */
+uint8_t R2Motors(char left, char right);
+
+
 /**
  * @Function R2_BJT2_BatteryVoltage(void)
  * @param None.
