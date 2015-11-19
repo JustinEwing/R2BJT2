@@ -148,7 +148,7 @@ ES_Event RunTapeFollowing(ES_Event ThisEvent) {
                             case RIGHT_TAPE_SENSOR:
                                 R2Motors(-30, 0);
                                 // kinda sketch to use timer twice.. might work tho
-                                ES_Timer_InitTimer(ALIGNMENT_TIMER, 700);
+                                ES_Timer_InitTimer(ALIGNMENT_TIMER, 600);
                                 break;
                             default:break;
                         }
@@ -209,7 +209,7 @@ ES_Event RunTapeFollowing(ES_Event ThisEvent) {
                     case TAPE_LOST:
                         switch (ThisEvent.EventParam) {
                             case RIGHT_TAPE_SENSOR:
-                                R2Motors(-15, -25); // slight right to realign
+                                R2Motors(-20, -25); // slight right to realign
                                 ES_Timer_InitTimer(ALIGNMENT_TIMER, 400);
                                 break;
                             default:break;
@@ -218,7 +218,7 @@ ES_Event RunTapeFollowing(ES_Event ThisEvent) {
                         break;
 
                     case ES_TIMEOUT:
-                        R2Motors(20, 25);
+                        R2Motors(20, 22);
                         break;
 
                     case ES_EXIT:
