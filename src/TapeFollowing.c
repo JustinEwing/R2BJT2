@@ -37,20 +37,18 @@
 /*******************************************************************************
  * MODULE #DEFINES                                                             *
  ******************************************************************************/
-#define LIST_OF_TEMPLATE_STATES(STATE) \
+#define LIST_OF_TAPE_FOLLOWING_STATES(STATE) \
         STATE(InitPSubState) \
         STATE(SubFirst) /*Make sure state names are unique in their hierachy*/ \
-        STATE(SubNext)       \
-        STATE(SubAnother)  \
 
 #define ENUM_FORM(STATE) STATE, //Enums are reprinted verbatim and comma'd
 typedef enum {
-    LIST_OF_TEMPLATE_STATES(ENUM_FORM)
+    LIST_OF_TAPE_FOLLOWING_STATES(ENUM_FORM)
 } TapeFollowingState_t;
 
 #define STRING_FORM(STATE) #STATE, //Strings are stringified and comma'd
 static const char *StateNames[] = {
-    LIST_OF_TEMPLATE_STATES(STRING_FORM)
+    LIST_OF_TAPE_FOLLOWING_STATES(STRING_FORM)
 };
 
 
@@ -122,11 +120,6 @@ ES_Event RunTapeFollowing(ES_Event ThisEvent)
     case InitPSubState: // If current state is initial Psedudo State
         if (ThisEvent.EventType == ES_INIT)// only respond to ES_Init
         {
-            // this is where you would put any actions associated with the
-            // transition from the initial pseudo-state into the actual
-            // initial state
-
-            // now put the machine into the actual initial state
             CurrentState = SubFirst;
             makeTransition = TRUE;
             ThisEvent.EventType = ES_NO_EVENT;
@@ -156,7 +149,7 @@ ES_Event RunTapeFollowing(ES_Event ThisEvent)
             case ES_TIMEOUT:
                 // create the case statement for all other events that you are
                 // interested in responding to.
-                nextState = SubAnother;
+                //nextState = SubAnother;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
                 break;
