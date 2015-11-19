@@ -11,15 +11,21 @@
 /***************** Public Defines *****************/
 #define LEFT_MOTOR  0
 #define RIGHT_MOTOR 1
+#define FORWARD 30
+#define STOP     0
+
+#define R2DriveStraight() R2Motors(FORWARD, FORWARD);
+#define R2FullStop() R2Motors(STOP, STOP);
 
 /***************** Function Prototypes *****************
  * 0. InitMotors()
  * 1. motorDirection()
  * 2. setMotorSpeed()
- * 3.
- * 4.
- * 5.
- * 6.
+ * 3. rightR2Motor()
+ * 4. leftR2Motor()
+ * 5. R2Motors()
+ * 6. R2DriveStraight()
+ * 7. R2FullStop()
  * */
 
 /*************************************************************
