@@ -9,23 +9,26 @@
 #define	DRIVEMOTOR_H
 
 /***************** Public Defines *****************/
-#define LEFT_MOTOR  0
-#define RIGHT_MOTOR 1
-#define FORWARD 30
+#define DRIVE_FORWARD 30
+#define DRIVE_BACK -30
 #define STOP     0
 
-#define R2DriveStraight() R2Motors(FORWARD, FORWARD);
-#define R2FullStop() R2Motors(STOP, STOP);
+#define R2DriveStraight() R2Motors(DRIVE_FORWARD, DRIVE_FORWARD)
+#define R2DriveBack() R2Motors(DRIVE_BACK, DRIVE_BACK)
+#define R2TankRight() R2Motors(DRIVE_FORWARD, DRIVE_BACK)
+#define R2TankLeft() R2Motors(DRIVE_BACK, DRIVE_FORWARD)
+#define R2FullStop() R2Motors(STOP, STOP)
 
 /***************** Function Prototypes *****************
  * 0. InitMotors()
- * 1. motorDirection()
- * 2. setMotorSpeed()
- * 3. rightR2Motor()
- * 4. leftR2Motor()
- * 5. R2Motors()
- * 6. R2DriveStraight()
- * 7. R2FullStop()
+ * 1. rightR2Motor()
+ * 2. leftR2Motor()
+ * 3. R2Motors()
+ * 4. R2DriveStraight()
+ * 5. R2DriveBack()
+ * 6. R2FullStop()
+ * 7. R2TankRight()
+ * 8. R2TankLeft()
  * */
 
 /*************************************************************
@@ -41,25 +44,6 @@
 uint8_t initMotors(void);
 
 
-/******************************************************
- *  Function: motorDirection(uint8_t, uint8_t)
- *
- * Protocol:
- * 1. takes a motor define and a direction
- * 2.
- */
-
-void motorDirection(uint8_t, uint8_t);
-
-/******************************************************
- *  Function: motorSpeed(uint8_t, uint8_t)
- *
- * Protocol:
- * 1. Sets a speed based on battery voltage for each motor
- * 2. returns ERROR or SUCCESS based on SET_PWMDutyCycle
- */
-
-uint8_t motorSpeed(uint16_t, char);
 
 /******************************************************
  *  Function: rightR2Motor(uint8_t)
