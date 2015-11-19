@@ -146,7 +146,8 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
                         R2Motors(30,30);
                         break;
 
-                    case TAPE_FOUND: break;
+                    case TAPE_FOUND:
+                         //ThisEvent = RunTapeFollowing(ThisEvent); // run sub-state machine for this statebreak;
 
                     case BUMPED: break;
 
