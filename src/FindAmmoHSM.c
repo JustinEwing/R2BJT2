@@ -38,10 +38,11 @@
  * MODULE #DEFINES                                                             *
  ******************************************************************************/
 #define LIST_OF_FindAmmo_STATES(STATE) \
-        STATE(InitFindAmmoState) \
-STATE(Searching) \
-STATE(ReversingRight) \
-STATE(ReversingLeft)  \
+STATE(InitFindAmmoState)\
+STATE(SearchingForTape) \
+STATE(ReversingRight)   \
+STATE(ReversingLeft)    \
+STATE(FollowTape)       \
 
 #define ENUM_FORM(STATE) STATE, //Enums are reprinted verbatim and comma'd
 
@@ -134,13 +135,13 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
     switch (CurrentState) {
         case InitFindAmmoState: // If current state is initial Psedudo State
             if (ThisEvent.EventType == ES_INIT) {
-                nextState = Searching;
+                nextState = SearchingForTape;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
             }
             break;
 
-        case Searching:
+        case SearchingForTape:
             if (ThisEvent.EventType != ES_NO_EVENT) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
@@ -149,8 +150,11 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
 
                     case TAPE_FOUND:
                         //R2FullStop();
-                        //ThisEvent = RunTapeFollowing(ThisEvent); //Tape Following
-                        printf("Found\n");
+                        // //Tape Following
+                        dbprintf("Found\n");
+                        nextState = FollowTape;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
                         break;
 
                     case BUMPED:
@@ -166,6 +170,7 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
                                 ThisEvent.EventType = ES_NO_EVENT;
                                 break;
                         }
+                        break;
 
                     default: break;
                 }
@@ -182,7 +187,7 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
 
 
                     case ES_TIMEOUT:
-                        nextState = Searching;
+                        nextState = SearchingForTape;
                         makeTransition = TRUE;
                         ThisEvent.EventType = ES_NO_EVENT;
                         break;
@@ -202,7 +207,7 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
 
 
                     case ES_TIMEOUT:
-                        nextState = Searching;
+                        nextState = SearchingForTape;
                         makeTransition = TRUE;
                         ThisEvent.EventType = ES_NO_EVENT;
                         break;
@@ -211,6 +216,28 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
                 }
             }
             break; //End ReversingLeft
+
+        case FollowTape:
+            ThisEvent = RunTapeFollowing(ThisEvent);
+            if (ThisEvent.EventType != ES_NO_EVENT) {
+                switch (ThisEvent.EventType) {
+                    case ES_ENTRY:
+                        break;
+
+                    case BUMPED:
+                        R2FullStop();
+                        break;
+
+                    case ES_TIMEOUT:
+                        nextState = SearchingForTape;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;
+
+                    default: break;
+                }
+            }
+            break; //End FollowTape
 
         default: break;
     } // end switch on Current State

@@ -21,7 +21,7 @@
  * 11/07/11 11:26 jec      made the queue static
  * 10/30/11 17:59 jec      fixed references to CurrentEvent in RunTemplateSM()
  * 10/23/11 18:20 jec      began conversion from SMTemplate.c (02/20/07 rev)
-*/
+ */
 
 
 /*******************************************************************************
@@ -33,15 +33,19 @@
 #include "BOARD.h"
 #include "R2_BJT2_HSM.h"
 #include "TapeFollowing.h"
+#include "FindAmmoHSM.h"
+#include "R2TapeEvents.h"
 
 /*******************************************************************************
  * MODULE #DEFINES                                                             *
  ******************************************************************************/
 #define LIST_OF_TAPE_FOLLOWING_STATES(STATE) \
-        STATE(TapeFollowing) \
-        STATE(Align) /*Make sure state names are unique in their hierachy*/ \
+        STATE(InitTapeFollowingState) \
+        STATE(Align) \
+        STATE(Follow) \
 
 #define ENUM_FORM(STATE) STATE, //Enums are reprinted verbatim and comma'd
+
 typedef enum {
     LIST_OF_TAPE_FOLLOWING_STATES(ENUM_FORM)
 } TapeFollowingState_t;
@@ -64,7 +68,7 @@ static const char *StateNames[] = {
 /* You will need MyPriority and the state variable; you may need others as well.
  * The type of state variable should match that of enum in header file. */
 
-static TapeFollowingState_t CurrentState = TapeFollowing;   // <- change name to match ENUM
+static TapeFollowingState_t CurrentState = InitTapeFollowingState; // <- change name to match ENUM
 static uint8_t MyPriority;
 
 
@@ -82,11 +86,10 @@ static uint8_t MyPriority;
  *        to rename this to something appropriate.
  *        Returns TRUE if successful, FALSE otherwise
  * @author J. Edward Carryer, 2011.10.23 19:25 */
-uint8_t InitTapeFollowing(void)
-{
-     ES_Event returnEvent;
+uint8_t InitTapeFollowing(void) {
+    ES_Event returnEvent;
 
-    CurrentState = TapeFollowing;
+    CurrentState = InitTapeFollowingState;
     returnEvent = RunTapeFollowing(INIT_EVENT);
     if (returnEvent.EventType == ES_NO_EVENT) {
         return TRUE;
@@ -109,67 +112,84 @@ uint8_t InitTapeFollowing(void)
  *       not consumed as these need to pass pack to the higher level state machine.
  * @author J. Edward Carryer, 2011.10.23 19:25
  * @author Gabriel H Elkaim, 2011.10.23 19:25 */
-ES_Event RunTapeFollowing(ES_Event ThisEvent)
-{
+ES_Event RunTapeFollowing(ES_Event ThisEvent) {
     uint8_t makeTransition = FALSE; // use to flag transition
-    TapeFollowingState_t nextState;      // <- change type to correct enum
+    TapeFollowingState_t nextState; // <- change type to correct enum
 
     ES_Tattle(); // trace call stack
 
     switch (CurrentState) {
-    case TapeFollowing: // If current state is initial Psedudo State
-        if (ThisEvent.EventType == ES_INIT)// only respond to ES_Init
-        {
-            CurrentState = Align;
-            makeTransition = TRUE;
-            ThisEvent.EventType = ES_NO_EVENT;
-        }
-        break;
-
-    case Align: // in the first state, replace this with correct names
-        if (ThisEvent.EventType != ES_NO_EVENT) { // An event is still active
-            switch (ThisEvent.EventType) {
-            case ES_ENTRY:
-                CurrentState = Align;
-                makeTransition = FALSE;
-                ThisEvent.EventType = ES_NO_EVENT;
-                break;
-
-            case ES_EXIT:
-                // this is where you would put any actions associated with the
-                // exit from this state
-                break;
-
-            case ES_KEYINPUT:
-                // this is an example where the state does NOT transition
-                // do things you need to do in this state
-                // event consumed
-                ThisEvent.EventType = ES_NO_EVENT;
-                break;
-
-            case ES_TIMEOUT:
-                // create the case statement for all other events that you are
-                // interested in responding to.
-                //nextState = SubAnother;
+        case InitTapeFollowingState: // If current state is initial Psedudo State
+            if (ThisEvent.EventType == ES_INIT)// only respond to ES_Init
+            {
+                nextState = Align;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
-                break;
-
-            default: // all unhandled events pass the event back up to the next level
-                break;
             }
-        }
-        break;
+            break;
 
-    default: // all unhandled states fall into here
-        break;
+        case Align: // in the first state, replace this with correct names
+            if (ThisEvent.EventType != ES_NO_EVENT) { // An event is still active
+                switch (ThisEvent.EventType) {
+                    case ES_ENTRY:
+                        break;
+
+                    case ES_EXIT:
+                        break;
+
+                    case TAPE_FOUND: // not sure if this will work... might need more
+                        // states to compensate complex behavior
+                        switch (ThisEvent.EventParam) {
+                            case TOP_TAPE_SENSOR:
+                                R2Motors(-50, 50);
+                                break;
+                            case LEFT_TAPE_SENSOR:
+                                R2Motors(-50, 50);
+                                break;
+                            case RIGHT_TAPE_SENSOR:
+                                R2Motors(-20, 20);
+                                ES_Timer_InitTimer(ALIGNMENT_TIMER, 250);
+                                break;
+                            default:break;
+                        }
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;
+
+                    case ES_TIMEOUT:
+                        R2FullStop();
+                        break;
+
+                    default: // all unhandled events pass the event back up to the next level
+                        break;
+                }
+            }
+            break;//End Align
+
+        case Follow:
+            if (ThisEvent.EventType != ES_NO_EVENT) { // An event is still active
+                switch (ThisEvent.EventType) {
+                    case ES_ENTRY:
+                        R2DriveStraight();
+                        break;
+
+                    case ES_EXIT:
+                        break;
+
+                    default: // all unhandled events pass the event back up to the next level
+                        break;
+                }
+            }
+            break;//End Follow
+
+        default: // all unhandled states fall into here
+            break;
     } // end switch on Current State
 
     if (makeTransition == TRUE) { // making a state transition, send EXIT and ENTRY
         // recursively call the current state with an exit event
-        RunTapeFollowing(EXIT_EVENT);   // <- rename to your own Run function
+        RunTapeFollowing(EXIT_EVENT); // <- rename to your own Run function
         CurrentState = nextState;
-        RunTapeFollowing(ENTRY_EVENT);  // <- rename to your own Run function
+        RunTapeFollowing(ENTRY_EVENT); // <- rename to your own Run function
     }
 
     ES_Tail(); // trace call stack end
@@ -187,11 +207,10 @@ ES_Event RunTapeFollowing(ES_Event ThisEvent)
  ******************************************************************************/
 
 #ifdef TapeFollowing_TEST // <-- change this name and define it in your MPLAB-X
-                        //     project to run the test harness
+//     project to run the test harness
 #include <stdio.h>
 
-void main(void)
-{
+void main(void) {
     ES_Return_t ErrorType;
     BOARD_Init();
     // When doing testing, it is useful to annouce just which program
@@ -214,15 +233,15 @@ void main(void)
     //
 
     switch (ErrorType) {
-    case FailedPointer:
-        printf("Failed on NULL pointer");
-        break;
-    case FailedInit:
-        printf("Failed Initialization");
-        break;
-    default:
-        printf("Other Failure");
-        break;
+        case FailedPointer:
+            printf("Failed on NULL pointer");
+            break;
+        case FailedInit:
+            printf("Failed Initialization");
+            break;
+        default:
+            printf("Other Failure");
+            break;
     }
 
     while (1) {

@@ -83,7 +83,7 @@ static const char *EventNames[] = {
                           CheckTopTape,      \
                           CheckLeftTape,     \
                           CheckRightTape,    \
-                          CheckLauncherTape, \
+                          //CheckLauncherTape, \
 
 
 /****************************************************************************/
@@ -97,7 +97,7 @@ static const char *EventNames[] = {
 #define TIMER2_RESP_FUNC TIMER_UNUSED  
 #define TIMER3_RESP_FUNC Post_R2_BJT2_HSM    //backup timer
 #define TIMER4_RESP_FUNC PostR2BumperService
-#define TIMER5_RESP_FUNC TIMER_UNUSED
+#define TIMER5_RESP_FUNC Post_R2_BJT2_HSM    //Alignment timer
 #define TIMER6_RESP_FUNC TIMER_UNUSED
 #define TIMER7_RESP_FUNC TIMER_UNUSED
 #define TIMER8_RESP_FUNC TIMER_UNUSED
@@ -118,6 +118,7 @@ static const char *EventNames[] = {
 
 #define BACKUP_TIMER 3      //backup timer used in FindAmmo
 #define R2_BUMPER_TIMER 4   //This is for the Bumper Service
+#define ALIGNMENT_TIMER 5   //This is for the Alignment to the tape
 
 
 /****************************************************************************/
