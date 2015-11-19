@@ -1,5 +1,3 @@
-
-
 /*
  * File: DumpFollowing.c
  * Author: J. Edward Carryer
@@ -40,10 +38,11 @@
 /*******************************************************************************
  * MODULE #DEFINES                                                             *
  ******************************************************************************/
-#define LIST_OF_DUMP_FOLLOWING_STATES(STATE) \
-        STATE(InitDumpFollowingState) \
-        STATE(Align) \
-        STATE(Follow) \
+#define LIST_OF_DUMP_FOLLOWING_STATES(STATE)    \
+        STATE(InitDumpFollowingState)           \
+        STATE(Reverse)                          \
+        STATE(TankLeft)                         \
+        STATE(TurnRight)                        \
 
 #define ENUM_FORM(STATE) STATE, //Enums are reprinted verbatim and comma'd
 
@@ -123,41 +122,99 @@ ES_Event RunDumpFollowing(ES_Event ThisEvent) {
         case InitDumpFollowingState: // If current state is initial Psedudo State
             if (ThisEvent.EventType == ES_INIT)// only respond to ES_Init
             {
-                nextState = Align;
+                nextState = Reverse;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
             }
             break;
 
-        case Align:
+        case Reverse: // with slight left to stay in bounds
             if (ThisEvent.EventType != ES_NO_EVENT) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
+                        R2Motors(-20, -40);
+                        ES_Timer_InitTimer(BACKUP_TIMER, 400);
                         break;
 
                     case ES_EXIT:
+                        ES_Timer_StopTimer(BACKUP_TIMER);
+                        break;
+
+                    case ES_TIMEOUT:
+                        nextState = TankLeft;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
                         break;
 
                     default: // all unhandled events pass the event back up to the next level
                         break;
                 }
             }
-            break; //End Align
+            break; //End Reverse
 
-        case Follow:
+        case TankLeft:
             if (ThisEvent.EventType != ES_NO_EVENT) { // An event is still active
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
+                        R2Motors(-30, 40);
+                        ES_Timer_InitTimer(BACKUP_TIMER, 500);
                         break;
 
                     case ES_EXIT:
+                        ES_Timer_StopTimer(BACKUP_TIMER);
+                        break;
+
+                    case ES_TIMEOUT:
+                        nextState = TurnRight;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;
+
+
+                    default: // all unhandled events pass the event back up to the next level
+                        break;
+                }
+            }
+            break; //End TankLeft
+
+        case TurnRight:
+            if (ThisEvent.EventType != ES_NO_EVENT) { // An event is still active
+                switch (ThisEvent.EventType) {
+                    case ES_ENTRY:
+                        R2Motors(40, 15);
+                        ES_Timer_InitTimer(BACKUP_TIMER, 500);
+                        break;
+
+                    case ES_EXIT:
+                        break;
+
+                    case BUMPED:
+                        nextState = Reverse;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;
+
+                    case TAPE_FOUND:
+                        switch (ThisEvent.EventParam) {
+                            case TOP_TAPE_SENSOR:
+                                R2FullStop();
+                                break;
+                            case LEFT_TAPE_SENSOR:
+                                R2FullStop();
+                                break;
+                            case RIGHT_TAPE_SENSOR:
+                                R2FullStop();
+                                break;
+                            default:break;
+                        }
+                        ThisEvent.EventType = ES_NO_EVENT;
                         break;
 
                     default: // all unhandled events pass the event back up to the next level
                         break;
                 }
             }
-            break; //End Follow
+            break; //End TurnRight
 
         default: // all unhandled states fall into here
             break;

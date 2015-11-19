@@ -33,6 +33,7 @@
 #include "R2_BJT2_HSM.h"
 #include "FindAmmoHSM.h"
 #include "TapeFollowing.h"
+#include "DumpFollowing.h"
 
 /*******************************************************************************
  * MODULE #DEFINES                                                             *
@@ -246,20 +247,25 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
             }
             break; //End FollowTape
 
-        case Verify:        // not sur how we are doing this yet...
+        case Verify: // not sur how we are doing this yet...
             if (ThisEvent.EventType != ES_NO_EVENT) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
                         R2FullStop();
+                        ES_Timer_InitTimer(BACKUP_TIMER, 2000);
                         break;
 
                     case UNBUMPED:
                         break;
 
                     case ES_TIMEOUT:
+                        nextState = FollowDump;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
                         break;
 
                     case ES_EXIT:
+                        ES_Timer_StopTimer(BACKUP_TIMER);
                         break;
 
                     default: break;
@@ -268,10 +274,11 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
             break; //End Verify
 
         case FollowDump:
+            ThisEvent = RunDumpFollowing(ThisEvent);
             if (ThisEvent.EventType != ES_NO_EVENT) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
-                        R2FullStop();
+                        //R2FullStop();
                         break;
 
                     case BUMPED:
@@ -280,10 +287,23 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
                     case ES_TIMEOUT:
                         break;
 
+                    case TAPE_FOUND:
+                        switch (ThisEvent.EventParam) {
+                            case TOP_TAPE_SENSOR:
+                                break;
+                            case LEFT_TAPE_SENSOR:
+                                break;
+                            case RIGHT_TAPE_SENSOR:
+                                break;
+                            default:break;
+                        }
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;
+
                     default: break;
                 }
             }
-            break; //End Verify
+            break; //End FollowDump
 
 
 
