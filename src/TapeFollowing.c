@@ -128,8 +128,8 @@ ES_Event RunTapeFollowing(ES_Event ThisEvent) {
             }
             break;
 
-        case Align: // in the first state, replace this with correct names
-            if (ThisEvent.EventType != ES_NO_EVENT) { // An event is still active
+        case Align:
+            if (ThisEvent.EventType != ES_NO_EVENT) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
                         break;
@@ -137,18 +137,39 @@ ES_Event RunTapeFollowing(ES_Event ThisEvent) {
                     case ES_EXIT:
                         break;
 
-                    case TAPE_FOUND: // not sure if this will work... might need more
-                        // states to compensate complex behavior
+                    case TAPE_FOUND:
                         switch (ThisEvent.EventParam) {
                             case TOP_TAPE_SENSOR:
-                                R2Motors(-50, 50);
+                                R2Motors(-20, 20);
                                 break;
                             case LEFT_TAPE_SENSOR:
-                                R2Motors(-50, 50);
+                                R2Motors(-20, 20);
                                 break;
                             case RIGHT_TAPE_SENSOR:
-                                R2Motors(-20, 20);
-                                ES_Timer_InitTimer(ALIGNMENT_TIMER, 250);
+                                R2Motors(-30, 0);
+                                // kinda sketch to use timer twice.. might work tho
+                                ES_Timer_InitTimer(ALIGNMENT_TIMER, 700);
+                                break;
+                            default:break;
+                        }
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;
+
+                    case TAPE_LOST:
+                        switch (ThisEvent.EventParam) {
+                            case TOP_TAPE_SENSOR:
+                                //R2FullStop();
+                                //R2Motors(-20, -10);
+                                //ES_Timer_InitTimer(ALIGNMENT_TIMER, 250);
+                                break;
+                            case LEFT_TAPE_SENSOR:
+                                break;
+                            case RIGHT_TAPE_SENSOR:
+                                ES_Timer_StopTimer(ALIGNMENT_TIMER);
+                                R2FullStop();
+                                nextState = Follow;
+                                makeTransition = TRUE;
+                                ThisEvent.EventType = ES_NO_EVENT;
                                 break;
                             default:break;
                         }
@@ -157,19 +178,47 @@ ES_Event RunTapeFollowing(ES_Event ThisEvent) {
 
                     case ES_TIMEOUT:
                         R2FullStop();
+                        nextState = Follow;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
                         break;
 
                     default: // all unhandled events pass the event back up to the next level
                         break;
                 }
             }
-            break;//End Align
+            break; //End Align
 
         case Follow:
             if (ThisEvent.EventType != ES_NO_EVENT) { // An event is still active
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
-                        R2DriveStraight();
+                        R2Motors(20, 25);
+                        break;
+
+                    case TAPE_FOUND:
+                        switch (ThisEvent.EventParam) {
+                            case TOP_TAPE_SENSOR:
+                                R2Motors(-20, 0); // slight left to realign
+                                ES_Timer_InitTimer(ALIGNMENT_TIMER, 400);
+                                break;
+                        }
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;
+
+                    case TAPE_LOST:
+                        switch (ThisEvent.EventParam) {
+                            case RIGHT_TAPE_SENSOR:
+                                R2Motors(-15, -25); // slight right to realign
+                                ES_Timer_InitTimer(ALIGNMENT_TIMER, 400);
+                                break;
+                            default:break;
+                        }
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;
+
+                    case ES_TIMEOUT:
+                        R2Motors(20, 25);
                         break;
 
                     case ES_EXIT:
@@ -179,7 +228,7 @@ ES_Event RunTapeFollowing(ES_Event ThisEvent) {
                         break;
                 }
             }
-            break;//End Follow
+            break; //End Follow
 
         default: // all unhandled states fall into here
             break;

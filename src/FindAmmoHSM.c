@@ -43,6 +43,7 @@ STATE(SearchingForTape) \
 STATE(ReversingRight)   \
 STATE(ReversingLeft)    \
 STATE(FollowTape)       \
+STATE(Verify)           \
 
 #define ENUM_FORM(STATE) STATE, //Enums are reprinted verbatim and comma'd
 
@@ -145,7 +146,8 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
             if (ThisEvent.EventType != ES_NO_EVENT) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
-                        R2DriveStraight();
+                        //R2DriveStraight();
+                        R2Motors(20, 20); // trying a slower speed...
                         break;
 
                     case TAPE_FOUND:
@@ -228,10 +230,20 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
                         R2FullStop();
                         break;
 
-                    case ES_TIMEOUT:
-                        nextState = SearchingForTape;
-                        makeTransition = TRUE;
-                        ThisEvent.EventType = ES_NO_EVENT;
+                    default: break;
+                }
+            }
+            break; //End FollowTape
+
+        case Verify:
+            ThisEvent = RunTapeFollowing(ThisEvent);
+            if (ThisEvent.EventType != ES_NO_EVENT) {
+                switch (ThisEvent.EventType) {
+                    case ES_ENTRY:
+                        R2FullStop();
+                        break;
+
+                    case BUMPED:
                         break;
 
                     default: break;
