@@ -220,7 +220,7 @@ return thisEvent;
 
 ES_Event R2_LauncherTape(){
             // We assume the bot starts in a white area, hence BLACK_TO_WHITE
-    static tapestate_t PrevRightTapeState = BLACK_TO_WHITE;
+    static tapestate_t PrevLauncherTapeState = BLACK_TO_WHITE;
 
     // thisEvent, which will be posted to the HSM on a TAPE_FOUND or
     //TAPE_LOST event
@@ -230,7 +230,7 @@ ES_Event R2_LauncherTape(){
     // value from ADC
     uint16_t TapeReading = 0;
 
-    tapestate_t NewRightTapeState = PrevRightTapeState; // Temp value
+    tapestate_t NewRightTapeState = PrevLauncherTapeState; // Temp value
 
     TapeReading = ReadTapeDetector(LAUNCHER_TAPE_PIN); //ADC value
 
@@ -238,7 +238,7 @@ ES_Event R2_LauncherTape(){
         return thisEvent;
 
     // Case: Tape Found
-    if ((PrevRightTapeState == BLACK_TO_WHITE) &&
+    if ((PrevLauncherTapeState == BLACK_TO_WHITE) &&
             (TapeReading > BLACK_HYSTERESIS) &&
             (TapeReading < ROOM_LIGHT_LEVEL)) {
         thisEvent.EventType = TAPE_FOUND;
@@ -248,7 +248,7 @@ ES_Event R2_LauncherTape(){
     }
 
     // Case: Tape Lost
-    if ((PrevRightTapeState == WHITE_TO_BLACK) &&
+    if ((PrevLauncherTapeState == WHITE_TO_BLACK) &&
             (TapeReading < WHITE_HYSTERESIS)) {
         thisEvent.EventType = TAPE_LOST;
         thisEvent.EventParam = LAUNCHER_TAPE_SENSOR;
@@ -260,7 +260,7 @@ ES_Event R2_LauncherTape(){
             thisEvent.EventParam, TapeSensor, ~TapeSensor);
 
 // PrevTapeState updated with NewTapeState
-PrevRightTapeState = NewRightTapeState;
+PrevLauncherTapeState = NewRightTapeState;
 
 return thisEvent;
 }
