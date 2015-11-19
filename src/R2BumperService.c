@@ -111,7 +111,6 @@ uint8_t InitR2BumperService(uint8_t Priority) {
     // Initialize Timers
     ES_Timer_Init();
 
-
     // post the initial transition event
     ThisEvent.EventType = ES_INIT;
     if (ES_PostToService(MyPriority, ThisEvent) == TRUE) {
@@ -150,9 +149,14 @@ ES_Event RunR2BumperService(ES_Event ThisEvent) {
     // This service is supposed to run because of a timeout event!
     // Posts events whenever the bumper's status changes
     
-    ES_Event ReturnEvent;
     ES_Event BumpEvent;
-    ReturnEvent.EventType = ES_NO_EVENT; // assume no errors
+    BumpEvent.EventType = ES_NO_EVENT; // assume no errors
+
+    if (ThisEvent.EventType == ES_INIT)// only respond to ES_Init
+    {
+        // Initialize R2BumperService Timer to 5 Milliseconds
+        ES_Timer_InitTimer(R2_BUMPER_TIMER, FIVE_MILLISECONDS); // Set Timer4 to 5 milliseconds
+    }
 
     if (ThisEvent.EventType == ES_TIMEOUT) {
         uint8_t bump_state = R2_ReadBumpers();
@@ -203,18 +207,11 @@ ES_Event RunR2BumperService(ES_Event ThisEvent) {
         }
 
         // Reset the Timer
-        // Initialize R2BumperService Timer to 5 Milliseconds
-        ES_Timer_InitTimer(R2_BUMPER_TIMER, FIVE_MILLISECONDS); // Set Timer4 to 5 milliseconds
-
-    }
-
-    if (ThisEvent.EventType == ES_INIT)// only respond to ES_Init
-    {
-        // Initialize R2BumperService Timer to 5 Milliseconds
         ES_Timer_InitTimer(R2_BUMPER_TIMER, FIVE_MILLISECONDS); // Set Timer4 to 5 milliseconds
     }
+    
     dbprintf("Exiting %s\n", __FUNCTION__);
-    return ReturnEvent;
+    return BumpEvent;
 }
 
 /*******************************************************************************

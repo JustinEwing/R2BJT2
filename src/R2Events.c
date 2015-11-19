@@ -32,7 +32,7 @@ static beaconstate_t PrevBeaconState = WAS_LOST;
 #endif
 
 
-uint8_t CheckTape(void) {
+uint8_t CheckTopTape(void) {
     dbprintf("Entered %s\n", __FUNCTION__);
     /***************** Declarations ****************/
     // thisEvent, which will be posted to the HSM on a TAPE_FOUND or
@@ -43,7 +43,76 @@ uint8_t CheckTape(void) {
     // posted an event. We assume no event initially happens, hence FALSE
     uint8_t returnVal = FALSE;
 
-    thisEvent = CheckTapeReading();
+    thisEvent = R2_TopTape();
+
+    //If an event has happened.
+    if(thisEvent.EventType != ES_NO_EVENT) {
+        Post_R2_BJT2_HSM(thisEvent);
+        returnVal = TRUE;
+    }
+
+    dbprintf("Exit %s\n", __FUNCTION__);
+    return returnVal;
+}
+
+uint8_t CheckLeftTape(void) {
+    dbprintf("Entered %s\n", __FUNCTION__);
+    /***************** Declarations ****************/
+    // thisEvent, which will be posted to the HSM on a TAPE_FOUND or
+    //TAPE_LOST event
+    ES_Event thisEvent;
+
+    // returnVal, which will be used by the ES_Framework to see if this event
+    // posted an event. We assume no event initially happens, hence FALSE
+    uint8_t returnVal = FALSE;
+
+    thisEvent = R2_LeftTape();
+
+    //If an event has happened.
+    if(thisEvent.EventType != ES_NO_EVENT) {
+        Post_R2_BJT2_HSM(thisEvent);
+        returnVal = TRUE;
+    }
+
+    dbprintf("Exit %s\n", __FUNCTION__);
+    return returnVal;
+}
+
+uint8_t CheckRightTape(void) {
+    dbprintf("Entered %s\n", __FUNCTION__);
+    /***************** Declarations ****************/
+    // thisEvent, which will be posted to the HSM on a TAPE_FOUND or
+    //TAPE_LOST event
+    ES_Event thisEvent;
+
+    // returnVal, which will be used by the ES_Framework to see if this event
+    // posted an event. We assume no event initially happens, hence FALSE
+    uint8_t returnVal = FALSE;
+
+    thisEvent = R2_RightTape();
+
+    //If an event has happened.
+    if(thisEvent.EventType != ES_NO_EVENT) {
+        Post_R2_BJT2_HSM(thisEvent);
+        returnVal = TRUE;
+    }
+
+    dbprintf("Exit %s\n", __FUNCTION__);
+    return returnVal;
+}
+
+uint8_t CheckLauncherTape(void) {
+    dbprintf("Entered %s\n", __FUNCTION__);
+    /***************** Declarations ****************/
+    // thisEvent, which will be posted to the HSM on a TAPE_FOUND or
+    //TAPE_LOST event
+    ES_Event thisEvent;
+
+    // returnVal, which will be used by the ES_Framework to see if this event
+    // posted an event. We assume no event initially happens, hence FALSE
+    uint8_t returnVal = FALSE;
+
+    thisEvent = R2_LauncherTape();
 
     //If an event has happened.
     if(thisEvent.EventType != ES_NO_EVENT) {
@@ -99,3 +168,4 @@ uint8_t InitBeacon(void) {
 uint8_t InitTrackWire(void) {
     return 0;// AD_AddPins(RIGHT_TRACK_PIN | LEFT_TRACK_PIN);
 }
+
