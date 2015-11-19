@@ -38,7 +38,7 @@
  * MODULE #DEFINES                                                             *
  ******************************************************************************/
 #define LIST_OF_TAPE_FOLLOWING_STATES(STATE) \
-        STATE(InitPSubState) \
+        STATE(TapeFollowing) \
         STATE(SubFirst) /*Make sure state names are unique in their hierachy*/ \
 
 #define ENUM_FORM(STATE) STATE, //Enums are reprinted verbatim and comma'd
@@ -64,7 +64,7 @@ static const char *StateNames[] = {
 /* You will need MyPriority and the state variable; you may need others as well.
  * The type of state variable should match that of enum in header file. */
 
-static TapeFollowingState_t CurrentState = InitTapeFollowing;   // <- change name to match ENUM
+static TapeFollowingState_t CurrentState = TapeFollowing;   // <- change name to match ENUM
 static uint8_t MyPriority;
 
 
@@ -86,7 +86,7 @@ uint8_t InitTapeFollowing(void)
 {
      ES_Event returnEvent;
 
-    CurrentState = InitTapeFollowing;
+    CurrentState = TapeFollowing;
     returnEvent = RunTapeFollowing(INIT_EVENT);
     if (returnEvent.EventType == ES_NO_EVENT) {
         return TRUE;
@@ -117,7 +117,7 @@ ES_Event RunTapeFollowing(ES_Event ThisEvent)
     ES_Tattle(); // trace call stack
 
     switch (CurrentState) {
-    case InitPSubState: // If current state is initial Psedudo State
+    case TapeFollowing: // If current state is initial Psedudo State
         if (ThisEvent.EventType == ES_INIT)// only respond to ES_Init
         {
             CurrentState = SubFirst;
