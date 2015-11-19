@@ -13,7 +13,7 @@
 #define DRIVE_BACK -30
 #define STOP     0
 
-#define R2DriveStraight() R2Motors(DRIVE_FORWARD, DRIVE_FORWARD)
+#define R2DriveStraight() R2Motors(DRIVE_FORWARD+2, DRIVE_FORWARD)//trying to compensate for misalignment
 #define R2DriveBack() R2Motors(DRIVE_BACK, DRIVE_BACK)
 #define R2TankRight() R2Motors(DRIVE_FORWARD, DRIVE_BACK)
 #define R2TankLeft() R2Motors(DRIVE_BACK, DRIVE_FORWARD)

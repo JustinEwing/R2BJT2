@@ -153,6 +153,7 @@ ES_Event Run_R2_BJT2_HSM(ES_Event ThisEvent) {
 
                 InitFindAmmoHSM();
                 InitTapeFollowing();
+                InitDumpFollowing();
                 //InitFindOpponentHSM();
                 //InitFindPortalHSM();
 

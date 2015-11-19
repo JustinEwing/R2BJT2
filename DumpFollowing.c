@@ -1,5 +1,7 @@
+
+
 /*
- * File: FindAmmoHSM.c
+ * File: DumpFollowing.c
  * Author: J. Edward Carryer
  * Modified: Gabriel H Elkaim
  *
@@ -31,41 +33,28 @@
 #include "ES_Framework.h"
 #include "BOARD.h"
 #include "R2_BJT2_HSM.h"
+#include "DumpFollowing.h"
 #include "FindAmmoHSM.h"
-#include "TapeFollowing.h"
+#include "R2TapeEvents.h"
 
 /*******************************************************************************
  * MODULE #DEFINES                                                             *
  ******************************************************************************/
-#define LIST_OF_FindAmmo_STATES(STATE) \
-STATE(InitFindAmmoState)\
-STATE(SearchingForTape) \
-STATE(ReversingRight)   \
-STATE(ReversingLeft)    \
-STATE(FollowTape)       \
-STATE(Verify)           \
-STATE(FollowDump)       \
+#define LIST_OF_DUMP_FOLLOWING_STATES(STATE) \
+        STATE(InitDumpFollowingState) \
+        STATE(Align) \
+        STATE(Follow) \
 
 #define ENUM_FORM(STATE) STATE, //Enums are reprinted verbatim and comma'd
 
 typedef enum {
-    LIST_OF_FindAmmo_STATES(ENUM_FORM)
-} FindAmmoState_t;
+    LIST_OF_DUMP_FOLLOWING_STATES(ENUM_FORM)
+} DumpFollowingState_t;
 
 #define STRING_FORM(STATE) #STATE, //Strings are stringified and comma'd
 static const char *StateNames[] = {
-    LIST_OF_FindAmmo_STATES(STRING_FORM)
+    LIST_OF_DUMP_FOLLOWING_STATES(STRING_FORM)
 };
-
-//#define FINDAMMO_HSM_DEBUG_VERBOSE
-#ifdef FINDAMMO_HSM_DEBUG_VERBOSE
-#include "serial.h"
-#include <stdio.h>
-#define dbprintf(...) while(!IsTransmitEmpty()); printf(__VA_ARGS__)
-#else
-#define dbprintf(...)
-#endif
-
 
 
 /*******************************************************************************
@@ -80,7 +69,7 @@ static const char *StateNames[] = {
 /* You will need MyPriority and the state variable; you may need others as well.
  * The type of state variable should match that of enum in header file. */
 
-static FindAmmoState_t CurrentState = InitFindAmmoState;
+static DumpFollowingState_t CurrentState = InitDumpFollowingState; // <- change name to match ENUM
 static uint8_t MyPriority;
 
 
@@ -89,7 +78,7 @@ static uint8_t MyPriority;
  ******************************************************************************/
 
 /**
- * @Function InitFindAmmoHSM(uint8_t Priority)
+ * @Function InitDumpFollowing(uint8_t Priority)
  * @param Priority - internal variable to track which event queue to use
  * @return TRUE or FALSE
  * @brief This will get called by the framework at the beginning of the code
@@ -98,13 +87,11 @@ static uint8_t MyPriority;
  *        to rename this to something appropriate.
  *        Returns TRUE if successful, FALSE otherwise
  * @author J. Edward Carryer, 2011.10.23 19:25 */
-uint8_t InitFindAmmoHSM(void) {
+uint8_t InitDumpFollowing(void) {
     ES_Event returnEvent;
 
-    dbprintf("Entered %s\n", __FUNCTION__);
-
-    CurrentState = InitFindAmmoState;
-    returnEvent = RunFindAmmoHSM(INIT_EVENT);
+    CurrentState = InitDumpFollowingState;
+    returnEvent = RunDumpFollowing(INIT_EVENT);
     if (returnEvent.EventType == ES_NO_EVENT) {
         return TRUE;
     }
@@ -112,7 +99,7 @@ uint8_t InitFindAmmoHSM(void) {
 }
 
 /**
- * @Function RunFindAmmoHSM(ES_Event ThisEvent)
+ * @Function RunDumpFollowing(ES_Event ThisEvent)
  * @param ThisEvent - the event (type and param) to be responded.
  * @return Event - return event (type and param), in general should be ES_NO_EVENT
  * @brief This function is where you implement the whole of the heirarchical state
@@ -126,175 +113,61 @@ uint8_t InitFindAmmoHSM(void) {
  *       not consumed as these need to pass pack to the higher level state machine.
  * @author J. Edward Carryer, 2011.10.23 19:25
  * @author Gabriel H Elkaim, 2011.10.23 19:25 */
-ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
-    //dbprintf("Entered %s with %s event and %s event parameter\n", __FUNCTION__, ThisEvent.EventType, ThisEvent.EventParam);
-
+ES_Event RunDumpFollowing(ES_Event ThisEvent) {
     uint8_t makeTransition = FALSE; // use to flag transition
-    FindAmmoState_t nextState; // <- change type to correct enum
+    DumpFollowingState_t nextState; // <- change type to correct enum
 
     ES_Tattle(); // trace call stack
 
     switch (CurrentState) {
-        case InitFindAmmoState: // If current state is initial Psedudo State
-            if (ThisEvent.EventType == ES_INIT) {
-                nextState = SearchingForTape;
+        case InitDumpFollowingState: // If current state is initial Psedudo State
+            if (ThisEvent.EventType == ES_INIT)// only respond to ES_Init
+            {
+                nextState = Align;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
             }
             break;
 
-        case SearchingForTape:
+        case Align:
             if (ThisEvent.EventType != ES_NO_EVENT) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
-                        //R2DriveStraight();
-                        R2Motors(20, 20); // trying a slower speed...
-                        break;
-
-                    case TAPE_FOUND:
-                        //R2FullStop();
-                        // //Tape Following
-                        dbprintf("Found\n");
-                        nextState = FollowTape;
-                        makeTransition = TRUE;
-                        ThisEvent.EventType = ES_NO_EVENT;
-                        break;
-
-                    case BUMPED:
-                        switch (ThisEvent.EventParam) {
-                            case LEFT_BUMPER:
-                                nextState = ReversingRight;
-                                makeTransition = TRUE;
-                                ThisEvent.EventType = ES_NO_EVENT;
-                                break;
-                            case RIGHT_BUMPER:
-                                nextState = ReversingLeft;
-                                makeTransition = TRUE;
-                                ThisEvent.EventType = ES_NO_EVENT;
-                                break;
-                        }
-                        break;
-
-                    default: break;
-                }
-            }
-            break; // End Searching
-
-        case ReversingRight:
-            if (ThisEvent.EventType != ES_NO_EVENT) {
-                switch (ThisEvent.EventType) {
-                    case ES_ENTRY:
-                        R2Motors(-20, -50);
-                        ES_Timer_InitTimer(BACKUP_TIMER, 500);
-                        break;
-
-
-                    case ES_TIMEOUT:
-                        nextState = SearchingForTape;
-                        makeTransition = TRUE;
-                        ThisEvent.EventType = ES_NO_EVENT;
-                        break;
-
-                    case ES_EXIT:
-                        ES_Timer_StopTimer(BACKUP_TIMER);
-                        break;
-
-                    default: break;
-                }
-            }
-            break; //End ReversingRight
-
-        case ReversingLeft:
-            if (ThisEvent.EventType != ES_NO_EVENT) {
-                switch (ThisEvent.EventType) {
-                    case ES_ENTRY:
-                        R2Motors(-50, -20);
-                        ES_Timer_InitTimer(BACKUP_TIMER, 500);
-                        break;
-
-
-                    case ES_TIMEOUT:
-                        nextState = SearchingForTape;
-                        makeTransition = TRUE;
-                        ThisEvent.EventType = ES_NO_EVENT;
-                        break;
-
-                    case ES_EXIT:
-                        ES_Timer_StopTimer(BACKUP_TIMER);
-                        break;
-
-                    default: break;
-                }
-            }
-            break; //End ReversingLeft
-
-        case FollowTape:
-            ThisEvent = RunTapeFollowing(ThisEvent);
-            if (ThisEvent.EventType != ES_NO_EVENT) {
-                switch (ThisEvent.EventType) {
-                    case ES_ENTRY:
-                        break;
-
-                    case BUMPED:
-                        nextState = Verify;
-                        makeTransition = TRUE;
-                        ThisEvent.EventType = ES_NO_EVENT;
-                        break;
-
-                    default: break;
-                }
-            }
-            break; //End FollowTape
-
-        case Verify:        // not sur how we are doing this yet...
-            if (ThisEvent.EventType != ES_NO_EVENT) {
-                switch (ThisEvent.EventType) {
-                    case ES_ENTRY:
-                        R2FullStop();
-                        break;
-
-                    case UNBUMPED:
-                        break;
-
-                    case ES_TIMEOUT:
                         break;
 
                     case ES_EXIT:
                         break;
 
-                    default: break;
+                    default: // all unhandled events pass the event back up to the next level
+                        break;
                 }
             }
-            break; //End Verify
+            break; //End Align
 
-        case FollowDump:
-            if (ThisEvent.EventType != ES_NO_EVENT) {
+        case Follow:
+            if (ThisEvent.EventType != ES_NO_EVENT) { // An event is still active
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
-                        R2FullStop();
                         break;
 
-                    case BUMPED:
+                    case ES_EXIT:
                         break;
 
-                    case ES_TIMEOUT:
+                    default: // all unhandled events pass the event back up to the next level
                         break;
-
-                    default: break;
                 }
             }
-            break; //End Verify
+            break; //End Follow
 
-
-
-        default: break;
+        default: // all unhandled states fall into here
+            break;
     } // end switch on Current State
 
     if (makeTransition == TRUE) { // making a state transition, send EXIT and ENTRY
         // recursively call the current state with an exit event
-        RunFindAmmoHSM(EXIT_EVENT);
+        RunDumpFollowing(EXIT_EVENT); // <- rename to your own Run function
         CurrentState = nextState;
-        RunFindAmmoHSM(ENTRY_EVENT);
+        RunDumpFollowing(ENTRY_EVENT); // <- rename to your own Run function
     }
 
     ES_Tail(); // trace call stack end
@@ -311,7 +184,7 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
  * TEST HARNESS                                                                *
  ******************************************************************************/
 
-#ifdef FindAmmoHSM_TEST // <-- change this name and define it in your MPLAB-X
+#ifdef DumpFollowing_TEST // <-- change this name and define it in your MPLAB-X
 //     project to run the test harness
 #include <stdio.h>
 
@@ -354,4 +227,4 @@ void main(void) {
     }
 }
 
-#endif // FindAmmoHSM_TEST
+#endif // DumpFollowing_TEST

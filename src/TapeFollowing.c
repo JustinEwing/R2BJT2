@@ -200,7 +200,6 @@ ES_Event RunTapeFollowing(ES_Event ThisEvent) {
                         switch (ThisEvent.EventParam) {
                             case TOP_TAPE_SENSOR:
                                 R2Motors(-20, 15);
-                                //ES_Timer_InitTimer(ALIGNMENT_TIMER, 400);
                                 break;
                         }
                         ThisEvent.EventType = ES_NO_EVENT;
@@ -208,13 +207,8 @@ ES_Event RunTapeFollowing(ES_Event ThisEvent) {
 
                     case TAPE_LOST:
                         switch (ThisEvent.EventParam) {
-                            case RIGHT_TAPE_SENSOR:
-                                //R2Motors(-20, -10); // slight right to realign
-                                //ES_Timer_InitTimer(ALIGNMENT_TIMER, 400);
-                                break;
                             case TOP_TAPE_SENSOR:
                                 R2Motors(25, 20);
-                                //ES_Timer_InitTimer(ALIGNMENT_TIMER, 400);
                                 break;
                             default:break;
                         }
