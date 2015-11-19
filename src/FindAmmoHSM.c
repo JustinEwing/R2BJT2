@@ -32,6 +32,7 @@
 #include "BOARD.h"
 #include "R2_BJT2_HSM.h"
 #include "FindAmmoHSM.h"
+#include "TapeFollowing.h"
 
 /*******************************************************************************
  * MODULE #DEFINES                                                             *
@@ -39,6 +40,8 @@
 #define LIST_OF_FindAmmo_STATES(STATE) \
         STATE(InitFindAmmoState) \
 STATE(Searching) \
+STATE(ReversingRight) \
+STATE(ReversingLeft)  \
 
 #define ENUM_FORM(STATE) STATE, //Enums are reprinted verbatim and comma'd
 
@@ -138,25 +141,83 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
             break;
 
         case Searching:
-            // This state assumes we have just collected ammo and that
-            // we are still positioned directly in front of the ammo dump
             if (ThisEvent.EventType != ES_NO_EVENT) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
-                        R2Motors(30,30);
+                        R2DriveStraight();
                         break;
 
-                    case TAPE_FOUND: break;
-
-                    case BUMPED: break;
-
-                    case ES_TIMEOUT:  break;
-
-                    default:
+                    case TAPE_FOUND:
+                        R2FullStop();
+                        //ThisEvent = RunTapeFollowing(ThisEvent); //Tape Following
                         break;
+
+                    case BUMPED:
+                        switch (ThisEvent.EventParam) {
+                            case LEFT_BUMPER:
+                                nextState = ReversingRight;
+                                makeTransition = TRUE;
+                                ThisEvent.EventType = ES_NO_EVENT;
+                                break;
+                            case RIGHT_BUMPER:
+                                nextState = ReversingLeft;
+                                makeTransition = TRUE;
+                                ThisEvent.EventType = ES_NO_EVENT;
+                                break;
+                        }
+
+                    default: break;
                 }
             }
-            break;
+            break; // End Searching
+
+        case ReversingRight:
+            if (ThisEvent.EventType != ES_NO_EVENT) {
+                switch (ThisEvent.EventType) {
+                    case ES_ENTRY:
+                        R2Motors(-20, -30);
+                        ES_Timer_InitTimer(BACKUP_TIMER, 500);
+                        break;
+
+                    case UNBUMPED:
+                        R2Motors(-20, -30);
+                        ES_Timer_InitTimer(BACKUP_TIMER, 500);
+                        break;
+
+                    case ES_TIMEOUT:
+                        nextState = Searching;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;
+
+                    default: break;
+                }
+            }
+            break; //End ReversingRight
+
+        case ReversingLeft:
+            if (ThisEvent.EventType != ES_NO_EVENT) {
+                switch (ThisEvent.EventType) {
+                    case ES_ENTRY:
+                        R2Motors(-30, -20);
+                        ES_Timer_InitTimer(BACKUP_TIMER, 500);
+                        break;
+
+                    case UNBUMPED:
+                        R2Motors(-30, -20);
+                        ES_Timer_InitTimer(BACKUP_TIMER, 500);
+                        break;
+
+                    case ES_TIMEOUT:
+                        nextState = Searching;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;
+
+                    default: break;
+                }
+            }
+            break; //End ReversingLeft
 
         default: break;
     } // end switch on Current State

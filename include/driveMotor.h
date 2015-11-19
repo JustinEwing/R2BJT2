@@ -11,10 +11,16 @@
 /***************** Public Defines *****************/
 #define LEFT_MOTOR  0
 #define RIGHT_MOTOR 1
-#define FORWARD 30
+#define RIGHT_FORWARD 30
+#define LEFT_FORWARD  30
+#define RIGHT_BACK -30
+#define LEFT_BACK  -30
 #define STOP     0
 
-#define R2DriveStraight() R2Motors(FORWARD, FORWARD);
+#define R2DriveStraight() R2Motors(LEFT_FORWARD, RIGHT_FORWARD);
+#define R2DriveBack() R2Motors(LEFT_BACK, RIGHT_BACK);
+#define R2TankRight() R2Motors(LEFT_FORWARD, RIGHT_BACK);
+#define R2TankLeft() R2Motors(LEFT_BACK, RIGHT_FORWARD);
 #define R2FullStop() R2Motors(STOP, STOP);
 
 /***************** Function Prototypes *****************
@@ -72,7 +78,7 @@ uint8_t rightR2Motor(char speed);
 
 /******************************************************
 
-  *  Function: leftR2Motor(uint8_t)
+ *  Function: leftR2Motor(uint8_t)
  *
  * Protocol:
  * 1. Sets a speed based on battery voltage for each motor
