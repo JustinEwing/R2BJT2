@@ -19,10 +19,10 @@
  *
  */
 
-#define DELAY(x)         for (wait = 0; wait <= x; wait++) {asm("nop");}
+#define DELAY(x)         for (wait = 0; wait <= x; wait++) {asm("nop");} // <-not supposed to have semicolon??
 unsigned int wait = 0;
 //// Tape Sensors
-#define TOP_TAPE_PIN       AD_PORTV8 // Should be PortV5
+#define TOP_TAPE_PIN       AD_PORTV8 
 #define LEFT_TAPE_PIN      AD_PORTV6
 #define RIGHT_TAPE_PIN     AD_PORTV7
 #define LAUNCHER_TAPE_PIN  AD_PORTV8

@@ -193,14 +193,14 @@ ES_Event RunTapeFollowing(ES_Event ThisEvent) {
             if (ThisEvent.EventType != ES_NO_EVENT) { // An event is still active
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
-                        R2Motors(20, 25);
+                        R2Motors(25, 20);
                         break;
 
                     case TAPE_FOUND:
                         switch (ThisEvent.EventParam) {
                             case TOP_TAPE_SENSOR:
-                                R2Motors(-20, 0); // slight left to realign
-                                ES_Timer_InitTimer(ALIGNMENT_TIMER, 400);
+                                R2Motors(-20, 15);
+                                //ES_Timer_InitTimer(ALIGNMENT_TIMER, 400);
                                 break;
                         }
                         ThisEvent.EventType = ES_NO_EVENT;
@@ -209,8 +209,12 @@ ES_Event RunTapeFollowing(ES_Event ThisEvent) {
                     case TAPE_LOST:
                         switch (ThisEvent.EventParam) {
                             case RIGHT_TAPE_SENSOR:
-                                R2Motors(-20, -25); // slight right to realign
-                                ES_Timer_InitTimer(ALIGNMENT_TIMER, 400);
+                                //R2Motors(-20, -10); // slight right to realign
+                                //ES_Timer_InitTimer(ALIGNMENT_TIMER, 400);
+                                break;
+                            case TOP_TAPE_SENSOR:
+                                R2Motors(25, 20);
+                                //ES_Timer_InitTimer(ALIGNMENT_TIMER, 400);
                                 break;
                             default:break;
                         }
@@ -218,10 +222,11 @@ ES_Event RunTapeFollowing(ES_Event ThisEvent) {
                         break;
 
                     case ES_TIMEOUT:
-                        R2Motors(20, 22);
+                        R2Motors(25, 20); // slight right
                         break;
 
                     case ES_EXIT:
+                        ES_Timer_StopTimer(ALIGNMENT_TIMER);
                         break;
 
                     default: // all unhandled events pass the event back up to the next level

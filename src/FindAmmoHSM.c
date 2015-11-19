@@ -194,6 +194,10 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
                         ThisEvent.EventType = ES_NO_EVENT;
                         break;
 
+                    case ES_EXIT:
+                        ES_Timer_StopTimer(BACKUP_TIMER);
+                        break;
+
                     default: break;
                 }
             }
@@ -214,6 +218,10 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
                         ThisEvent.EventType = ES_NO_EVENT;
                         break;
 
+                    case ES_EXIT:
+                        ES_Timer_StopTimer(BACKUP_TIMER);
+                        break;
+
                     default: break;
                 }
             }
@@ -227,7 +235,9 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
                         break;
 
                     case BUMPED:
-                        R2FullStop();
+                        nextState = Verify;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
                         break;
 
                     default: break;
@@ -236,14 +246,17 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
             break; //End FollowTape
 
         case Verify:
-            ThisEvent = RunTapeFollowing(ThisEvent);
             if (ThisEvent.EventType != ES_NO_EVENT) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
                         R2FullStop();
+                        ES_Timer_InitTimer(BACKUP_TIMER, 2000); // used to see if its a roach
                         break;
 
                     case BUMPED:
+                        nextState = FollowTape;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
                         break;
 
                     default: break;
