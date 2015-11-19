@@ -39,7 +39,7 @@
  ******************************************************************************/
 #define LIST_OF_TAPE_FOLLOWING_STATES(STATE) \
         STATE(TapeFollowing) \
-        STATE(SubFirst) /*Make sure state names are unique in their hierachy*/ \
+        STATE(Align) /*Make sure state names are unique in their hierachy*/ \
 
 #define ENUM_FORM(STATE) STATE, //Enums are reprinted verbatim and comma'd
 typedef enum {
@@ -120,18 +120,19 @@ ES_Event RunTapeFollowing(ES_Event ThisEvent)
     case TapeFollowing: // If current state is initial Psedudo State
         if (ThisEvent.EventType == ES_INIT)// only respond to ES_Init
         {
-            CurrentState = SubFirst;
+            CurrentState = Align;
             makeTransition = TRUE;
             ThisEvent.EventType = ES_NO_EVENT;
         }
         break;
 
-    case SubFirst: // in the first state, replace this with correct names
+    case Align: // in the first state, replace this with correct names
         if (ThisEvent.EventType != ES_NO_EVENT) { // An event is still active
             switch (ThisEvent.EventType) {
             case ES_ENTRY:
-                // this is where you would put any actions associated with the
-                // entry to this state
+                CurrentState = Align;
+                makeTransition = FALSE;
+                ThisEvent.EventType = ES_NO_EVENT;
                 break;
 
             case ES_EXIT:

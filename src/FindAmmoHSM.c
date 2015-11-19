@@ -148,8 +148,9 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
                         break;
 
                     case TAPE_FOUND:
-                        R2FullStop();
+                        //R2FullStop();
                         //ThisEvent = RunTapeFollowing(ThisEvent); //Tape Following
+                        printf("Found\n");
                         break;
 
                     case BUMPED:
@@ -175,14 +176,10 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
             if (ThisEvent.EventType != ES_NO_EVENT) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
-                        R2Motors(-20, -30);
+                        R2Motors(-20, -50);
                         ES_Timer_InitTimer(BACKUP_TIMER, 500);
                         break;
 
-                    case UNBUMPED:
-                        R2Motors(-20, -30);
-                        ES_Timer_InitTimer(BACKUP_TIMER, 500);
-                        break;
 
                     case ES_TIMEOUT:
                         nextState = Searching;
@@ -199,14 +196,10 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
             if (ThisEvent.EventType != ES_NO_EVENT) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
-                        R2Motors(-30, -20);
+                        R2Motors(-50, -20);
                         ES_Timer_InitTimer(BACKUP_TIMER, 500);
                         break;
 
-                    case UNBUMPED:
-                        R2Motors(-30, -20);
-                        ES_Timer_InitTimer(BACKUP_TIMER, 500);
-                        break;
 
                     case ES_TIMEOUT:
                         nextState = Searching;
