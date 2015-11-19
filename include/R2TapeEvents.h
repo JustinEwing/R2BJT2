@@ -41,19 +41,10 @@
  * the .c file, and should be called in main().
  */
 
-
-/* @Function CheckTapeReading
- * @Param void
- * @Return uint8_t so that the ES_Framework can call it
- * @Author Daniel Ruatta, 11.12/2015
- * @Brief
- * 1. Gets a Tape Reading for the Top Tape Sensor
- * 2. Checks if this reading has passed its next
- * Hysteresis Threshold
- * 3. If so, post an event to the TapeSensorHSM
- * 4. Return TRUE if an event has been posted, FALSE otherwise
- */
-ES_Event CheckTapeReading();
+ES_Event R2_TopTape();
+ES_Event R2_LeftTape();
+ES_Event R2_RightTape();
+ES_Event R2_LauncherTape();
 
 
 /*************************************************************

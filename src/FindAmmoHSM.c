@@ -217,10 +217,7 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
                         makeTransition = TRUE;
                         ThisEvent.EventType = ES_NO_EVENT;
                         break;
-                    case ES_EXIT:
-                        rightR2Motor(100); // for testing
-                        leftR2Motor(100); // for testing
-                        break;
+                    case ES_EXIT: break;
                     default: break;
                 }
             }

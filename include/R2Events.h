@@ -33,7 +33,13 @@
  */
 uint8_t CheckBumpers(void);
 
-uint8_t CheckTape(void);
+uint8_t CheckTopTape(void);
+
+uint8_t CheckLeftTape(void);
+
+uint8_t CheckRightTape(void);
+
+uint8_t CheckLauncherTape(void);
 
 uint8_t CheckTrackWire(void);
 

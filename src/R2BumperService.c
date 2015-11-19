@@ -20,6 +20,10 @@
 
 #define FIVE_MILLISECONDS 5
 
+//Bumper pins
+#define LEFT_BUMPER_READ PORTY03_BIT // Pin Y03 Read
+#define RIGHT_BUMPER_READ PORTY04_BIT // Pin Y04 Read
+
 // Need 4 checking masks
 #define FIRST_BIT (0x1)
 #define SECOND_BIT (0x2)
@@ -51,7 +55,8 @@
 /* Prototypes for private functions for this machine. They should be functions
    relevant to the behavior of this state machine */
 
-
+//Function to read the status of the pins
+static uint8_t R2_ReadBumpers();
 
 
 /*******************************************************************************
@@ -73,6 +78,19 @@ static unsigned char FrontRightBumper = 0; // Second Bit
 /*******************************************************************************
  * PUBLIC FUNCTIONS                                                            *
  ******************************************************************************/
+/******************************************************************
+ * @Function InitBumpers
+ * @Param void
+ * @Return SUCCESS or ERROR
+ * @Author Daniel Ruatta, 11/13/2015
+ * @Brief Sets the Bumper pins (Y3 and Y4) to inputs so that we
+ * can read BUMP_EVENTS from them
+ * @Usage To be called in main() to initialize our bumpers
+ */
+uint8_t InitBumpers(void) {
+    LEFT_BUMPER_INIT = INPUT;
+    RIGHT_BUMPER_INIT = INPUT;
+}
 
 /**
  * @Function InitR2Service(uint8_t Priority)
@@ -92,7 +110,6 @@ uint8_t InitR2BumperService(uint8_t Priority) {
 
     // Initialize Timers
     ES_Timer_Init();
-
 
     // post the initial transition event
     ThisEvent.EventType = ES_INIT;
@@ -132,15 +149,17 @@ ES_Event RunR2BumperService(ES_Event ThisEvent) {
     // This service is supposed to run because of a timeout event!
     // Posts events whenever the bumper's status changes
     
-    ES_Event ReturnEvent;
     ES_Event BumpEvent;
-    ReturnEvent.EventType = ES_NO_EVENT; // assume no errors
+    BumpEvent.EventType = ES_NO_EVENT; // assume no errors
+
+    if (ThisEvent.EventType == ES_INIT)// only respond to ES_Init
+    {
+        // Initialize R2BumperService Timer to 5 Milliseconds
+        ES_Timer_InitTimer(R2_BUMPER_TIMER, FIVE_MILLISECONDS); // Set Timer4 to 5 milliseconds
+    }
 
     if (ThisEvent.EventType == ES_TIMEOUT) {
-        uint8_t bump_state = CheckBumpers();
-
-        // Debugging printf
-        //printf("After Bit Test: %x\n", (bump_state & SECOND_BIT));
+        uint8_t bump_state = R2_ReadBumpers();
 
         // Left Bumper Buffer Reading
         FrontLeftBumper <<= 1;
@@ -188,37 +207,34 @@ ES_Event RunR2BumperService(ES_Event ThisEvent) {
         }
 
         // Reset the Timer
-        // Initialize R2BumperService Timer to 5 Milliseconds
-        ES_Timer_InitTimer(R2_BUMPER_TIMER, FIVE_MILLISECONDS); // Set Timer4 to 5 milliseconds
-
-    }
-
-    if (ThisEvent.EventType == ES_INIT)// only respond to ES_Init
-    {
-        // Initialize R2BumperService Timer to 5 Milliseconds
         ES_Timer_InitTimer(R2_BUMPER_TIMER, FIVE_MILLISECONDS); // Set Timer4 to 5 milliseconds
     }
+    
     dbprintf("Exiting %s\n", __FUNCTION__);
-    return ReturnEvent;
+    return BumpEvent;
 }
 
 /*******************************************************************************
  * PRIVATE FUNCTIONs                                                           *
  ******************************************************************************/
+static uint8_t R2_ReadBumpers(){
+    dbprintf("Entered %s\n", __FUNCTION__);
+    //      1. Create a uint8_t to store their combined state
+    uint8_t BumperStates;
 
-/******************************************************************
- * @Function InitBumpers
- * @Param void
- * @Return SUCCESS or ERROR
- * @Author Daniel Ruatta, 11/13/2015
- * @Brief Sets the Bumper pins (Y3 and Y4) to inputs so that we
- * can read BUMP_EVENTS from them
- * @Usage To be called in main() to initialize our bumpers
- */
-uint8_t InitBumpers(void) {
-    LEFT_BUMPER_INIT = INPUT;
-    RIGHT_BUMPER_INIT = INPUT;
+    //  2. Use IO_PortsReadPort to read the digital value of the left bumper
+    //  3. Use |= to SET that value as the first bit in bump_state
+    BumperStates = LEFT_BUMPER_READ;
+    //  4. Bit shift that value into the second bit in bump_state
+    BumperStates <<= 1;
+
+    //  5. Use IO_PortsReadPort to read the digital value of the right bumper
+    //  6. Use |= to SET that value as the first bit in bump_state
+    BumperStates |= RIGHT_BUMPER_READ;
+
+    return BumperStates;
 }
+
 
 /*******************************************************************************
  * TEST HARNESS                                                                *

@@ -203,9 +203,6 @@ ES_Event Run_R2_BJT2_HSM(ES_Event ThisEvent) {
             break;
 
         case FindOpponent: // If current state is state OtherState
-            //UNCOMMENT ONCE SUB HSM IS MADE
-            //ThisEvent = RunFindOpponentHSM(ThisEvent); // run sub-state machine for this state
-
             //Note: this is currently running the same substate machine for both states
             //usually you want to use two Different ones
             ThisEvent = RunFindOpponentHSM(ThisEvent);

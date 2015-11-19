@@ -78,10 +78,12 @@ static const char *EventNames[] = {
 
 /****************************************************************************/
 // This is the list of event checking functions
-#define EVENT_CHECK_LIST  CheckBumpers, \
-                          CheckTrackWire, \
-                          CheckBeacon, \
-                          CheckTape \
+#define EVENT_CHECK_LIST  CheckTrackWire,   \
+                          CheckBeacon,      \
+                          CheckTopTape,     \
+                          CheckLeftTape,    \
+                          CheckRightTape,   \
+                         CheckLauncherTape, \
 
 
 /****************************************************************************/
@@ -92,8 +94,8 @@ static const char *EventNames[] = {
 #define TIMER0_RESP_FUNC PostTimerService
 #define TIMER1_RESP_FUNC PostTimerService
 //user modifiable timers start below here
-#define TIMER2_RESP_FUNC Post_R2_BJT2_HSM  //These are for?
-#define TIMER3_RESP_FUNC Post_R2_BJT2_HSM  //These are for?
+#define TIMER2_RESP_FUNC TIMER_UNUSED  //These are for?
+#define TIMER3_RESP_FUNC TIMER_UNUSED  //These are for?
 #define TIMER4_RESP_FUNC PostR2BumperService
 #define TIMER5_RESP_FUNC Post_R2_BJT2_HSM
 #define TIMER6_RESP_FUNC Post_R2_BJT2_HSM
@@ -114,7 +116,6 @@ static const char *EventNames[] = {
 // definitions for the response functions to make it easire to check that
 // the timer number matches where the timer event will be routed
 
-#define FANCY_ROACH_TIMER 2 /*Yo, fuck this timer */
 #define BACKUP_TIMER 3      //backup timer used in FindAmmo
 #define R2_BUMPER_TIMER 4   //This is for the Bumper Service
 
@@ -170,7 +171,7 @@ static const char *EventNames[] = {
 // the name of the run function
 #define SERV_2_RUN Run_R2_BJT2_HSM
 // How big should this services Queue be?
-#define SERV_2_QUEUE_SIZE 3
+#define SERV_2_QUEUE_SIZE 8
 #endif
 
 
