@@ -150,6 +150,10 @@ ES_Event RunDumpFollowing(ES_Event ThisEvent) {
                         ThisEvent.EventType = ES_NO_EVENT;
                         break;
 
+                    case TAPE_LOST:
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;
+
                     default: // all unhandled events pass the event back up to the next level
                         break;
                 }
@@ -178,6 +182,10 @@ ES_Event RunDumpFollowing(ES_Event ThisEvent) {
                         ThisEvent.EventType = ES_NO_EVENT;
                         break;
 
+                        case TAPE_LOST:
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;
+
 
                     default: // all unhandled events pass the event back up to the next level
                         break;
@@ -200,22 +208,6 @@ ES_Event RunDumpFollowing(ES_Event ThisEvent) {
                         makeTransition = TRUE;
                         ThisEvent.EventType = ES_NO_EVENT;
                         break;
-
-//                    case TAPE_FOUND:
-//                        switch (ThisEvent.EventParam) {
-//                            case TOP_TAPE_SENSOR:
-//                                R2FullStop();
-//                                break;
-//                            case LEFT_TAPE_SENSOR:
-//                                R2FullStop();
-//                                break;
-//                            case RIGHT_TAPE_SENSOR:
-//                                R2FullStop();
-//                                break;
-//                            default:break;
-//                        }
-//                        ThisEvent.EventType = ES_NO_EVENT;
-//                        break;
 
                     default: // all unhandled events pass the event back up to the next level
                         break;

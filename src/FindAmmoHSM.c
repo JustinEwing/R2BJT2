@@ -290,9 +290,9 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
                     case ES_TIMEOUT:
                         break;
 
-                    case TAPE_FOUND:
+                    case TAPE_LOST:
                         switch (ThisEvent.EventParam) {
-                            case RIGHT_TAPE_SENSOR:
+                            case TOP_TAPE_SENSOR:
                                 nextState = AlignOnT;
                                 makeTransition = TRUE;
                                 ThisEvent.EventType = ES_NO_EVENT;
@@ -311,7 +311,7 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
                         //R2FullStop();
-                        R2Motors(30, -30);
+                        R2Motors(-10, -20);
                         break;
 
                     case BUMPED:
@@ -321,7 +321,7 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
                     case TAPE_FOUND:
                         switch (ThisEvent.EventParam) {
                             case TOP_TAPE_SENSOR:
-                                R2Motors(-20, 15);
+                                R2Motors(30, 20);
                                 break;
                         }
                         ThisEvent.EventType = ES_NO_EVENT;
@@ -330,7 +330,7 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
                     case TAPE_LOST:
                         switch (ThisEvent.EventParam) {
                             case TOP_TAPE_SENSOR:
-                                R2Motors(25, 20);
+                                R2Motors(-10, -30);
                                 break;
                             default:break;
                         }
