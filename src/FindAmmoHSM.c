@@ -150,7 +150,7 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
                         //R2DriveStraight();
-                        R2Motors(20, 20); // trying a slower speed...
+                        R2Motors(30, 30); // trying a slower speed...
                         break;
 
                     case TAPE_FOUND:
@@ -316,6 +316,7 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
 
                     case BUMPED:
                         R2FullStop();
+                        ES_Timer_InitTimer(BACKUP_TIMER, 2000);
                         break;
 
                     case TAPE_FOUND:
