@@ -135,6 +135,7 @@ ES_Event RunTapeFollowing(ES_Event ThisEvent) {
                         break;
 
                     case ES_EXIT:
+                        ES_Timer_StopTimer(ALIGNMENT_TIMER);//NOTE: might cause issues if timer is already stopped?
                         break;
 
                     case TAPE_FOUND:
@@ -157,16 +158,9 @@ ES_Event RunTapeFollowing(ES_Event ThisEvent) {
 
                     case TAPE_LOST:
                         switch (ThisEvent.EventParam) {
-                            case TOP_TAPE_SENSOR:
-                                //R2FullStop();
-                                //R2Motors(-20, -10);
-                                //ES_Timer_InitTimer(ALIGNMENT_TIMER, 250);
-                                break;
-                            case LEFT_TAPE_SENSOR:
-                                break;
                             case RIGHT_TAPE_SENSOR:
                                 ES_Timer_StopTimer(ALIGNMENT_TIMER);
-                                R2FullStop();
+                                //R2FullStop();
                                 nextState = Follow;
                                 makeTransition = TRUE;
                                 ThisEvent.EventType = ES_NO_EVENT;
@@ -177,7 +171,7 @@ ES_Event RunTapeFollowing(ES_Event ThisEvent) {
                         break;
 
                     case ES_TIMEOUT:
-                        R2FullStop();
+                        //R2FullStop();
                         nextState = Follow;
                         makeTransition = TRUE;
                         ThisEvent.EventType = ES_NO_EVENT;
@@ -193,7 +187,7 @@ ES_Event RunTapeFollowing(ES_Event ThisEvent) {
             if (ThisEvent.EventType != ES_NO_EVENT) { // An event is still active
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
-                        R2Motors(25, 20);
+                        R2Motors(25, 20);// drive slightly right
                         break;
 
                     case TAPE_FOUND:
@@ -215,12 +209,7 @@ ES_Event RunTapeFollowing(ES_Event ThisEvent) {
                         ThisEvent.EventType = ES_NO_EVENT;
                         break;
 
-                    case ES_TIMEOUT:
-                        R2Motors(25, 20); // slight right
-                        break;
-
                     case ES_EXIT:
-                        ES_Timer_StopTimer(ALIGNMENT_TIMER);
                         break;
 
                     default: // all unhandled events pass the event back up to the next level

@@ -46,6 +46,7 @@ STATE(ReversingLeft)    \
 STATE(FollowTape)       \
 STATE(Verify)           \
 STATE(FollowDump)       \
+STATE(AlignOnT)         \
 
 #define ENUM_FORM(STATE) STATE, //Enums are reprinted verbatim and comma'd
 
@@ -247,7 +248,7 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
             }
             break; //End FollowTape
 
-        case Verify: // not sur how we are doing this yet...
+        case Verify: // not sure how we are doing this yet...
             if (ThisEvent.EventType != ES_NO_EVENT) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
@@ -256,6 +257,9 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
                         break;
 
                     case UNBUMPED:
+                        nextState = FollowTape;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
                         break;
 
                     case ES_TIMEOUT:
@@ -278,7 +282,6 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
             if (ThisEvent.EventType != ES_NO_EVENT) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
-                        //R2FullStop();
                         break;
 
                     case BUMPED:
@@ -289,21 +292,58 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
 
                     case TAPE_FOUND:
                         switch (ThisEvent.EventParam) {
-                            case TOP_TAPE_SENSOR:
-                                break;
-                            case LEFT_TAPE_SENSOR:
-                                break;
                             case RIGHT_TAPE_SENSOR:
+                                nextState = AlignOnT;
+                                makeTransition = TRUE;
+                                ThisEvent.EventType = ES_NO_EVENT;
                                 break;
                             default:break;
                         }
-                        ThisEvent.EventType = ES_NO_EVENT;
                         break;
 
                     default: break;
                 }
             }
             break; //End FollowDump
+
+        case AlignOnT:
+            if (ThisEvent.EventType != ES_NO_EVENT) {
+                switch (ThisEvent.EventType) {
+                    case ES_ENTRY:
+                        //R2FullStop();
+                        R2Motors(30, -30);
+                        break;
+
+                    case BUMPED:
+                        R2FullStop();
+                        break;
+
+                    case TAPE_FOUND:
+                        switch (ThisEvent.EventParam) {
+                            case TOP_TAPE_SENSOR:
+                                R2Motors(-20, 15);
+                                break;
+                        }
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;
+
+                    case TAPE_LOST:
+                        switch (ThisEvent.EventParam) {
+                            case TOP_TAPE_SENSOR:
+                                R2Motors(25, 20);
+                                break;
+                            default:break;
+                        }
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;
+
+                    case ES_TIMEOUT:
+                        break;
+
+                    default: break;
+                }
+            }
+            break; //End AlignOnT
 
 
 

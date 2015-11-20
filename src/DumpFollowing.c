@@ -146,6 +146,10 @@ ES_Event RunDumpFollowing(ES_Event ThisEvent) {
                         ThisEvent.EventType = ES_NO_EVENT;
                         break;
 
+                    case TAPE_FOUND:
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;
+
                     default: // all unhandled events pass the event back up to the next level
                         break;
                 }
@@ -170,6 +174,10 @@ ES_Event RunDumpFollowing(ES_Event ThisEvent) {
                         ThisEvent.EventType = ES_NO_EVENT;
                         break;
 
+                    case TAPE_FOUND:
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;
+
 
                     default: // all unhandled events pass the event back up to the next level
                         break;
@@ -182,7 +190,6 @@ ES_Event RunDumpFollowing(ES_Event ThisEvent) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
                         R2Motors(40, 15);
-                        ES_Timer_InitTimer(BACKUP_TIMER, 500);
                         break;
 
                     case ES_EXIT:
@@ -194,21 +201,21 @@ ES_Event RunDumpFollowing(ES_Event ThisEvent) {
                         ThisEvent.EventType = ES_NO_EVENT;
                         break;
 
-                    case TAPE_FOUND:
-                        switch (ThisEvent.EventParam) {
-                            case TOP_TAPE_SENSOR:
-                                R2FullStop();
-                                break;
-                            case LEFT_TAPE_SENSOR:
-                                R2FullStop();
-                                break;
-                            case RIGHT_TAPE_SENSOR:
-                                R2FullStop();
-                                break;
-                            default:break;
-                        }
-                        ThisEvent.EventType = ES_NO_EVENT;
-                        break;
+//                    case TAPE_FOUND:
+//                        switch (ThisEvent.EventParam) {
+//                            case TOP_TAPE_SENSOR:
+//                                R2FullStop();
+//                                break;
+//                            case LEFT_TAPE_SENSOR:
+//                                R2FullStop();
+//                                break;
+//                            case RIGHT_TAPE_SENSOR:
+//                                R2FullStop();
+//                                break;
+//                            default:break;
+//                        }
+//                        ThisEvent.EventType = ES_NO_EVENT;
+//                        break;
 
                     default: // all unhandled events pass the event back up to the next level
                         break;
