@@ -23,6 +23,7 @@
       <itemPath>include/TrackWireEvents.h</itemPath>
       <itemPath>include/R2TapeEvents.h</itemPath>
       <itemPath>include/TapeFollowing.h</itemPath>
+      <itemPath>include/DumpFollowing.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -50,6 +51,7 @@
       <itemPath>src/TrackWireEvents.c</itemPath>
       <itemPath>src/R2TapeEvents.c</itemPath>
       <itemPath>src/TapeFollowing.c</itemPath>
+      <itemPath>src/DumpFollowing.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
