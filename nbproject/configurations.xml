@@ -24,6 +24,7 @@
       <itemPath>include/R2TapeEvents.h</itemPath>
       <itemPath>include/TapeFollowing.h</itemPath>
       <itemPath>include/DumpFollowing.h</itemPath>
+      <itemPath>include/PortalEnterSubHSM.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -52,6 +53,7 @@
       <itemPath>src/R2TapeEvents.c</itemPath>
       <itemPath>src/TapeFollowing.c</itemPath>
       <itemPath>src/DumpFollowing.c</itemPath>
+      <itemPath>src/PortalEnterSubHSM.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"

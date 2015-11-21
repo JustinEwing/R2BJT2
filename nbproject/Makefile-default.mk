@@ -45,17 +45,17 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
 # Source Files Quoted if spaced
-SOURCEFILES_QUOTED_IF_SPACED=src/AD.c src/BOARD.c src/ES_Framework.c src/FindAmmoHSM.c src/FindOpponentHSM.c src/FindPortalHSM.c src/IO_Ports.c src/LED.c src/R2BJT2_Main.c src/R2_BJT2_HSM.c src/RC_Servo.c src/driveMotor.c src/pwm.c src/serial.c src/R2Events.c src/R2BumperService.c src/TrackWireEvents.c src/R2TapeEvents.c src/TapeFollowing.c src/DumpFollowing.c
+SOURCEFILES_QUOTED_IF_SPACED=src/AD.c src/BOARD.c src/ES_Framework.c src/FindAmmoHSM.c src/FindOpponentHSM.c src/FindPortalHSM.c src/IO_Ports.c src/LED.c src/R2BJT2_Main.c src/R2_BJT2_HSM.c src/RC_Servo.c src/driveMotor.c src/pwm.c src/serial.c src/R2Events.c src/R2BumperService.c src/TrackWireEvents.c src/R2TapeEvents.c src/TapeFollowing.c src/DumpFollowing.c src/PortalEnterSubHSM.c
 
 # Object Files Quoted if spaced
-OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/src/AD.o ${OBJECTDIR}/src/BOARD.o ${OBJECTDIR}/src/ES_Framework.o ${OBJECTDIR}/src/FindAmmoHSM.o ${OBJECTDIR}/src/FindOpponentHSM.o ${OBJECTDIR}/src/FindPortalHSM.o ${OBJECTDIR}/src/IO_Ports.o ${OBJECTDIR}/src/LED.o ${OBJECTDIR}/src/R2BJT2_Main.o ${OBJECTDIR}/src/R2_BJT2_HSM.o ${OBJECTDIR}/src/RC_Servo.o ${OBJECTDIR}/src/driveMotor.o ${OBJECTDIR}/src/pwm.o ${OBJECTDIR}/src/serial.o ${OBJECTDIR}/src/R2Events.o ${OBJECTDIR}/src/R2BumperService.o ${OBJECTDIR}/src/TrackWireEvents.o ${OBJECTDIR}/src/R2TapeEvents.o ${OBJECTDIR}/src/TapeFollowing.o ${OBJECTDIR}/src/DumpFollowing.o
-POSSIBLE_DEPFILES=${OBJECTDIR}/src/AD.o.d ${OBJECTDIR}/src/BOARD.o.d ${OBJECTDIR}/src/ES_Framework.o.d ${OBJECTDIR}/src/FindAmmoHSM.o.d ${OBJECTDIR}/src/FindOpponentHSM.o.d ${OBJECTDIR}/src/FindPortalHSM.o.d ${OBJECTDIR}/src/IO_Ports.o.d ${OBJECTDIR}/src/LED.o.d ${OBJECTDIR}/src/R2BJT2_Main.o.d ${OBJECTDIR}/src/R2_BJT2_HSM.o.d ${OBJECTDIR}/src/RC_Servo.o.d ${OBJECTDIR}/src/driveMotor.o.d ${OBJECTDIR}/src/pwm.o.d ${OBJECTDIR}/src/serial.o.d ${OBJECTDIR}/src/R2Events.o.d ${OBJECTDIR}/src/R2BumperService.o.d ${OBJECTDIR}/src/TrackWireEvents.o.d ${OBJECTDIR}/src/R2TapeEvents.o.d ${OBJECTDIR}/src/TapeFollowing.o.d ${OBJECTDIR}/src/DumpFollowing.o.d
+OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/src/AD.o ${OBJECTDIR}/src/BOARD.o ${OBJECTDIR}/src/ES_Framework.o ${OBJECTDIR}/src/FindAmmoHSM.o ${OBJECTDIR}/src/FindOpponentHSM.o ${OBJECTDIR}/src/FindPortalHSM.o ${OBJECTDIR}/src/IO_Ports.o ${OBJECTDIR}/src/LED.o ${OBJECTDIR}/src/R2BJT2_Main.o ${OBJECTDIR}/src/R2_BJT2_HSM.o ${OBJECTDIR}/src/RC_Servo.o ${OBJECTDIR}/src/driveMotor.o ${OBJECTDIR}/src/pwm.o ${OBJECTDIR}/src/serial.o ${OBJECTDIR}/src/R2Events.o ${OBJECTDIR}/src/R2BumperService.o ${OBJECTDIR}/src/TrackWireEvents.o ${OBJECTDIR}/src/R2TapeEvents.o ${OBJECTDIR}/src/TapeFollowing.o ${OBJECTDIR}/src/DumpFollowing.o ${OBJECTDIR}/src/PortalEnterSubHSM.o
+POSSIBLE_DEPFILES=${OBJECTDIR}/src/AD.o.d ${OBJECTDIR}/src/BOARD.o.d ${OBJECTDIR}/src/ES_Framework.o.d ${OBJECTDIR}/src/FindAmmoHSM.o.d ${OBJECTDIR}/src/FindOpponentHSM.o.d ${OBJECTDIR}/src/FindPortalHSM.o.d ${OBJECTDIR}/src/IO_Ports.o.d ${OBJECTDIR}/src/LED.o.d ${OBJECTDIR}/src/R2BJT2_Main.o.d ${OBJECTDIR}/src/R2_BJT2_HSM.o.d ${OBJECTDIR}/src/RC_Servo.o.d ${OBJECTDIR}/src/driveMotor.o.d ${OBJECTDIR}/src/pwm.o.d ${OBJECTDIR}/src/serial.o.d ${OBJECTDIR}/src/R2Events.o.d ${OBJECTDIR}/src/R2BumperService.o.d ${OBJECTDIR}/src/TrackWireEvents.o.d ${OBJECTDIR}/src/R2TapeEvents.o.d ${OBJECTDIR}/src/TapeFollowing.o.d ${OBJECTDIR}/src/DumpFollowing.o.d ${OBJECTDIR}/src/PortalEnterSubHSM.o.d
 
 # Object Files
-OBJECTFILES=${OBJECTDIR}/src/AD.o ${OBJECTDIR}/src/BOARD.o ${OBJECTDIR}/src/ES_Framework.o ${OBJECTDIR}/src/FindAmmoHSM.o ${OBJECTDIR}/src/FindOpponentHSM.o ${OBJECTDIR}/src/FindPortalHSM.o ${OBJECTDIR}/src/IO_Ports.o ${OBJECTDIR}/src/LED.o ${OBJECTDIR}/src/R2BJT2_Main.o ${OBJECTDIR}/src/R2_BJT2_HSM.o ${OBJECTDIR}/src/RC_Servo.o ${OBJECTDIR}/src/driveMotor.o ${OBJECTDIR}/src/pwm.o ${OBJECTDIR}/src/serial.o ${OBJECTDIR}/src/R2Events.o ${OBJECTDIR}/src/R2BumperService.o ${OBJECTDIR}/src/TrackWireEvents.o ${OBJECTDIR}/src/R2TapeEvents.o ${OBJECTDIR}/src/TapeFollowing.o ${OBJECTDIR}/src/DumpFollowing.o
+OBJECTFILES=${OBJECTDIR}/src/AD.o ${OBJECTDIR}/src/BOARD.o ${OBJECTDIR}/src/ES_Framework.o ${OBJECTDIR}/src/FindAmmoHSM.o ${OBJECTDIR}/src/FindOpponentHSM.o ${OBJECTDIR}/src/FindPortalHSM.o ${OBJECTDIR}/src/IO_Ports.o ${OBJECTDIR}/src/LED.o ${OBJECTDIR}/src/R2BJT2_Main.o ${OBJECTDIR}/src/R2_BJT2_HSM.o ${OBJECTDIR}/src/RC_Servo.o ${OBJECTDIR}/src/driveMotor.o ${OBJECTDIR}/src/pwm.o ${OBJECTDIR}/src/serial.o ${OBJECTDIR}/src/R2Events.o ${OBJECTDIR}/src/R2BumperService.o ${OBJECTDIR}/src/TrackWireEvents.o ${OBJECTDIR}/src/R2TapeEvents.o ${OBJECTDIR}/src/TapeFollowing.o ${OBJECTDIR}/src/DumpFollowing.o ${OBJECTDIR}/src/PortalEnterSubHSM.o
 
 # Source Files
-SOURCEFILES=src/AD.c src/BOARD.c src/ES_Framework.c src/FindAmmoHSM.c src/FindOpponentHSM.c src/FindPortalHSM.c src/IO_Ports.c src/LED.c src/R2BJT2_Main.c src/R2_BJT2_HSM.c src/RC_Servo.c src/driveMotor.c src/pwm.c src/serial.c src/R2Events.c src/R2BumperService.c src/TrackWireEvents.c src/R2TapeEvents.c src/TapeFollowing.c src/DumpFollowing.c
+SOURCEFILES=src/AD.c src/BOARD.c src/ES_Framework.c src/FindAmmoHSM.c src/FindOpponentHSM.c src/FindPortalHSM.c src/IO_Ports.c src/LED.c src/R2BJT2_Main.c src/R2_BJT2_HSM.c src/RC_Servo.c src/driveMotor.c src/pwm.c src/serial.c src/R2Events.c src/R2BumperService.c src/TrackWireEvents.c src/R2TapeEvents.c src/TapeFollowing.c src/DumpFollowing.c src/PortalEnterSubHSM.c
 
 
 CFLAGS=
@@ -214,6 +214,12 @@ ${OBJECTDIR}/src/DumpFollowing.o: src/DumpFollowing.c  nbproject/Makefile-${CND_
 	@${RM} ${OBJECTDIR}/src/DumpFollowing.o 
 	@${FIXDEPS} "${OBJECTDIR}/src/DumpFollowing.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -I"include" -MMD -MF "${OBJECTDIR}/src/DumpFollowing.o.d" -o ${OBJECTDIR}/src/DumpFollowing.o src/DumpFollowing.c   
 	
+${OBJECTDIR}/src/PortalEnterSubHSM.o: src/PortalEnterSubHSM.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} ${OBJECTDIR}/src 
+	@${RM} ${OBJECTDIR}/src/PortalEnterSubHSM.o.d 
+	@${RM} ${OBJECTDIR}/src/PortalEnterSubHSM.o 
+	@${FIXDEPS} "${OBJECTDIR}/src/PortalEnterSubHSM.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -I"include" -MMD -MF "${OBJECTDIR}/src/PortalEnterSubHSM.o.d" -o ${OBJECTDIR}/src/PortalEnterSubHSM.o src/PortalEnterSubHSM.c   
+	
 else
 ${OBJECTDIR}/src/AD.o: src/AD.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/src 
@@ -334,6 +340,12 @@ ${OBJECTDIR}/src/DumpFollowing.o: src/DumpFollowing.c  nbproject/Makefile-${CND_
 	@${RM} ${OBJECTDIR}/src/DumpFollowing.o.d 
 	@${RM} ${OBJECTDIR}/src/DumpFollowing.o 
 	@${FIXDEPS} "${OBJECTDIR}/src/DumpFollowing.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -I"include" -MMD -MF "${OBJECTDIR}/src/DumpFollowing.o.d" -o ${OBJECTDIR}/src/DumpFollowing.o src/DumpFollowing.c   
+	
+${OBJECTDIR}/src/PortalEnterSubHSM.o: src/PortalEnterSubHSM.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} ${OBJECTDIR}/src 
+	@${RM} ${OBJECTDIR}/src/PortalEnterSubHSM.o.d 
+	@${RM} ${OBJECTDIR}/src/PortalEnterSubHSM.o 
+	@${FIXDEPS} "${OBJECTDIR}/src/PortalEnterSubHSM.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -I"include" -MMD -MF "${OBJECTDIR}/src/PortalEnterSubHSM.o.d" -o ${OBJECTDIR}/src/PortalEnterSubHSM.o src/PortalEnterSubHSM.c   
 	
 endif
 

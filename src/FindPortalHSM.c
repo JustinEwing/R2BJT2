@@ -1,23 +1,4 @@
-/*
- * @File: FindPortalHSM.c
- * @Author: Daniel Ruatta
- * @Brief: EnterPortalSubHSM: Used to move the robot from its (random) location
- * on the center obstacle to the inside of the track wire that is turned on
- * after the opponent is hit. It will follow the obstacle, reversing right,
- * pivoting right, and turning left, until it detects a TRACKWIREEVENT.
- * When this event is detected, it will pivot right until a second
- * TRACKWIREEVENT is detected. This will align us parallel to the obstacle.
- * Once we are parallel to the obstacle, we will drive forward for 3 seconds
- * (UNDETERMINED), waiting for a second TRACKWIREEVENT. If it doesn't get a
- * TRACKWIREEVENT before TIMEOUT, it has left the portal, and will reverse
- * for 5 seconds and stop inside the portal. If it gets a TRACKWIREEVENT
- * during this PortalEnter stage, it will reverse for 2 seconds and stop
- * inside the portal.
- *
- * If a BUMPEVENT happens during this time, we have hit a roach, and will stop
- * for 3 seconds, waiting for it to pass by.
- *
- * */
+
 
 /*******************************************************************************
  * MODULE #INCLUDE                                                             *
