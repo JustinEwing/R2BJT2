@@ -2,19 +2,20 @@
  * @File: FindPortalHSM.c
  * @Author: Daniel Ruatta
  * @Brief: EnterPortalSubHSM: Used to move the robot from its (random) location
- * on the center obstacle to the inside of the track wire that is turned on after
- * the opponent is hit. It will follow the obstacle, reversing right, pivoting
- * right, and turning left, until it detects a FRONTTRACKWIRE event (figure a).
- * When this event is detected, it will pivot left until it gets a REARTRACKWIRE
- * event (figure b). This guarantees that R2-BJT2 is ready to reverse along one
- * of the two parallel track wires in the portal. At this point it will drive
- * straight backward (figure c), away from the obstacle. If the rear track wire
- * is lost, we have reached one of the two front corners of the portal. We will
- * then turn backwards in a left arc until we get another FRONTTRACKWIRE event,
- * at which point we know the entirety of the bot is inside the portal
- * (figure d). Cases 3 and 4 are the 1% chance that we get a REARTRACKWIRE event
- * first, in which case we will reverse straight backward until we get a
- * FRONTTRACKWIRE event, and proceed with the algorithm as usual.
+ * on the center obstacle to the inside of the track wire that is turned on
+ * after the opponent is hit. It will follow the obstacle, reversing right,
+ * pivoting right, and turning left, until it detects a TRACKWIREEVENT.
+ * When this event is detected, it will pivot right until a second
+ * TRACKWIREEVENT is detected. This will align us parallel to the obstacle.
+ * Once we are parallel to the obstacle, we will drive forward for 3 seconds
+ * (UNDETERMINED), waiting for a second TRACKWIREEVENT. If it doesn't get a
+ * TRACKWIREEVENT before TIMEOUT, it has left the portal, and will reverse
+ * for 5 seconds and stop inside the portal. If it gets a TRACKWIREEVENT
+ * during this PortalEnter stage, it will reverse for 2 seconds and stop
+ * inside the portal.
+ *
+ * If a BUMPEVENT happens during this time, we have hit a roach, and will stop
+ * for 3 seconds, waiting for it to pass by.
  *
  * */
 
