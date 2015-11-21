@@ -201,24 +201,12 @@ ES_Event RunFindOpponentHSM(ES_Event ThisEvent) {
             if (ThisEvent.EventType != ES_NO_EVENT) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
-                        dbprintf("\n WallRide: Motors on. \n");
-                        // need a sharp enough left turn to go around obstacle
-                        rightR2Motor(25);
-                        leftR2Motor(25);
-                        ThisEvent.EventType = ES_NO_EVENT;
                         break;
 
                     case ES_EXIT:
                         // this is where you would put any actions associated with the
                         // exit from this state
                         break;
-
-                    case BUMPED:
-                        nextState = Reverse;
-                        makeTransition = TRUE;
-                        ThisEvent.EventType = ES_NO_EVENT;
-                        break;
-
 
                     case BEACON_FOUND:
                         rightR2Motor(0); // STOP!
