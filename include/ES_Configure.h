@@ -19,9 +19,9 @@
 
 
 //defines for keyboard input
-#define USE_KEYBOARD_INPUT
+//#define USE_KEYBOARD_INPUT
 //What State machine are we testing
-#define POSTFUNCTION_FOR_KEYBOARD_INPUT Post_R2_BJT2_HSM
+//#define POSTFUNCTION_FOR_KEYBOARD_INPUT Post_R2_BJT2_HSM
 
 //define for TattleTale
 #define USE_TATTLETALE

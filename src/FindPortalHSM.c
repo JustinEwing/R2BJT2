@@ -107,8 +107,7 @@ ES_Event RunFindPortalHSM(ES_Event ThisEvent) {
             break;
 
         case ObstacleFollow:
-            /*************** NEED OBSTACLE FOLLOW SUB HSM ********************/
-            // Run ObstacleFollowSubHSM
+            RunDumpFollowing(ThisEvent);// Run ObstacleFollowSubHSM
             if (ThisEvent.EventType != ES_NO_EVENT) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
