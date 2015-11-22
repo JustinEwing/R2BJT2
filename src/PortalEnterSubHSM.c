@@ -34,10 +34,9 @@
 #define LIST_OF_PORTAL_ENTER_STATES(STATE) \
 STATE(InitPortalEnter) /* Init: Called at the start of this SubHSM */ \
 STATE(PortalPivot)/* ENTER: TRACKWIREEVENT - EXIT: TRACKWIREEVENT */ \
-STATE(PortalTest) /* ENTER: TRACKWIREEVENT - EXIT: ES_TIMEOUT || TRACKWIREEVENT || BUMPED */ \
-STATE(InPortal) /* ENTER: TRACKWIREEVENT - EXIT: BUMPED || ES_TIMEOUT */ \
-STATE(OutsidePortal) /* ENTER: ES_TIMEOUT - EXIT: BUMPED */ \
-STATE(PortalRoach) /* ENTER: BUMPED - EXIT: ES_TIMEOUT*/ \
+STATE(PortalTest) /* ENTER: TRACKWIREEVENT - EXIT: ES_TIMEOUT || TRACKWIREEVENT */ \
+STATE(InPortal) /* ENTER: TRACKWIREEVENT - EXIT:  ES_TIMEOUT */ \
+STATE(OutsidePortal) /* ENTER: ES_TIMEOUT - EXIT: ES_TIMEOUT */ \
 STATE(PortalStopped) /* ENTER: ES_TIMEOUT - EXIT: None */ \
 
 #define ENUM_FORM(STATE) STATE, //Enums are reprinted verbatim and comma'd
@@ -190,12 +189,10 @@ ES_Event RunPortalEnterSubHSM(ES_Event ThisEvent) {
                         ThisEvent.EventType = ES_NO_EVENT;
                         break;
 
+                        /************** BUMPED NEEDS TO STOP ********/
                     case BUMPED: // Roach detected, stopping until it passes
                         dbprintf("\n PortalTest: BUMPED. Exiting PortalTest"
                                 "and entering PortalRoach. \n");
-                        nextState = PortalRoach;
-                        makeTransition = TRUE;
-                        ThisEvent.EventType = ES_NO_EVENT;
                         break;
 
                         /*********** NEED TO PAUSE PORTAL_TEST_TIMER **********/
@@ -270,38 +267,87 @@ ES_Event RunPortalEnterSubHSM(ES_Event ThisEvent) {
             if (ThisEvent.EventType != ES_NO_EVENT) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
-                        dbprintf("\n Entered OutsidePortal. \n");
+                        dbprintf("\n Entered OutsidePortal. Reversing"
+                                "straight backward for 7 seconds. \n");
                         ThisEvent.EventType = ES_NO_EVENT;
 
-                        /*************** TIMER INIT NEEDED *******************/
+                        /********** REVERSE TIMER INIT NEEDED *******************/
                         /**************** REVERSE NEEDED *******************/
+                        break;
+
+                    case ES_EXIT:
+                        dbprintf("\n OutsidePortal: ES_EXIT event. Stopping "
+                                "PORTAL_TEST_TIMER and PORTAL_ROACH_TIMER. \n");
+
+                        /************* STOP REVERSE TIMER NEEDED **************/
+                        /************* STOP ROACH TIMER NEEDED **************/
+                        break;
 
                     case BUMPED:
                         dbprintf("\n OutsidePortal: BUMPED event. Roach"
                                 "detected. Stopping R2-BJT2 for 3 seconds. \n");
 
+                        /************* STOP REVERSE TIMER NEEDED **************/
                         /*************** STOP TIMER INIT NEEDED ****************/
-                        /****************** STOP NEEDED *******************/
-
+                        /****************** STOP NEEDED ************************/
                         break;
 
                     case ES_TIMEOUT:
                         switch (ThisEvent.EventParam) {
                             case PORTAL_TEST_TIMER:
+                                dbprintf("\n OutsidePortal: ES_TIMEOUT->"
+                                        "PORTAL_TEST_TIMER. Transitioning"
+                                        "to PortalStopped. \n");
+                                nextState = PortalStopped;
+                                makeTransition = TRUE;
+                                ThisEvent.EventType = ES_NO_EVENT;
                                 break;
 
                             case PORTAL_ROACH_TIMER:
+                                dbprintf("\n OutsidePortal: ES_TIMEOUT->"
+                                        "PORTAL_ROACH_TIMER. Reversing until"
+                                        "PORTAL_TEST_TIMER expires. \n");
+
+                                /********** REVERSE TIMER START NEEDED **********/
+                                /*************MOTOR  REVERSE NEEDED ************/
+                                break;
+
+                            default: // Unhandled ES_TIMEOUT events
                                 break;
                         }
+                        break;
+
+                    default: // Unhandled OutsidePortal events.
                         break;
                 }
             }
             break;
 
-            //  case PortalRoach: // Will not use this, will use timer EventParams instead
-            //     break;
+            /******************************************************************
+             * @State PortalStopped
+             * @Author: Daniel Ruatta, 11/21/2015, 5:46pm
+             * @Brief: This state will stop R2-BJT2 permanently so that he
+             * can be checked off. This state cannot be exited out of.
+             * @Enter: ES_TIMEOUT->PORTAL_TEST_TIMER from OutsidePortal or
+             * InPortal
+             * @Exit: None
+             *
+             */
+        case PortalStopped: // R2-BJT2 has entered the portal, and will now
+            // stop permanently
+            if (ThisEvent.EventType != ES_NO_EVENT) {
+                switch (ThisEvent.EventType) {
+                    case ES_ENTRY:
+                        dbprintf("\n Entered PortalStopped. Bringing R2-BJT2"
+                                "to a full stop. \n");
 
-        case PortalStopped:
+                        /****************** STOP NEEDED ************************/
+                        break;
+
+                    default: // Unhandled PortalStopped events
+                        break;
+                }
+            }
             break;
 
             if (makeTransition == TRUE) {
