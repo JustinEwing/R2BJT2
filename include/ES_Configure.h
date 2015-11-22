@@ -19,9 +19,9 @@
 
 
 //defines for keyboard input
-//#define USE_KEYBOARD_INPUT
+#define USE_KEYBOARD_INPUT
 //What State machine are we testing
-//#define POSTFUNCTION_FOR_KEYBOARD_INPUT Post_R2_BJT2_HSM
+#define POSTFUNCTION_FOR_KEYBOARD_INPUT Post_R2_BJT2_HSM
 
 //define for TattleTale
 #define USE_TATTLETALE
@@ -99,8 +99,8 @@ static const char *EventNames[] = {
 #define TIMER4_RESP_FUNC PostR2BumperService
 #define TIMER5_RESP_FUNC Post_R2_BJT2_HSM    //Alignment timer
 #define TIMER6_RESP_FUNC TIMER_UNUSED
-#define TIMER7_RESP_FUNC Post_R2_BJT2_HSM // PortalEnter Timer
-#define TIMER8_RESP_FUNC TIMER_UNUSED
+#define TIMER7_RESP_FUNC Post_R2_BJT2_HSM // PORTAL_TEST_TIMER
+#define TIMER8_RESP_FUNC Post_R2_BJT2_HSM // PORTAL_ROACH_TIMER
 #define TIMER9_RESP_FUNC TIMER_UNUSED
 #define TIMER10_RESP_FUNC TIMER_UNUSED
 #define TIMER11_RESP_FUNC TIMER_UNUSED
@@ -120,6 +120,8 @@ static const char *EventNames[] = {
 #define R2_BUMPER_TIMER 4   //This is for the Bumper Service
 #define ALIGNMENT_TIMER 5   //This is for the Alignment to the tape
 
+        // Timer7 is PORTAL_TEST_TIMER - Ruatta
+        // Timer8 is PORTAL_ROACH_TIMER - Ruatta
 
 /****************************************************************************/
 // The maximum number of services sets an upper bound on the number of 

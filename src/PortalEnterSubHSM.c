@@ -50,7 +50,7 @@ static const char *StateNames[] = {
     LIST_OF_PORTAL_ENTER_STATES(STRING_FORM)
 };
 
-#define ENTER_PORTAL_SUB_HSM_DEBUG_VERBOSE
+//#define ENTER_PORTAL_SUB_HSM_DEBUG_VERBOSE
 #ifdef ENTER_PORTAL_SUB_HSM_DEBUG_VERBOSE
 #include "serial.h"
 #include <stdio.h>

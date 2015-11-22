@@ -155,10 +155,10 @@ ES_Event Run_R2_BJT2_HSM(ES_Event ThisEvent) {
                 InitTapeFollowing();
                 InitDumpFollowing();
                 //InitFindOpponentHSM();
-                //InitFindPortalHSM();
+                InitFindPortalHSM();
 
                 // now put the machine into the actual initial state
-                nextState = FindAmmo; // Should be FindAmmo
+                nextState = FindPortal; // Should be FindAmmo
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
             }
@@ -229,7 +229,7 @@ ES_Event Run_R2_BJT2_HSM(ES_Event ThisEvent) {
                     case ES_TIMEOUT:
                         // create the case statement for all other events that you are
                         // interested in responding to. This does a transition
-                        
+
                         //Commented out temporarily
                         //nextState = ;
                         //makeTransition = TRUE;
@@ -243,43 +243,25 @@ ES_Event Run_R2_BJT2_HSM(ES_Event ThisEvent) {
             break;
 
         case FindPortal: // example of a state without a sub-statemachine
-            ThisEvent = RunFindPortalHSM(ThisEvent); // run sub-state machine for this state
-            switch (ThisEvent.EventType) {
-                case ES_ENTRY:
-                    // this is where you would put any actions associated with the
-                    // entry to this state
-                    break;
+            ThisEvent = RunFindPortalHSM(ThisEvent);
+            // run sub-state machine for this state
+            if (ThisEvent.EventType != ES_NO_EVENT) { // An event is still active
+                switch (ThisEvent.EventType) {
+                    case ES_ENTRY:
+                        // this is where you would put any actions associated with the
+                        // entry to this state
+                        dbprintf("Entered %s\n", __FUNCTION__);
+                        break;
 
-                case ES_EXIT:
-                    // this is where you would put any actions associated with the
-                    // exit from this state
-                    break;
+                    default: // all unhandled events pass the event back up to the next level
+                        break;
+                }
+                break;
 
-                case ES_KEYINPUT:
-                    // this is an example where the state does NOT transition
-                    // do things you need to do in this state
-                    // event consumed
-                    ThisEvent.EventType = ES_NO_EVENT;
-                    break;
-
-                case ES_TIMEOUT:
-                    // create the case statement for all other events that you are
-                    // interested in responding to. This one does a transition
-
-                    //Commented out temporarily
-                    //nextState = ;
-                    //makeTransition = TRUE;
-                    ThisEvent.EventType = ES_NO_EVENT;
-                    break;
-
-                default: // all unhandled events pass the event back up to the next level
-                    break;
-            }
-            break;
-
-        default: // all unhandled states fall into here
-            break;
-    } // end switch on Current State
+                default: // all unhandled states fall into here
+                break;
+            } // end switch on Current State
+    }
 
     if (makeTransition == TRUE) { // making a state transition, send EXIT and ENTRY
         // recursively call the current state with an exit event

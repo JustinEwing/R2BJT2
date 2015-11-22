@@ -31,7 +31,7 @@ static const char *StateNames[] = {
     LIST_OF_FindPortal_STATES(STRING_FORM)
 };
 
-//#define FINDPORTAL_HSM_DEBUG_VERBOSE
+#define FINDPORTAL_HSM_DEBUG_VERBOSE
 #ifdef FINDPORTAL_HSM_DEBUG_VERBOSE
 #include "serial.h"
 #include <stdio.h>
@@ -126,7 +126,7 @@ ES_Event RunFindPortalHSM(ES_Event ThisEvent) {
             break;
 
         case PortalEnter:
-            // Run PortalEnterSubHSM
+             ThisEvent = RunPortalEnterSubHSM(ThisEvent);
             if (ThisEvent.EventType != ES_NO_EVENT) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
