@@ -110,7 +110,6 @@ ES_Event RunFindPortalHSM(ES_Event ThisEvent) {
                         ThisEvent.EventType = ES_NO_EVENT;
                         break;
 
-
                     case TRACK_WIRE_FOUND:
                         dbprintf("\n Exiting ObstacleFollow: TRACK_WIRE_FOUND."
                                 " Should enter PortalEnter. \n");
