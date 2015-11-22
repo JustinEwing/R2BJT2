@@ -156,6 +156,7 @@ ES_Event Run_R2_BJT2_HSM(ES_Event ThisEvent) {
                 InitDumpFollowing();
                 //InitFindOpponentHSM();
                 InitFindPortalHSM();
+                InitPortalEnterSubHSM();
 
                 // now put the machine into the actual initial state
                 nextState = FindPortal; // Should be FindAmmo

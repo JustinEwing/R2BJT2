@@ -50,7 +50,7 @@ static const char *StateNames[] = {
     LIST_OF_PORTAL_ENTER_STATES(STRING_FORM)
 };
 
-//#define ENTER_PORTAL_SUB_HSM_DEBUG_VERBOSE
+#define ENTER_PORTAL_SUB_HSM_DEBUG_VERBOSE // Uncomment this for debugging help
 #ifdef ENTER_PORTAL_SUB_HSM_DEBUG_VERBOSE
 #include "serial.h"
 #include <stdio.h>
@@ -128,7 +128,7 @@ ES_Event RunPortalEnterSubHSM(ES_Event ThisEvent) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
                         dbprintf("\n PortalPivot: ES_ENTRY event. Pivoting"
-                                "left to detect the track wire using the left"
+                                "left to detect the track wire using the left "
                                 "sensor. \n");
                         ThisEvent.EventType = ES_NO_EVENT;
 
@@ -184,13 +184,30 @@ ES_Event RunPortalEnterSubHSM(ES_Event ThisEvent) {
                         /************* STOP ROACH TIMER NEEDED **************/
                         break;
 
-                    case ES_TIMEOUT: // Drove too far, Portal Lost
-                        dbprintf("\n PortalTest: ES_TIMEOUT event. Exiting"
-                                "PortalTest and entering OutsidePortal. \n");
-                        nextState = OutsidePortal;
-                        makeTransition = TRUE;
-                        ThisEvent.EventType = ES_NO_EVENT;
-                        break;
+                    case ES_TIMEOUT:
+                        switch (ThisEvent.EventParam) {
+                            case PORTAL_TEST_TIMER: // Drove too far, Portal Lost
+                                dbprintf("\n PortalTest: ES_TIMEOUT event. Exiting"
+                                        "PortalTest and entering OutsidePortal. \n");
+                                nextState = OutsidePortal;
+                                makeTransition = TRUE;
+                                ThisEvent.EventType = ES_NO_EVENT;
+                                break;
+
+                            case PORTAL_ROACH_TIMER:
+                                dbprintf("\n PortalTest: ES_TIMEOUT->"
+                                        "PORTAL_ROACH_TIMER. Reversing until"
+                                        "PORTAL_TEST_TIMER expires. \n");
+
+                                /********** REVERSE TIMER START NEEDED **********/
+                                /*************MOTOR  REVERSE NEEDED ************/
+
+                                break;
+
+                            default: // Unhandled ES_TIMEOUT events
+                                break;
+                        }
+                        break; // End of ES_TIMEOUT
 
                     case TRACK_WIRE_FOUND: // Second track wire found, inside portal
                         dbprintf("\n PortalTest: TRACK_WIRE_FOUND event. Exiting"

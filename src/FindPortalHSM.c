@@ -32,7 +32,7 @@ static const char *StateNames[] = {
     LIST_OF_FindPortal_STATES(STRING_FORM)
 };
 
-#define FINDPORTAL_HSM_DEBUG_VERBOSE
+//#define FINDPORTAL_HSM_DEBUG_VERBOSE
 #ifdef FINDPORTAL_HSM_DEBUG_VERBOSE
 #include "serial.h"
 #include <stdio.h>
@@ -94,15 +94,20 @@ ES_Event RunFindPortalHSM(ES_Event ThisEvent) {
     switch (CurrentState) {
         case InitFindPortal:
             if (ThisEvent.EventType == ES_INIT) {
-                dbprintf("\n. Exiting Init. Should enter ObstacleFollow. \n");
+                dbprintf("\n. Exiting Init. Should enter ObstacleFollow."
+                        "Also initializing PortalEnterSubHSM and"
+                        "ObstacleFollowingSubHSM. \n");
 
-                nextState = ObstacleFollow;
+
+
+                nextState = PortalEnter;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
             }
             break;
 
         case ObstacleFollow:
+            /*************** NEED OBSTACLE FOLLOW SUB HSM ********************/
             // Run ObstacleFollowSubHSM
             if (ThisEvent.EventType != ES_NO_EVENT) {
                 switch (ThisEvent.EventType) {
@@ -127,11 +132,11 @@ ES_Event RunFindPortalHSM(ES_Event ThisEvent) {
             break;
 
         case PortalEnter:
-             ThisEvent = RunPortalEnterSubHSM(ThisEvent);
+            ThisEvent = RunPortalEnterSubHSM(ThisEvent);
             if (ThisEvent.EventType != ES_NO_EVENT) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
-                        dbprintf("\n. Entered PortalEnter. \n");
+                        dbprintf("\n Entered PortalEnter. \n");
 
                         ThisEvent.EventType = ES_NO_EVENT;
                         break;
