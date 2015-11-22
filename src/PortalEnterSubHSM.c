@@ -35,10 +35,10 @@
 STATE(InitPortalEnter) /* Init: Called at the start of this SubHSM */ \
 STATE(PortalPivot)/* ENTER: TRACKWIREEVENT - EXIT: TRACKWIREEVENT */ \
 STATE(PortalTest) /* ENTER: TRACKWIREEVENT - EXIT: ES_TIMEOUT || TRACKWIREEVENT || BUMPED */ \
-STATE(InPortal) /* ENTER: TRACKWIREEVENT - EXIT: BUMPED */ \
-STATE(OutsidePortal) /* ENTER: TIMEOUT - EXIT: BUMPED */ \
+STATE(InPortal) /* ENTER: TRACKWIREEVENT - EXIT: BUMPED || ES_TIMEOUT */ \
+STATE(OutsidePortal) /* ENTER: ES_TIMEOUT - EXIT: BUMPED */ \
 STATE(PortalRoach) /* ENTER: BUMPED - EXIT: ES_TIMEOUT*/ \
-STATE(RoachStopped) /* ENTER: ES_TIMEOUT - EXIT: None */ \
+STATE(PortalStopped) /* ENTER: ES_TIMEOUT - EXIT: None */ \
 
 #define ENUM_FORM(STATE) STATE, //Enums are reprinted verbatim and comma'd
 
@@ -169,8 +169,6 @@ ES_Event RunPortalEnterSubHSM(ES_Event ThisEvent) {
                         dbprintf("\n Entered PortalTest. \n");
                         ThisEvent.EventType = ES_NO_EVENT;
 
-
-
                         /*************** TIMER INIT NEEDED *******************
                         /************* DRIVE FORWARD NEEDED *******************/
 
@@ -209,29 +207,101 @@ ES_Event RunPortalEnterSubHSM(ES_Event ThisEvent) {
             break;
 
             /******************************************************************
-             @State: InPortal
-             * This state will reverse R2-BJT2 for 1 (UNTESTED) second so that
+             * @STATE: InPortal
+             * @BRIEF: This state will reverse R2-BJT2 for 1 (UNTESTED) second so that
              * he enters the portal. If he receives a BUMPED event during this
              * state, we will enter PortalRoach. If we get an ES_TIMEOUT, we
-             * will  */
+             * will transition to RoachStopped so that R2-BJT2 will remain
+             * in the portal until he is checked off.
+             * @ENTER: TRACKWIREEVENT
+             * @EXIT: BUMPED || ES_TIMEOUT
+             */
 
         case InPortal: // R2-BJT2 is inside the portal, reverse for 1 (UNTESTED) second
             if (ThisEvent.EventType != ES_NO_EVENT) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
-                        dbprintf("\n Entered InPortal. \n");
+                        dbprintf("\n Entered InPortal. Initializing Reverse"
+                                "Timer to 1 second and setting the motor "
+                                "speeds to -30 / -30. \n");
                         ThisEvent.EventType = ES_NO_EVENT;
 
-                        /* This state will reverse R2-BJT for one second so
-                         that he */
+                        /*************** MOTOR SPEEDS NEEDED ******************/
+                        /************ REVERSE TIMER INIT NEEDED ***************/
+
+                    case BUMPED:
+                        dbprintf("\n InPortal: BUMPED event, roach detected."
+                                "Stopping R2-BJT2 for 3 seconds. \n");
+
+                        /*************** STOP TIMER INIT NEEDED ****************/
+                        /****************** STOP NEEDED *******************/
+
+                        break;
+
+                    case ES_TIMEOUT:
+                        dbprintf("\n InPortal: ES_TIMEOUT event, inside portal."
+                                "Exiting InPortal and entering RoachStopped. \n");
+                        nextState = PortalStopped;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;
+
+                    default: //  Unhandled InPortal Events
+                        break;
                 }
             }
             break;
 
-        case OutsidePortal:
+            /******************************************************************
+             * @State OutsidePortal
+             * @Brief: This state will reverse R2-BJT2 for 7 (UNTESTED) seconds.
+             * Since PortalTest drove us forward for 5 seconds and we never
+             * reached a final TRACK_WIRE_FOUND event, we know that we started
+             * on the outer edge of the track wire and drove away from the portal.
+             * In order to compensate for this, we will reverse for 2 extra
+             * seconds and end up inside of the portal. Any BUMPED events will
+             * pause this
+             * @Enter: ES_TIMEOUT from PortalTest
+             * @Exit: BUMPED to PortalRoach || ES_TIMEOUT to RoachStopped
+             */
+        case OutsidePortal: // R2-BJT2 has driven forward past the portal
+            // He will now reverse for 7 (UNTESTED) seconds and transition
+            // to PortalStopped
+            if (ThisEvent.EventType != ES_NO_EVENT) {
+                switch (ThisEvent.EventType) {
+                    case ES_ENTRY:
+                        dbprintf("\n Entered OutsidePortal. \n");
+                        ThisEvent.EventType = ES_NO_EVENT;
+
+                        /*************** TIMER INIT NEEDED *******************/
+                        /**************** REVERSE NEEDED *******************/
+
+                    case BUMPED:
+                        dbprintf("\n OutsidePortal: BUMPED event. Roach"
+                                "detected. Stopping R2-BJT2 for 3 seconds. \n");
+
+                        /*************** STOP TIMER INIT NEEDED ****************/
+                        /****************** STOP NEEDED *******************/
+
+                        break;
+
+                    case ES_TIMEOUT:
+                        switch (ThisEvent.EventParam) {
+                            case PORTAL_TEST_TIMER:
+                                break;
+
+                            case PORTAL_ROACH_TIMER:
+                                break;
+                        }
+                        break;
+                }
+            }
             break;
 
-        case PortalRoach:
+            //  case PortalRoach: // Will not use this, will use timer EventParams instead
+            //     break;
+
+        case PortalStopped:
             break;
 
             if (makeTransition == TRUE) {
