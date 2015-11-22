@@ -167,7 +167,7 @@ ES_Event RunPortalEnterSubHSM(ES_Event ThisEvent) {
             if (ThisEvent.EventType != ES_NO_EVENT) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
-                        dbprintf("\n PortalTest: ES_ENTRY event. Driving straight"
+                        dbprintf("\n PortalTest: ES_ENTRY event. Driving straight "
                                 "forward for 5 seconds. \n");
                         ThisEvent.EventType = ES_NO_EVENT;
 
@@ -196,7 +196,7 @@ ES_Event RunPortalEnterSubHSM(ES_Event ThisEvent) {
 
                             case PORTAL_ROACH_TIMER:
                                 dbprintf("\n PortalTest: ES_TIMEOUT->"
-                                        "PORTAL_ROACH_TIMER. Reversing until"
+                                        "PORTAL_ROACH_TIMER. Reversing until "
                                         "PORTAL_TEST_TIMER expires. \n");
 
                                 /********** REVERSE TIMER START NEEDED **********/
@@ -210,7 +210,7 @@ ES_Event RunPortalEnterSubHSM(ES_Event ThisEvent) {
                         break; // End of ES_TIMEOUT
 
                     case TRACK_WIRE_FOUND: // Second track wire found, inside portal
-                        dbprintf("\n PortalTest: TRACK_WIRE_FOUND event. Exiting"
+                        dbprintf("\n PortalTest: TRACK_WIRE_FOUND event. Exiting "
                                 "PortalTest and entering InPortal. \n");
                         nextState = InPortal;
                         makeTransition = TRUE;
@@ -248,7 +248,7 @@ ES_Event RunPortalEnterSubHSM(ES_Event ThisEvent) {
             if (ThisEvent.EventType != ES_NO_EVENT) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
-                        dbprintf("\n InPortal: ES_ENTRY event. Initializing Reverse"
+                        dbprintf("\n InPortal: ES_ENTRY event. Initializing Reverse "
                                 "Timer to 1 second and setting the motor "
                                 "speeds to -30 / -30. \n");
                         ThisEvent.EventType = ES_NO_EVENT;
@@ -268,7 +268,7 @@ ES_Event RunPortalEnterSubHSM(ES_Event ThisEvent) {
                         break;
 
                     case BUMPED:
-                        dbprintf("\n InPortal: BUMPED event. Roach detected."
+                        dbprintf("\n InPortal: BUMPED event. Roach detected. "
                                 "Stopping R2-BJT2 for 3 seconds. \n");
 
                         /************* STOP REVERSE TIMER NEEDED **************/
@@ -281,7 +281,7 @@ ES_Event RunPortalEnterSubHSM(ES_Event ThisEvent) {
                         switch (ThisEvent.EventParam) {
                             case PORTAL_TEST_TIMER:
                                 dbprintf("\n InsidePortal: ES_TIMEOUT->"
-                                        "PORTAL_TEST_TIMER. Transitioning"
+                                        "PORTAL_TEST_TIMER. Transitioning "
                                         "to PortalStopped. \n");
                                 nextState = PortalStopped;
                                 makeTransition = TRUE;
@@ -290,7 +290,7 @@ ES_Event RunPortalEnterSubHSM(ES_Event ThisEvent) {
 
                             case PORTAL_ROACH_TIMER:
                                 dbprintf("\n InsidePortal: ES_TIMEOUT->"
-                                        "PORTAL_ROACH_TIMER. Reversing until"
+                                        "PORTAL_ROACH_TIMER. Reversing until "
                                         "PORTAL_TEST_TIMER expires. \n");
 
                                 /********** REVERSE TIMER START NEEDED **********/
@@ -328,7 +328,7 @@ ES_Event RunPortalEnterSubHSM(ES_Event ThisEvent) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
                         dbprintf("\n OutsidePortal: ES_ENTRY event. Reversing"
-                                "straight backward for 7 seconds. \n");
+                                " straight backward for 7 seconds. \n");
                         ThisEvent.EventType = ES_NO_EVENT;
 
                         /********** REVERSE TIMER INIT NEEDED *******************/
@@ -344,7 +344,7 @@ ES_Event RunPortalEnterSubHSM(ES_Event ThisEvent) {
                         break;
 
                     case BUMPED:
-                        dbprintf("\n OutsidePortal: BUMPED event. Roach"
+                        dbprintf("\n OutsidePortal: BUMPED event. Roach "
                                 "detected. Stopping R2-BJT2 for 3 seconds. \n");
 
                         /************* STOP REVERSE TIMER NEEDED **************/
@@ -356,7 +356,7 @@ ES_Event RunPortalEnterSubHSM(ES_Event ThisEvent) {
                         switch (ThisEvent.EventParam) {
                             case PORTAL_TEST_TIMER:
                                 dbprintf("\n OutsidePortal: ES_TIMEOUT->"
-                                        "PORTAL_TEST_TIMER. Transitioning"
+                                        "PORTAL_TEST_TIMER. Transitioning "
                                         "to PortalStopped. \n");
                                 nextState = PortalStopped;
                                 makeTransition = TRUE;
@@ -365,7 +365,7 @@ ES_Event RunPortalEnterSubHSM(ES_Event ThisEvent) {
 
                             case PORTAL_ROACH_TIMER:
                                 dbprintf("\n OutsidePortal: ES_TIMEOUT->"
-                                        "PORTAL_ROACH_TIMER. Reversing until"
+                                        "PORTAL_ROACH_TIMER. Reversing until "
                                         "PORTAL_TEST_TIMER expires. \n");
 
                                 /********** REVERSE TIMER START NEEDED **********/
@@ -398,7 +398,7 @@ ES_Event RunPortalEnterSubHSM(ES_Event ThisEvent) {
             if (ThisEvent.EventType != ES_NO_EVENT) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
-                        dbprintf("\n Entered PortalStopped. Bringing R2-BJT2"
+                        dbprintf("\n Entered PortalStopped. Bringing R2-BJT2 "
                                 "to a full stop. \n");
 
                         /****************** STOP NEEDED ************************/
