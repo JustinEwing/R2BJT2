@@ -100,7 +100,7 @@ static const char *EventNames[] = {
 #define TIMER4_RESP_FUNC PostR2BumperService
 #define TIMER5_RESP_FUNC Post_R2_BJT2_HSM    //Alignment timer
 #define TIMER6_RESP_FUNC Post_R2_BJT2_HSM    //Find Opponent Timer
-#define TIMER7_RESP_FUNC TIMER_UNUSED
+#define TIMER7_RESP_FUNC TIMER_UNUSED 
 #define TIMER8_RESP_FUNC TIMER_UNUSED
 #define TIMER9_RESP_FUNC TIMER_UNUSED
 #define TIMER10_RESP_FUNC TIMER_UNUSED

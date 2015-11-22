@@ -11,9 +11,9 @@
 
 
 
-#define BEACON_PORT PORTY //used for init
-#define BEACON_PIN PIN5
-#define BEACON_READ PORTY05_BIT
+#define BEACON_PORT PORTW //used for init
+#define BEACON_PIN AD_PORTW3 //PIN3
+//#define BEACON_READ PORTX07_BIT
 
 typedef enum {
     WAS_FOUND, WAS_LOST
@@ -31,7 +31,6 @@ static beaconstate_t PrevBeaconState = WAS_LOST;
 #define dbprintf(...)
 #endif
 
-
 uint8_t CheckTopTape(void) {
     dbprintf("Entered %s\n", __FUNCTION__);
     /***************** Declarations ****************/
@@ -46,7 +45,7 @@ uint8_t CheckTopTape(void) {
     thisEvent = R2_TopTape();
 
     //If an event has happened.
-    if(thisEvent.EventType != ES_NO_EVENT) {
+    if (thisEvent.EventType != ES_NO_EVENT) {
         Post_R2_BJT2_HSM(thisEvent);
         returnVal = TRUE;
     }
@@ -69,7 +68,7 @@ uint8_t CheckLeftTape(void) {
     thisEvent = R2_LeftTape();
 
     //If an event has happened.
-    if(thisEvent.EventType != ES_NO_EVENT) {
+    if (thisEvent.EventType != ES_NO_EVENT) {
         Post_R2_BJT2_HSM(thisEvent);
         returnVal = TRUE;
     }
@@ -92,7 +91,7 @@ uint8_t CheckRightTape(void) {
     thisEvent = R2_RightTape();
 
     //If an event has happened.
-    if(thisEvent.EventType != ES_NO_EVENT) {
+    if (thisEvent.EventType != ES_NO_EVENT) {
         Post_R2_BJT2_HSM(thisEvent);
         returnVal = TRUE;
     }
@@ -115,7 +114,7 @@ uint8_t CheckLauncherTape(void) {
     thisEvent = R2_LauncherTape();
 
     //If an event has happened.
-    if(thisEvent.EventType != ES_NO_EVENT) {
+    if (thisEvent.EventType != ES_NO_EVENT) {
         Post_R2_BJT2_HSM(thisEvent);
         returnVal = TRUE;
     }
@@ -140,18 +139,19 @@ uint8_t CheckBeacon(void) {
     dbprintf("Entered %s\n", __FUNCTION__);
     ES_Event thisEvent;
     uint8_t returnVal = FALSE;
-    uint8_t beacon = BEACON_READ;
+    // Using ADC
+    uint16_t beacon = AD_ReadADPin(BEACON_PIN);
     //printf("%d\n",beacon); // quick and dirty
-    
+
     // NOTE: beacon detector circuit is active low
-    if (!beacon && (PrevBeaconState == WAS_LOST)) {
+    if ((beacon < 400) && (PrevBeaconState == WAS_LOST)) {
         dbprintf("Found da beacon\n");
         PrevBeaconState = WAS_FOUND;
         thisEvent.EventType = BEACON_FOUND;
         thisEvent.EventParam = 1;
         Post_R2_BJT2_HSM(thisEvent);
         returnVal = TRUE;
-    } else if (beacon && (PrevBeaconState == WAS_FOUND)) {
+    } else if ((beacon >= 400) && (PrevBeaconState == WAS_FOUND)) {
         dbprintf("Lost da beacon\n");
         PrevBeaconState = WAS_LOST;
         thisEvent.EventType = BEACON_LOST;
@@ -162,10 +162,10 @@ uint8_t CheckBeacon(void) {
 }
 
 uint8_t InitBeacon(void) {
-    return IO_PortsSetPortInputs(BEACON_PORT, BEACON_PIN);
+    return 0; //being init in initTape
 }
 
 uint8_t InitTrackWire(void) {
-    return 0;// AD_AddPins(RIGHT_TRACK_PIN | LEFT_TRACK_PIN);
+    return 0; //being init in initTape
 }
 

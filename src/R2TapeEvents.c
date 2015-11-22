@@ -9,6 +9,7 @@
 #include "ES_Framework.h"
 #include "AD.h"
 #include "R2TapeEvents.h"
+#include "R2Events.h"
 
 /************************** #DEFINES **********************
  * - 4 Tape sensors, so we need 4 ports for our tape sensors
@@ -283,6 +284,6 @@ uint8_t InitTape(void) {
     return AD_AddPins(TOP_TAPE_PIN |
             LEFT_TAPE_PIN |
             RIGHT_TAPE_PIN |
-            LAUNCHER_TAPE_PIN | LEFT_TRACK_PIN | RIGHT_TRACK_PIN);
-    //| RIGHT_TRACK_PIN | LEFT_TRACK_PIN);
+            LAUNCHER_TAPE_PIN | LEFT_TRACK_PIN | RIGHT_TRACK_PIN | AD_PORTW3);
+    //last one is for the beacon
 }
