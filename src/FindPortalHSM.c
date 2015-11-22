@@ -11,6 +11,7 @@
 #include "FindPortalHSM.h"
 #include "R2Events.h"
 #include <stdio.h>
+#include "PortalEnterSubHSM.h"
 
 /*******************************************************************************
  * MODULE #DEFINES                                                             *
