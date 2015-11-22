@@ -231,7 +231,7 @@ ES_Event R2_LauncherTape(){
     // value from ADC
     uint16_t TapeReading = 0;
 
-    tapestate_t NewRightTapeState = PrevLauncherTapeState; // Temp value
+    tapestate_t NewLauncherTapeState = PrevLauncherTapeState; // Temp value
 
     TapeReading = ReadTapeDetector(LAUNCHER_TAPE_PIN); //ADC value
 
@@ -245,7 +245,7 @@ ES_Event R2_LauncherTape(){
         thisEvent.EventType = TAPE_FOUND;
         thisEvent.EventParam = LAUNCHER_TAPE_SENSOR;
         Post_R2_BJT2_HSM(thisEvent);
-        NewRightTapeState = WHITE_TO_BLACK;
+        NewLauncherTapeState = WHITE_TO_BLACK;
     }
 
     // Case: Tape Lost
@@ -254,14 +254,14 @@ ES_Event R2_LauncherTape(){
         thisEvent.EventType = TAPE_LOST;
         thisEvent.EventParam = LAUNCHER_TAPE_SENSOR;
         Post_R2_BJT2_HSM(thisEvent);
-        NewRightTapeState = BLACK_TO_WHITE;
+        NewLauncherTapeState = BLACK_TO_WHITE;
     }
 
     dbprintf("EventParam: %x TapeSensor %x not TapeSensor: %x\n",
             thisEvent.EventParam, TapeSensor, ~TapeSensor);
 
 // PrevTapeState updated with NewTapeState
-PrevLauncherTapeState = NewRightTapeState;
+PrevLauncherTapeState = NewLauncherTapeState;
 
 return thisEvent;
 }
