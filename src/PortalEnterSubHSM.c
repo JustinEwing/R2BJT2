@@ -135,12 +135,10 @@ ES_Event RunPortalEnterSubHSM(ES_Event ThisEvent) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
                         dbprintf("\n PortalPivot: ES_ENTRY event. Pivoting"
-                                "left to detect the track wire using the left "
+                                "right to detect the track wire using the left "
                                 "sensor. \n");
                         ThisEvent.EventType = ES_NO_EVENT;
-
                         R2Motors(20, 0); // Pivoting right
-
                         break;
 
                     case TRACK_WIRE_FOUND:
@@ -177,19 +175,15 @@ ES_Event RunPortalEnterSubHSM(ES_Event ThisEvent) {
                         dbprintf("\n PortalTest: ES_ENTRY event. Driving straight "
                                 "forward for 5 seconds. \n");
                         ThisEvent.EventType = ES_NO_EVENT;
-
                         // Straightforward timer set to 5 seconds
                         ES_Timer_InitTimer(PORTAL_TEST_TIMER, SECONDS(5));
-                        // Straightforward - fast
+                        // Straightforward at 30,30
                         R2Motors(STRAIGHTFORWARD, STRAIGHTFORWARD);
-
-
                         break;
 
                     case ES_EXIT:
                         dbprintf("\n PortalTest: ES_EXIT event. Stopping "
                                 "PORTAL_TEST_TIMER and PORTAL_ROACH_TIMER. \n");
-
                         // Stop Straightforward Timer
                         ES_Timer_StopTimer(PORTAL_TEST_TIMER);
                         // Stop Roach test timer
@@ -210,12 +204,10 @@ ES_Event RunPortalEnterSubHSM(ES_Event ThisEvent) {
                                 dbprintf("\n PortalTest: ES_TIMEOUT->"
                                         "PORTAL_ROACH_TIMER. Driving forward until "
                                         "PORTAL_TEST_TIMER expires. \n");
-
                                 // Start straight forward timer
                                 ES_Timer_StartTimer(PORTAL_TEST_TIMER);
                                 // Drive straight forward at 30,30
                                 R2Motors(STRAIGHTFORWARD, STRAIGHTFORWARD);
-
                                 break;
 
                             default: // Unhandled ES_TIMEOUT events
@@ -234,12 +226,11 @@ ES_Event RunPortalEnterSubHSM(ES_Event ThisEvent) {
                     case BUMPED: // Roach detected, stopping until it passes
                         dbprintf("\n PortalTest: BUMPED event. Roach "
                                 "detected. Stopping R2-BJT2 for 3 seconds. \n");
-
                         // Stopping Straight forward timer
                         ES_Timer_StopTimer(PORTAL_TEST_TIMER);
-                        /*************** STOP TIMER INIT NEEDED ****************/
+                        // Initializing the stop timer to 3 seconds
                         ES_Timer_InitTimer(PORTAL_ROACH_TIMER, SECONDS(3));
-                        /****************** STOP NEEDED ************************/
+                        // Stopping R2-BJT2 while we wait for the roach to pass by
                         R2Motors(STOPPED, STOPPED);
                         break;
 
@@ -251,52 +242,47 @@ ES_Event RunPortalEnterSubHSM(ES_Event ThisEvent) {
 
             /******************************************************************
              * @STATE: InPortal
-             * @BRIEF: This state will reverse R2-BJT2 for 1 (UNTESTED) second so that
+             * @BRIEF: This state will reverse R2-BJT2 for 2 (UNTESTED) seconds so that
              * he enters the portal. If he receives a BUMPED event during this
-             * state, we will enter PortalRoach. If we get an ES_TIMEOUT, we
+             * state, he will stop for 3 seconds. If we get an ES_TIMEOUT, we
              * will transition to RoachStopped so that R2-BJT2 will remain
              * in the portal until he is checked off.
              * @ENTER: TRACKWIREEVENT
              * @EXIT: BUMPED || ES_TIMEOUT
              */
 
-        case InPortal: // R2-BJT2 is inside the portal, reverse for 1 (UNTESTED) second
+        case InPortal: // R2-BJT2 is inside the portal, reverse for 2 (UNTESTED) seconds
             if (ThisEvent.EventType != ES_NO_EVENT) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
                         dbprintf("\n InPortal: ES_ENTRY event. Initializing Reverse "
-                                "Timer to 1 second and setting the motor "
+                                "Timer to 2 seconds and setting the motor "
                                 "speeds to -30 / -30. \n");
                         ThisEvent.EventType = ES_NO_EVENT;
-
                         // Reversing at -30,-30
                         R2Motors(STRAIGHTBACKWARD, STRAIGHTBACKWARD);
-                        // Reverse timer initialized to 1 second
-                        ES_Timer_InitTimer(PORTAL_TEST_TIMER, SECONDS(1));
-
+                        // Reverse timer initialized to 2 seconds
+                        ES_Timer_InitTimer(PORTAL_TEST_TIMER, SECONDS(2));
                         break;
 
                     case ES_EXIT:
                         dbprintf("\n InPortal: ES_EXIT event. Stopping "
                                 "PORTAL_TEST_TIMER and PORTAL_ROACH_TIMER. \n");
-
                         // Stopping reverse timer
                         ES_Timer_StopTimer(PORTAL_TEST_TIMER);
                         // Stopping roach test timer
                         ES_Timer_StopTimer(PORTAL_ROACH_TIMER);
-
                         break;
 
                     case BUMPED:
                         dbprintf("\n InPortal: BUMPED event. Roach detected. "
                                 "Stopping R2-BJT2 for 3 seconds. \n");
-
+                        // Stopping reverse timer
                         ES_Timer_StopTimer(PORTAL_TEST_TIMER);
-                        /*************** STOP TIMER INIT NEEDED ****************/
+                        // Initializing roach test timer to 3 seconds
                         ES_Timer_InitTimer(PORTAL_ROACH_TIMER, SECONDS(3));
-                        /****************** STOP NEEDED *******************/
-                        R2Motors(STOPPED,STOPPED);
-
+                        // Stopping motors
+                        R2Motors(STOPPED, STOPPED);
                         break;
 
                     case ES_TIMEOUT:
@@ -314,10 +300,10 @@ ES_Event RunPortalEnterSubHSM(ES_Event ThisEvent) {
                                 dbprintf("\n InsidePortal: ES_TIMEOUT->"
                                         "PORTAL_ROACH_TIMER. Reversing until "
                                         "PORTAL_TEST_TIMER expires. \n");
-
-                                /********** REVERSE TIMER START NEEDED **********/
-                                /*************MOTOR  REVERSE NEEDED ************/
-
+                                // Starting the reverse timer back up
+                                ES_Timer_StartTimer(PORTAL_TEST_TIMER);
+                                // Driving the roach straight backward
+                                R2Motors(STRAIGHTBACKWARD, STRAIGHTBACKWARD);
                                 break;
 
                             default: // Unhandled ES_TIMEOUT events
@@ -339,7 +325,7 @@ ES_Event RunPortalEnterSubHSM(ES_Event ThisEvent) {
              * on the outer edge of the track wire and drove away from the portal.
              * In order to compensate for this, we will reverse for 2 extra
              * seconds and end up inside of the portal. Any BUMPED events will
-             * pause this
+             * pause this while we wait for the suspected roach to pass by.
              * @Enter: ES_TIMEOUT from PortalTest
              * @Exit: BUMPED to PortalRoach || ES_TIMEOUT to RoachStopped
              */
@@ -352,26 +338,30 @@ ES_Event RunPortalEnterSubHSM(ES_Event ThisEvent) {
                         dbprintf("\n OutsidePortal: ES_ENTRY event. Reversing"
                                 " straight backward for 7 seconds. \n");
                         ThisEvent.EventType = ES_NO_EVENT;
-
-                        /********** REVERSE TIMER INIT NEEDED *******************/
-                        /************ MOTOR REVERSE NEEDED *******************/
+                        // Initializing the reverse timer to 7 seconds
+                        ES_Timer_InitTimer(PORTAL_TEST_TIMER, SECONDS(7));
+                        // Reversing R2-BJT2 straight backward
+                        R2Motors(STRAIGHTBACKWARD, STRAIGHTBACKWARD);
                         break;
 
                     case ES_EXIT:
                         dbprintf("\n OutsidePortal: ES_EXIT event. Stopping "
                                 "PORTAL_TEST_TIMER and PORTAL_ROACH_TIMER. \n");
-
-                        /************* STOP REVERSE TIMER NEEDED **************/
-                        /************* STOP ROACH TIMER NEEDED **************/
+                        // Stopping Reverse timer
+                        ES_Timer_StopTimer(PORTAL_TEST_TIMER);
+                        // Stopping Roach test timer
+                        ES_Timer_StopTimer(PORTAL_ROACH_TIMER);
                         break;
 
                     case BUMPED:
                         dbprintf("\n OutsidePortal: BUMPED event. Roach "
                                 "detected. Stopping R2-BJT2 for 3 seconds. \n");
-
-                        /************* STOP REVERSE TIMER NEEDED **************/
-                        /*************** STOP TIMER INIT NEEDED ****************/
-                        /****************** STOP NEEDED ************************/
+                        // Stopping Reverse Timer
+                        ES_Timer_StopTimer(PORTAL_TEST_TIMER);
+                        // Initializing the roach test timer to 3 seconds
+                        ES_Timer_InitTimer(PORTAL_ROACH_TIMER, SECONDS(3));
+                        // Stopping R2-BJT2
+                        R2Motors(STOPPED, STOPPED);
                         break;
 
                     case ES_TIMEOUT:
@@ -389,9 +379,10 @@ ES_Event RunPortalEnterSubHSM(ES_Event ThisEvent) {
                                 dbprintf("\n OutsidePortal: ES_TIMEOUT->"
                                         "PORTAL_ROACH_TIMER. Reversing until "
                                         "PORTAL_TEST_TIMER expires. \n");
-
-                                /********** REVERSE TIMER START NEEDED **********/
-                                /*************MOTOR  REVERSE NEEDED ************/
+                                // Starting the reverse timer back up
+                                ES_Timer_StartTimer(PORTAL_TEST_TIMER);
+                                // Driving R2-BJT2 straight backward
+                                R2Motors(STRAIGHTBACKWARD, STRAIGHTBACKWARD);
                                 break;
 
                             default: // Unhandled ES_TIMEOUT events
@@ -422,9 +413,8 @@ ES_Event RunPortalEnterSubHSM(ES_Event ThisEvent) {
                     case ES_ENTRY:
                         dbprintf("\n Entered PortalStopped. Bringing R2-BJT2 "
                                 "to a full stop. \n");
-
-                        /****************** STOP NEEDED ************************/
-
+                        // Stopping R2-BJT2
+                        R2Motors(STOPPED, STOPPED);
                         break;
 
                     default: // Unhandled PortalStopped events
