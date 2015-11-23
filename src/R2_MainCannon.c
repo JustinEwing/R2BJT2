@@ -58,7 +58,7 @@ static const char *StateNames[] = {
     LIST_OF_R2MainCannon_STATES(STRING_FORM)
 };
 
-//#define MAINCANNON_DEBUG_VERBOSE
+#define MAINCANNON_DEBUG_VERBOSE
 #ifdef MAINCANNON_DEBUG_VERBOSE
 #include "serial.h"
 #include <stdio.h>
@@ -101,6 +101,9 @@ static uint8_t MyPriority;
 uint8_t InitR2MainCannon(void) {
     ES_Event returnEvent;
 
+    dbprintf("Init Cannon FSM\n");
+    R2CloseBarrel();
+
     CurrentState = InitR2MainCannonState;
     returnEvent = RunR2MainCannon(INIT_EVENT);
     if (returnEvent.EventType == ES_NO_EVENT) {
@@ -137,6 +140,10 @@ ES_Event RunR2MainCannon(ES_Event ThisEvent) {
     switch (CurrentState) {
         case InitR2MainCannonState: // If current state is initial Psedudo State
             if (ThisEvent.EventType == ES_INIT) {
+
+                //Set up the cannon
+                dbprintf("Initing Cannon\n");
+
                 nextState = InitCannon;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
@@ -149,14 +156,22 @@ ES_Event RunR2MainCannon(ES_Event ThisEvent) {
                     case ES_ENTRY:
                         R2CloseBarrel();
                         R2LauncherMotorSpeed(0);
-                        ES_Timer_InitTimer(GUN_TIMER, 10);
-                        break;
-
-                    case ES_TIMEOUT:
                         nextState = Spooling;
                         makeTransition = TRUE;
                         ThisEvent.EventType = ES_NO_EVENT;
+                        ES_Timer_SetTimer(GUN_TIMER, 4000);
+                        dbprintf("psudo cannon init\n");
                         break;
+
+                        //                    case ES_TIMEOUT:
+                        //                        switch (ThisEvent.EventParam) {
+                        //                            case GUN_TIMER:
+                        //                                nextState = Spooling;
+                        //                                makeTransition = TRUE;
+                        //                                ThisEvent.EventType = ES_NO_EVENT;
+                        //                                break;
+                        //                        }
+                        //                        break;
 
                     default: break;
                 }
@@ -167,21 +182,26 @@ ES_Event RunR2MainCannon(ES_Event ThisEvent) {
             if (ThisEvent.EventType != ES_NO_EVENT) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
+                        dbprintf("Spooling motors\n");
                         R2LauncherMotorSpeed(100);
-                        ES_Timer_InitTimer(GUN_TIMER, 2500);
+                        ES_Timer_StartTimer(GUN_TIMER);
                         break;
 
 
 
                     case ES_TIMEOUT:
-                        nextState = Load;
-                        makeTransition = TRUE;
-                        ThisEvent.EventType = ES_NO_EVENT;
+                        switch (ThisEvent.EventParam) {
+                            case GUN_TIMER:
+                                ES_Timer_SetTimer(GUN_TIMER, 450);
+                                nextState = Load;
+                                makeTransition = TRUE;
+                                ThisEvent.EventType = ES_NO_EVENT;
+                                break;
+                        }
                         break;
 
 
-                    default:
-                        break;
+                    default: break;
                 }
             }
             break;
@@ -190,18 +210,25 @@ ES_Event RunR2MainCannon(ES_Event ThisEvent) {
             if (ThisEvent.EventType != ES_NO_EVENT) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
-                        ES_Timer_InitTimer(GUN_TIMER, 500);
+                        dbprintf("Loading Cannon\n");
                         R2OpenBarrel();
+                        ES_Timer_StartTimer(GUN_TIMER);
                         break;
 
                     case ES_TIMEOUT:
-                        nextState = FIRE;
-                        makeTransition = TRUE;
-                        ThisEvent.EventType = ES_NO_EVENT;
+                        switch (ThisEvent.EventParam) {
+                            case GUN_TIMER:
+                                R2OpenBarrel();
+                                nextState = FIRE;
+                                makeTransition = TRUE;
+                                ThisEvent.EventType = ES_NO_EVENT;
+                                break;
+
+                            default: break;
+                        }
                         break;
 
-                    default:
-                        break;
+                    default: break;
                 }
             }
             break;
@@ -211,11 +238,12 @@ ES_Event RunR2MainCannon(ES_Event ThisEvent) {
             if (ThisEvent.EventType != ES_NO_EVENT) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
+                        dbprintf("FIRE!!!\n");
                         R2CloseBarrel();
-                        R2LauncherMotorSpeed(0);
-                        nextState = Spooling;
-                        makeTransition = FALSE;
-                        ThisEvent.EventType = ES_NO_EVENT;
+                        //R2LauncherMotorSpeed(0);
+                        //nextState = Spooling;
+                        //makeTransition = TRUE;
+                        ThisEvent.EventType = ES_EXIT;
                         break;
 
 
@@ -225,8 +253,7 @@ ES_Event RunR2MainCannon(ES_Event ThisEvent) {
             break;
 
 
-        default: // all unhandled states fall into here
-            break;
+        default: break;
     } // end switch on Current State
 
     if (makeTransition == TRUE) { // making a state transition, send EXIT and ENTRY

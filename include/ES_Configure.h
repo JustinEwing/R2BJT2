@@ -151,7 +151,7 @@ static const char *EventNames[] = {
 // the name of the run function
 #define SERV_0_RUN RunTimerService
 // How big should this service's Queue be?
-#define SERV_0_QUEUE_SIZE 9
+#define SERV_0_QUEUE_SIZE 12
 
 /****************************************************************************/
 // These are the definitions for Service 1

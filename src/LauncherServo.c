@@ -16,7 +16,7 @@
 //PWM AND IO Ports for motors
 #define LAUNCHER_SERVO   RC_PORTZ08
 #define BARREL_OPEN 1000
-#define BARREL_CLOSED 1400
+#define BARREL_CLOSED 1500
 
 
 //#define MOTOR_DEBUG_VERBOSE
