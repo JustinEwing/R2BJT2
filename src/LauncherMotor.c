@@ -87,15 +87,6 @@ uint8_t R2LauncherMotorSpeed(char speed){
     return SUCCESS;
 }
 
-/**
- * @Function R2_BJT2_BatteryVoltage(void)
- * @param None.
- * @return a 10-bit value corresponding to the current voltage of the roach
- * @brief  returns a 10:1 scaled value of the roach battery level
- * @author Max Dunne, 2013.07.12 */
-unsigned int R2_BJT2_BatteryVoltage(void) {
-    return AD_ReadADPin(BAT_VOLTAGE);
-}
 /*******************************************************************************
  * TEST HARNESS                                                                *
  ******************************************************************************/
