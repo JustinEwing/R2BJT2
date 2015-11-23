@@ -18,6 +18,8 @@
 
 
 
+
+
 //defines for keyboard input
 //#define USE_KEYBOARD_INPUT
 //What State machine are we testing
@@ -100,7 +102,7 @@ static const char *EventNames[] = {
 #define TIMER4_RESP_FUNC PostR2BumperService
 #define TIMER5_RESP_FUNC Post_R2_BJT2_HSM    //Alignment timer
 #define TIMER6_RESP_FUNC Post_R2_BJT2_HSM    //Find Opponent Timer
-#define TIMER7_RESP_FUNC TIMER_UNUSED 
+#define TIMER7_RESP_FUNC Post_R2_BJT2_HSM    //Cannon Timer
 #define TIMER8_RESP_FUNC TIMER_UNUSED
 #define TIMER9_RESP_FUNC TIMER_UNUSED
 #define TIMER10_RESP_FUNC TIMER_UNUSED
@@ -121,6 +123,7 @@ static const char *EventNames[] = {
 #define R2_BUMPER_TIMER 4   //This is for the Bumper Service
 #define ALIGNMENT_TIMER 5   //This is for the Alignment to the tape
 #define FIND_OPPONENT_TIMER 6
+#define GUN_TIMER 7
 
 
 /****************************************************************************/

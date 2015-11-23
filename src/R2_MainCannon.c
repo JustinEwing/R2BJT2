@@ -1,19 +1,26 @@
+
 /*
- * File: R2_BJT2_HSM.c
- * Author: Brushless DC-3PO
+ * File: FindOpponentHSM.c
+ * Author: J. Edward Carryer
+ * Modified: Gabriel H Elkaim
  *
- * File to set up a Heirarchical State Machine to work with the Events and
- * Services Framework (ES_Framework) on the Uno32 for the CMPE-118/L class.
+ * Template file to set up a Heirarchical State Machine to work with the Events and
+ * Services Framework (ES_Framework) on the Uno32 for the CMPE-118/L class. Note that
+ * this file will need to be modified to fit your exact needs, and most of the names
+ * will have to be changed to match your code.
  *
- * There is another template file for the SubHSM's that is slightly differet, and
- * should be used for all of the subordinate state machines (flat or heirarchical)
+ * There is for a substate machine. Make sure it has a unique name
+ *
+ * This is provided as an example and a good place to start.
  *
  * History
  * When           Who     What/Why
  * -------------- ---     --------
- * 11/11/15       DTL     Started writing HSM/because you gotta start somewhere
- *
- *
+ * 09/13/13 15:17 ghe      added tattletail functionality and recursive calls
+ * 01/15/12 11:12 jec      revisions for Gen2 framework
+ * 11/07/11 11:26 jec      made the queue static
+ * 10/30/11 17:59 jec      fixed references to CurrentEvent in RunTemplateSM()
+ * 10/23/11 18:20 jec      began conversion from SMTemplate.c (02/20/07 rev)
  */
 
 
@@ -25,26 +32,34 @@
 #include "ES_Framework.h"
 #include "BOARD.h"
 #include "R2_BJT2_HSM.h"
-#include "FindAmmoHSM.h"
-#include "FindOpponentHSM.h"
-#include "FindPortalHSM.h"
 #include "R2_MainCannon.h"
-/*******************************************************************************
- * PRIVATE #DEFINES                                                            *
- ******************************************************************************/
-//Include any defines you need to do
+#include "LauncherMotor.h"
+#include "LauncherServo.h"
+
 /*******************************************************************************
  * MODULE #DEFINES                                                             *
  ******************************************************************************/
+#define LIST_OF_R2MainCannon_STATES(STATE) \
+        STATE(InitR2MainCannonState)    \
+        STATE(InitCannon) \
+        STATE(Spooling) \
+        STATE(Load) \
+        STATE(FIRE) \
 
+
+#define ENUM_FORM(STATE) STATE, //Enums are reprinted verbatim and comma'd
+
+typedef enum {
+    LIST_OF_R2MainCannon_STATES(ENUM_FORM)
+} R2MainCannonState_t;
 
 #define STRING_FORM(STATE) #STATE, //Strings are stringified and comma'd
 static const char *StateNames[] = {
-    LIST_OF_HSM_STATES(STRING_FORM)
+    LIST_OF_R2MainCannon_STATES(STRING_FORM)
 };
 
-//#define HSM_DEBUG_VERBOSE
-#ifdef HSM_DEBUG_VERBOSE
+//#define MAINCANNON_DEBUG_VERBOSE
+#ifdef MAINCANNON_DEBUG_VERBOSE
 #include "serial.h"
 #include <stdio.h>
 #define dbprintf(...) while(!IsTransmitEmpty()); printf(__VA_ARGS__)
@@ -52,19 +67,20 @@ static const char *StateNames[] = {
 #define dbprintf(...)
 #endif
 
+
 /*******************************************************************************
  * PRIVATE FUNCTION PROTOTYPES                                                 *
  ******************************************************************************/
 /* Prototypes for private functions for this machine. They should be functions
-   relevant to the behavior of this state machine
-   Example: char RunAway(uint_8 seconds);*/
+   relevant to the behavior of this state machine */
+
 /*******************************************************************************
  * PRIVATE MODULE VARIABLES                                                            *
  ******************************************************************************/
 /* You will need MyPriority and the state variable; you may need others as well.
  * The type of state variable should match that of enum in header file. */
 
-static R2_BJT2_State_t CurrentState = InitHSMtate; // <- change enum name to match ENUM
+static R2MainCannonState_t CurrentState = InitR2MainCannonState;
 static uint8_t MyPriority;
 
 
@@ -73,56 +89,28 @@ static uint8_t MyPriority;
  ******************************************************************************/
 
 /**
- * @Function Init_R2_BJT2_HSM(uint8_t Priority)
+ * @Function InitR2MainCannon(uint8_t Priority)
  * @param Priority - internal variable to track which event queue to use
  * @return TRUE or FALSE
  * @brief This will get called by the framework at the beginning of the code
  *        execution. It will post an ES_INIT event to the appropriate event
- *        queue, which will be handled inside Run_R2_BJT2_FSM function. Remember
+ *        queue, which will be handled inside RunTemplateFSM function. Remember
  *        to rename this to something appropriate.
  *        Returns TRUE if successful, FALSE otherwise
  * @author J. Edward Carryer, 2011.10.23 19:25 */
-uint8_t Init_R2_BJT2_HSM(uint8_t Priority) {
-    dbprintf("Entered %s\n", __FUNCTION__);
-    MyPriority = Priority;
-    // put us into the Initial PseudoState
-    CurrentState = InitHSMtate;
-    // post the initial transition event
-    if (ES_PostToService(MyPriority, INIT_EVENT) == TRUE) {
+uint8_t InitR2MainCannon(void) {
+    ES_Event returnEvent;
+
+    CurrentState = InitR2MainCannonState;
+    returnEvent = RunR2MainCannon(INIT_EVENT);
+    if (returnEvent.EventType == ES_NO_EVENT) {
         return TRUE;
-    } else {
-        return FALSE;
     }
+    return FALSE;
 }
 
 /**
- * @Function Post_R2_BJT2_HSM(ES_Event ThisEvent)
- * @param ThisEvent - the event (type and param) to be posted to queue
- * @return TRUE or FALSE
- * @brief This function is a wrapper to the queue posting function, and its name
- *        will be used inside ES_Configure to point to which queue events should
- *        be posted to. Remember to rename to something appropriate.
- *        Returns TRUE if successful, FALSE otherwise
- * @author J. Edward Carryer, 2011.10.23 19:25 */
-uint8_t Post_R2_BJT2_HSM(ES_Event ThisEvent) {
-    return ES_PostToService(MyPriority, ThisEvent);
-}
-
-/**
- * @Function Query_R2_BJT2_HSM(void)
- * @param none
- * @return Current state of the state machine
- * @brief This function is a wrapper to return the current state of the state
- *        machine. Return will match the ENUM above. Remember to rename to
- *        something appropriate, and also to rename the R2_BJT2_State_t to your
- *        correct variable name.
- * @author J. Edward Carryer, 2011.10.23 19:25 */
-R2_BJT2_State_t Query_R2_BJT2_HSM(void) {
-    return (CurrentState);
-}
-
-/**
- * @Function Run_R2_BJT2_HSM(ES_Event ThisEvent)
+ * @Function RunR2MainCannon(ES_Event ThisEvent)
  * @param ThisEvent - the event (type and param) to be responded.
  * @return Event - return event (type and param), in general should be ES_NO_EVENT
  * @brief This function is where you implement the whole of the heirarchical state
@@ -136,59 +124,78 @@ R2_BJT2_State_t Query_R2_BJT2_HSM(void) {
  *       not consumed as these need to pass pack to the higher level state machine.
  * @author J. Edward Carryer, 2011.10.23 19:25
  * @author Gabriel H Elkaim, 2011.10.23 19:25 */
-ES_Event Run_R2_BJT2_HSM(ES_Event ThisEvent) {
+
+
+// TODO: Need to integrate beacon events -> beacon detected & beacon lost
+
+ES_Event RunR2MainCannon(ES_Event ThisEvent) {
     uint8_t makeTransition = FALSE; // use to flag transition
-    R2_BJT2_State_t nextState; // <- change type to correct enum
+    R2MainCannonState_t nextState;
 
     ES_Tattle(); // trace call stack
 
     switch (CurrentState) {
-        case InitHSMtate: // If current state is initial Pseudo State
-            if (ThisEvent.EventType == ES_INIT)// only respond to ES_Init
-            {
-                // this is where you would put any actions associated with the
-                // transition from the initial pseudo-state into the actual
-                // initial state
-                // Initialize all sub-state machines
-                dbprintf("Entered %s\n", __FUNCTION__);
-
-                InitFindAmmoHSM();
-                InitTapeFollowing();
-                InitDumpFollowing();
-                InitFindOpponentHSM();
-                InitObstacleFollowing();
-                InitR2MainCannon();
-                //InitFindPortalHSM();
-
-                // now put the machine into the actual initial state
-                nextState = FindAmmo; // Should be FindAmmo
+        case InitR2MainCannonState: // If current state is initial Psedudo State
+            if (ThisEvent.EventType == ES_INIT) {
+                nextState = InitCannon;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
             }
             break;
 
-        case FindAmmo: // in the first state, replace this with correct names
-
-            ThisEvent = RunFindAmmoHSM(ThisEvent);
-            if (ThisEvent.EventType != ES_NO_EVENT) { // An event is still active
+        case InitCannon:
+            if (ThisEvent.EventType != ES_NO_EVENT) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
-                        dbprintf("Entered %s\n", __FUNCTION__);
-                        break;
-
-                    case ES_EXIT:
-                        break;
-
-                    case ES_KEYINPUT:
-                        ThisEvent.EventType = ES_NO_EVENT;
+                        R2CloseBarrel();
+                        R2LauncherMotorSpeed(0);
+                        ES_Timer_InitTimer(GUN_TIMER, 10);
                         break;
 
                     case ES_TIMEOUT:
+                        nextState = Spooling;
+                        makeTransition = TRUE;
                         ThisEvent.EventType = ES_NO_EVENT;
                         break;
 
-                    case FOUND_AMMO:
-                        nextState = FindOpponent;
+                    default: break;
+                }
+            }
+            break;
+
+        case Spooling:
+            if (ThisEvent.EventType != ES_NO_EVENT) {
+                switch (ThisEvent.EventType) {
+                    case ES_ENTRY:
+                        R2LauncherMotorSpeed(100);
+                        ES_Timer_InitTimer(GUN_TIMER, 2500);
+                        break;
+
+
+
+                    case ES_TIMEOUT:
+                        nextState = Load;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;
+
+
+                    default:
+                        break;
+                }
+            }
+            break;
+
+        case Load:
+            if (ThisEvent.EventType != ES_NO_EVENT) {
+                switch (ThisEvent.EventType) {
+                    case ES_ENTRY:
+                        ES_Timer_InitTimer(GUN_TIMER, 500);
+                        R2OpenBarrel();
+                        break;
+
+                    case ES_TIMEOUT:
+                        nextState = FIRE;
                         makeTransition = TRUE;
                         ThisEvent.EventType = ES_NO_EVENT;
                         break;
@@ -199,50 +206,24 @@ ES_Event Run_R2_BJT2_HSM(ES_Event ThisEvent) {
             }
             break;
 
-        case FindOpponent:
-            ThisEvent = RunFindOpponentHSM(ThisEvent);
+
+        case FIRE:
             if (ThisEvent.EventType != ES_NO_EVENT) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
-                        break;
-
-                    case ES_EXIT:
-                        break;
-
-                    case ES_KEYINPUT:
+                        R2CloseBarrel();
+                        R2LauncherMotorSpeed(0);
+                        nextState = Spooling;
+                        makeTransition = FALSE;
                         ThisEvent.EventType = ES_NO_EVENT;
                         break;
 
-                    case ES_TIMEOUT:
-                        break;
 
-                    default:
-                        break;
+                    default: break;
                 }
             }
             break;
 
-        case FindPortal:
-            ThisEvent = RunFindPortalHSM(ThisEvent);
-            switch (ThisEvent.EventType) {
-                case ES_ENTRY:
-                    break;
-
-                case ES_EXIT:
-                    break;
-
-                case ES_KEYINPUT:
-                    ThisEvent.EventType = ES_NO_EVENT;
-                    break;
-
-                case ES_TIMEOUT:
-                    ThisEvent.EventType = ES_NO_EVENT;
-                    break;
-
-                default:
-                    break;
-            }
-            break;
 
         default: // all unhandled states fall into here
             break;
@@ -250,9 +231,9 @@ ES_Event Run_R2_BJT2_HSM(ES_Event ThisEvent) {
 
     if (makeTransition == TRUE) { // making a state transition, send EXIT and ENTRY
         // recursively call the current state with an exit event
-        Run_R2_BJT2_HSM(EXIT_EVENT); // <- rename to your own Run function
+        RunR2MainCannon(EXIT_EVENT); // <- rename to your own Run function
         CurrentState = nextState;
-        Run_R2_BJT2_HSM(ENTRY_EVENT); // <- rename to your own Run function
+        RunR2MainCannon(ENTRY_EVENT); // <- rename to your own Run function
     }
 
     ES_Tail(); // trace call stack end
@@ -263,18 +244,13 @@ ES_Event Run_R2_BJT2_HSM(ES_Event ThisEvent) {
 /*******************************************************************************
  * PRIVATE FUNCTIONS                                                           *
  ******************************************************************************/
-/*Here's where you put the actual content of your functions.
-Example:
- * char RunAway(uint_8 seconds) {
- * Lots of code here
- * } */
+
 
 /*******************************************************************************
  * TEST HARNESS                                                                *
  ******************************************************************************/
-/* Define R2_BJT2_FSM_TEST to run this file as your main file (without the rest
- * of the framework)-useful for debugging */
-#ifdef R2_BJT2_HSM_TEST // <-- change this name and define it in your MPLAB-X
+
+#ifdef R2MAAINCANNON_TEST // <-- change this name and define it in your MPLAB-X
 //     project to run the test harness
 #include <stdio.h>
 
@@ -317,4 +293,4 @@ void main(void) {
     }
 }
 
-#endif // R2_BJT2_HSM_TEST
+#endif // FindOpponentHSM_TEST

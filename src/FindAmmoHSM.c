@@ -34,6 +34,8 @@
 #include "FindAmmoHSM.h"
 #include "TapeFollowing.h"
 #include "DumpFollowing.h"
+#include "R2_MainCannon.h"
+#include "LauncherServo.h"
 
 /*******************************************************************************
  * MODULE #DEFINES                                                             *
@@ -149,30 +151,27 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
             if (ThisEvent.EventType != ES_NO_EVENT) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
-                        //R2DriveStraight();
                         R2Motors(30, 30); // trying a slower speed...
                         break;
 
-                    case TAPE_FOUND:
-                        //R2FullStop();
-                        // //Tape Following
-                        dbprintf("Found\n");
-                        nextState = FollowTape;
-                        makeTransition = TRUE;
-                        ThisEvent.EventType = ES_NO_EVENT;
-                        break;
+//                    case TAPE_FOUND:
+//                        dbprintf("Found\n");
+//                        nextState = FollowTape;
+//                        makeTransition = TRUE;
+//                        ThisEvent.EventType = ES_NO_EVENT;
+//                        break;
 
                     case BUMPED:
                         switch (ThisEvent.EventParam) {
-                            case LEFT_BUMPER:
+                            case LEFT_BUMPER:                                 
                                 nextState = ReversingRight;
                                 makeTransition = TRUE;
                                 ThisEvent.EventType = ES_NO_EVENT;
                                 break;
                             case RIGHT_BUMPER:
-                                nextState = ReversingLeft;
-                                makeTransition = TRUE;
-                                ThisEvent.EventType = ES_NO_EVENT;
+//                                nextState = ReversingLeft;
+//                                makeTransition = TRUE;
+//                                ThisEvent.EventType = ES_NO_EVENT;
                                 break;
                         }
                         break;
@@ -183,6 +182,7 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
             break; // End Searching
 
         case ReversingRight:
+            ThisEvent = RunR2MainCannon(ThisEvent); //FOR TESTING
             if (ThisEvent.EventType != ES_NO_EVENT) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
