@@ -164,8 +164,8 @@ ES_Event RunFindOpponentHSM(ES_Event ThisEvent) {
                         dbprintf("\n Tunring around to hit center. \n");
                         // being used for 180 degree turn.
                         ES_Timer_InitTimer(FIND_OPPONENT_TIMER, 1500);
-                        rightR2Motor(-10);
-                        leftR2Motor(-40);
+                        rightR2Motor(-20);
+                        leftR2Motor(-50);
                         break;
 
                     case BUMPED:
@@ -187,8 +187,8 @@ ES_Event RunFindOpponentHSM(ES_Event ThisEvent) {
                     case ES_TIMEOUT:
                         // drive forward until you hit the center obstacle
                         if (ThisEvent.EventParam == FIND_OPPONENT_TIMER) { // not sure why.. but timer three is causing a timeout event here (SKETCH)
-                            rightR2Motor(30);
-                            leftR2Motor(30);
+                            rightR2Motor(50);
+                            leftR2Motor(50);
                             ThisEvent.EventType = ES_NO_EVENT;
                         }
                         break;

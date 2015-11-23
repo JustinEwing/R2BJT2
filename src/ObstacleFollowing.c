@@ -132,7 +132,7 @@ ES_Event RunObstacleFollowing(ES_Event ThisEvent) {
             if (ThisEvent.EventType != ES_NO_EVENT) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
-                        R2Motors(-10, -40);
+                        R2Motors(-20, -50);
                         ES_Timer_InitTimer(FIND_OPPONENT_TIMER, 400);
                         break;
 
@@ -165,7 +165,7 @@ ES_Event RunObstacleFollowing(ES_Event ThisEvent) {
             if (ThisEvent.EventType != ES_NO_EVENT) { // An event is still active
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
-                        R2Motors(20, 40);
+                        R2Motors(30, 50);
                         break;
 
                     case ES_EXIT:

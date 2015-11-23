@@ -141,15 +141,15 @@ ES_Event RunTapeFollowing(ES_Event ThisEvent) {
                     case TAPE_FOUND:
                         switch (ThisEvent.EventParam) {
                             case TOP_TAPE_SENSOR:
-                                R2Motors(-20, 20);
+                                R2Motors(-40, 40);
                                 break;
                             case LEFT_TAPE_SENSOR:
-                                R2Motors(-20, 20);
+                                R2Motors(-40, 40);
                                 break;
                             case RIGHT_TAPE_SENSOR:
-                                R2Motors(-30, 0);
+                                R2Motors(-40, 0);
                                 // kinda sketch to use timer twice.. might work tho
-                                ES_Timer_InitTimer(ALIGNMENT_TIMER, 600);
+                                ES_Timer_InitTimer(ALIGNMENT_TIMER, 500);
                                 break;
                             default:break;
                         }
@@ -171,7 +171,6 @@ ES_Event RunTapeFollowing(ES_Event ThisEvent) {
                         break;
 
                     case ES_TIMEOUT:
-                        //R2FullStop();
                         nextState = Follow;
                         makeTransition = TRUE;
                         ThisEvent.EventType = ES_NO_EVENT;
@@ -187,13 +186,13 @@ ES_Event RunTapeFollowing(ES_Event ThisEvent) {
             if (ThisEvent.EventType != ES_NO_EVENT) { // An event is still active
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
-                        R2Motors(25, 20);// drive slightly right
+                        R2Motors(35, 30);// drive slightly right
                         break;
 
                     case TAPE_FOUND:
                         switch (ThisEvent.EventParam) {
                             case TOP_TAPE_SENSOR:
-                                R2Motors(-20, 15);
+                                R2Motors(-30, 20);
                                 break;
                         }
                         ThisEvent.EventType = ES_NO_EVENT;
@@ -202,7 +201,7 @@ ES_Event RunTapeFollowing(ES_Event ThisEvent) {
                     case TAPE_LOST:
                         switch (ThisEvent.EventParam) {
                             case TOP_TAPE_SENSOR:
-                                R2Motors(25, 20);
+                                R2Motors(35, 30);
                                 break;
                             default:break;
                         }
