@@ -19,6 +19,8 @@ void main(void)
     InitTape();
     InitBumpers();
     InitBeacon();
+    initLauncherServo();
+    initLauncherMotor();
     //InitTrackWire();
     // When doing testing, it is usefull to annouce just which program
     // is running.

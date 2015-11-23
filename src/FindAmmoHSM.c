@@ -34,6 +34,7 @@
 #include "FindAmmoHSM.h"
 #include "TapeFollowing.h"
 #include "DumpFollowing.h"
+#include "LauncherServo.h"
 
 /*******************************************************************************
  * MODULE #DEFINES                                                             *
@@ -149,13 +150,10 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
             if (ThisEvent.EventType != ES_NO_EVENT) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
-                        //R2DriveStraight();
                         R2Motors(30, 30); // trying a slower speed...
                         break;
 
                     case TAPE_FOUND:
-                        //R2FullStop();
-                        // //Tape Following
                         dbprintf("Found\n");
                         nextState = FollowTape;
                         makeTransition = TRUE;

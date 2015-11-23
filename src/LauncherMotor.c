@@ -69,16 +69,16 @@ uint8_t initLauncherMotor() {
          and cap at 60% duty cycle after function
  */
 
-uint8_t R2LauncherMotorSpeed(char speed){
+uint8_t R2LauncherMotorSpeed(char speed) {
     dbprintf("Entered %s with speed %d\n", __FUNCTION__, speed);
     unsigned int newSpeed;
 
     if (speed > 100 || speed < 0)
         return ERROR;
 
+    newSpeed = speed;
     //Cap the Duty Cycle at 33% for now
-    if (speed > 33)
-        speed = 33;
+    if (speed > 33) newSpeed = 33;
 
     //set the speed
     if ((PWM_SetDutyCycle(LAUNCHER_MOTOR_ENABLE, newSpeed * 10)) != SUCCESS) {
