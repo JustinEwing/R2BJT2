@@ -33,12 +33,18 @@
 #include "BOARD.h"
 #include "R2_BJT2_HSM.h"
 #include "R2_MainCannon.h"
+#include "LauncherMotor.h"
+#include "LauncherServo.h"
 
 /*******************************************************************************
  * MODULE #DEFINES                                                             *
  ******************************************************************************/
 #define LIST_OF_R2MainCannon_STATES(STATE) \
-        STATE(InitMainCannonState)    \
+        STATE(InitR2MainCannonState)    \
+        STATE(InitCannon) \
+        STATE(Spooling) \
+        STATE(Load) \
+        STATE(FIRE) \
 
 
 #define ENUM_FORM(STATE) STATE, //Enums are reprinted verbatim and comma'd
@@ -74,7 +80,7 @@ static const char *StateNames[] = {
 /* You will need MyPriority and the state variable; you may need others as well.
  * The type of state variable should match that of enum in header file. */
 
-static R2MainCannonState_t CurrentState = InitFindOpponentState;
+static R2MainCannonState_t CurrentState = InitR2MainCannonState;
 static uint8_t MyPriority;
 
 
@@ -83,7 +89,7 @@ static uint8_t MyPriority;
  ******************************************************************************/
 
 /**
- * @Function InitFindOpponentHSM(uint8_t Priority)
+ * @Function InitR2MainCannon(uint8_t Priority)
  * @param Priority - internal variable to track which event queue to use
  * @return TRUE or FALSE
  * @brief This will get called by the framework at the beginning of the code
@@ -92,11 +98,11 @@ static uint8_t MyPriority;
  *        to rename this to something appropriate.
  *        Returns TRUE if successful, FALSE otherwise
  * @author J. Edward Carryer, 2011.10.23 19:25 */
-uint8_t InitFindOpponentHSM(void) {
+uint8_t InitR2MainCannon(void) {
     ES_Event returnEvent;
 
-    CurrentState = InitFindOpponentState;
-    returnEvent = RunFindOpponentHSM(INIT_EVENT);
+    CurrentState = InitR2MainCannonState;
+    returnEvent = RunR2MainCannon(INIT_EVENT);
     if (returnEvent.EventType == ES_NO_EVENT) {
         return TRUE;
     }
@@ -104,7 +110,7 @@ uint8_t InitFindOpponentHSM(void) {
 }
 
 /**
- * @Function RunFindOpponentHSM(ES_Event ThisEvent)
+ * @Function RunR2MainCannon(ES_Event ThisEvent)
  * @param ThisEvent - the event (type and param) to be responded.
  * @return Event - return event (type and param), in general should be ES_NO_EVENT
  * @brief This function is where you implement the whole of the heirarchical state
@@ -122,86 +128,102 @@ uint8_t InitFindOpponentHSM(void) {
 
 // TODO: Need to integrate beacon events -> beacon detected & beacon lost
 
-ES_Event RunFindOpponentHSM(ES_Event ThisEvent) {
+ES_Event RunR2MainCannon(ES_Event ThisEvent) {
     uint8_t makeTransition = FALSE; // use to flag transition
     R2MainCannonState_t nextState;
 
     ES_Tattle(); // trace call stack
 
     switch (CurrentState) {
-        case InitFindOpponentState: // If current state is initial Psedudo State
+        case InitR2MainCannonState: // If current state is initial Psedudo State
             if (ThisEvent.EventType == ES_INIT) {
-                nextState = HitCenter;
+                nextState = InitCannon;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
             }
             break;
 
-        case HitCenter:
+        case InitCannon:
             if (ThisEvent.EventType != ES_NO_EVENT) {
                 switch (ThisEvent.EventType) {
-                    case ES_ENTRY:  break;
-
-                    case BUMPED: break;
-
-                    case BEACON_FOUND: break;
-
-                    case ES_TIMEOUT: break;
-
-                    case ES_EXIT: break;
-
-                    default:
+                    case ES_ENTRY:
+                        R2CloseBarrel();
+                        R2LauncherMotorSpeed(0);
+                        ES_Timer_InitTimer(GUN_TIMER, 10);
                         break;
-                }
-            }
-            break;
 
-        case WallRide:
-            if (ThisEvent.EventType != ES_NO_EVENT) {
-                switch (ThisEvent.EventType) {
-                    case ES_ENTRY: break;
-
-                    case ES_EXIT: break;
-
-                    case BEACON_FOUND: break;
-
-                    case ES_TIMEOUT: break;
-
-                    case TAPE_FOUND: break;
-
-                    default:
+                    case ES_TIMEOUT:
+                        nextState = Spooling;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
                         break;
-                }
-            }
-            break;
-
-
-        case LookForEnemy:
-            if (ThisEvent.EventType != ES_NO_EVENT) {
-                switch (ThisEvent.EventType) {
-                    case ES_ENTRY: break;
-
-                    case ES_EXIT: break;
-
-                    case ES_TIMEOUT: break;
 
                     default: break;
                 }
             }
             break;
 
-        case EliminateEnemy:
-            switch (ThisEvent.EventType) {
-                case ES_ENTRY: break;
+        case Spooling:
+            if (ThisEvent.EventType != ES_NO_EVENT) {
+                switch (ThisEvent.EventType) {
+                    case ES_ENTRY:
+                        R2LauncherMotorSpeed(100);
+                        ES_Timer_InitTimer(GUN_TIMER, 2500);
+                        break;
 
-                case ES_EXIT: break;
 
 
-                case ES_TIMEOUT: break;
+                    case ES_TIMEOUT:
+                        nextState = Load;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;
 
-                default: break;
+
+                    default:
+                        break;
+                }
             }
             break;
+
+        case Load:
+            if (ThisEvent.EventType != ES_NO_EVENT) {
+                switch (ThisEvent.EventType) {
+                    case ES_ENTRY:
+                        ES_Timer_InitTimer(GUN_TIMER, 500);
+                        R2OpenBarrel();
+                        break;
+
+                    case ES_TIMEOUT:
+                        nextState = FIRE;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+            break;
+
+
+        case FIRE:
+            if (ThisEvent.EventType != ES_NO_EVENT) {
+                switch (ThisEvent.EventType) {
+                    case ES_ENTRY:
+                        R2CloseBarrel();
+                        R2LauncherMotorSpeed(0);
+                        nextState = Spooling;
+                        makeTransition = FALSE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;
+
+
+                    default: break;
+                }
+            }
+            break;
+
 
         default: // all unhandled states fall into here
             break;
@@ -209,9 +231,9 @@ ES_Event RunFindOpponentHSM(ES_Event ThisEvent) {
 
     if (makeTransition == TRUE) { // making a state transition, send EXIT and ENTRY
         // recursively call the current state with an exit event
-        RunFindOpponentHSM(EXIT_EVENT); // <- rename to your own Run function
+        RunR2MainCannon(EXIT_EVENT); // <- rename to your own Run function
         CurrentState = nextState;
-        RunFindOpponentHSM(ENTRY_EVENT); // <- rename to your own Run function
+        RunR2MainCannon(ENTRY_EVENT); // <- rename to your own Run function
     }
 
     ES_Tail(); // trace call stack end
@@ -228,7 +250,7 @@ ES_Event RunFindOpponentHSM(ES_Event ThisEvent) {
  * TEST HARNESS                                                                *
  ******************************************************************************/
 
-#ifdef FindOpponentHSM_TEST // <-- change this name and define it in your MPLAB-X
+#ifdef R2MAAINCANNON_TEST // <-- change this name and define it in your MPLAB-X
 //     project to run the test harness
 #include <stdio.h>
 

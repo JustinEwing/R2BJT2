@@ -28,6 +28,7 @@
 #include "FindAmmoHSM.h"
 #include "FindOpponentHSM.h"
 #include "FindPortalHSM.h"
+#include "R2_MainCannon.h"
 /*******************************************************************************
  * PRIVATE #DEFINES                                                            *
  ******************************************************************************/
@@ -156,6 +157,7 @@ ES_Event Run_R2_BJT2_HSM(ES_Event ThisEvent) {
                 InitDumpFollowing();
                 InitFindOpponentHSM();
                 InitObstacleFollowing();
+                InitR2MainCannon();
                 //InitFindPortalHSM();
 
                 // now put the machine into the actual initial state
