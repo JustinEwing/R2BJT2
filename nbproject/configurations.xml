@@ -28,6 +28,7 @@
       <itemPath>include/LauncherMotor.h</itemPath>
       <itemPath>include/LauncherServo.h</itemPath>
       <itemPath>include/R2_MainCannon.h</itemPath>
+      <itemPath>include/PortalEnterSubHSM.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -60,6 +61,7 @@
       <itemPath>src/LauncherMotor.c</itemPath>
       <itemPath>src/LauncherServo.c</itemPath>
       <itemPath>src/R2_MainCannon.c</itemPath>
+      <itemPath>src/PortalEnterSubHSM.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"

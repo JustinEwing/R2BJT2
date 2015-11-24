@@ -58,7 +58,7 @@
     EVENT(BEACON_FOUND) \
     EVENT(BEACON_LOST)  \
     EVENT(FOUND_AMMO)  \
-    EVENT(SHOT_OPPONENT) \
+    EVENT(SHOT_OPPONENT) /*Opponent was shot*/ \
     
 // This turns the EVENT_NAMES list into an enum statement
 // To see how it expands, right-click -> navigate -> View macro expansion
@@ -179,7 +179,7 @@ static const char *EventNames[] = {
 // the name of the run function
 #define SERV_2_RUN Run_R2_BJT2_HSM
 // How big should this services Queue be?
-#define SERV_2_QUEUE_SIZE 8
+#define SERV_2_QUEUE_SIZE 16
 #endif
 
 

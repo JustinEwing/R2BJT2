@@ -159,6 +159,7 @@ ES_Event Run_R2_BJT2_HSM(ES_Event ThisEvent) {
                 InitObstacleFollowing();
                 InitR2MainCannon();
                 InitFindPortalHSM();
+                //InitPortalEnterSubHSM();
 
                 // now put the machine into the actual initial state
                 nextState = FindAmmo; // Should be FindAmmo
@@ -207,6 +208,7 @@ ES_Event Run_R2_BJT2_HSM(ES_Event ThisEvent) {
                         break;
 
                     case SHOT_OPPONENT:
+                        printf("i hate my life\n");
                         nextState = FindPortal;
                         makeTransition = TRUE;
                         ThisEvent.EventType = ES_NO_EVENT;
@@ -219,9 +221,10 @@ ES_Event Run_R2_BJT2_HSM(ES_Event ThisEvent) {
             break;
 
         case FindPortal:
-            //ThisEvent = RunFindPortalHSM(ThisEvent);
+            ThisEvent = RunFindPortalHSM(ThisEvent);
             switch (ThisEvent.EventType) {
                 case ES_ENTRY:
+                     printf("i hate mjkoly life\n");
                     R2Motors(60, 60);
                     break;
 

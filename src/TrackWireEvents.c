@@ -78,9 +78,9 @@ ES_Event ReadTrackWire(void) {
     // Determine if there was an event
     if (((param & LEFT_TRACKWIRE_SENSOR) && (PrevLeftState == TRACK_WIRE_SEARCHING)) ||
             ((param & RIGHT_TRACKWIRE_SENSOR) && (PrevRightState == TRACK_WIRE_SEARCHING))) {
-        printf("PrevLState: %d\n", PrevLeftState);
-        printf("NextLState: %d\n", NewLeftState);
-        printf("Param: %d\n", param);
+        dbprintf("PrevLState: %d\n", PrevLeftState);
+        dbprintf("NextLState: %d\n", NewLeftState);
+        dbprintf("Param: %d\n", param);
         thisEvent.EventType = TRACK_WIRE_FOUND;
         thisEvent.EventParam = param;
 

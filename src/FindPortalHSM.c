@@ -132,12 +132,12 @@ ES_Event RunFindPortalHSM(ES_Event ThisEvent) {
             break;
 
         case PortalEnter:
-            ThisEvent = RunPortalEnterSubHSM(ThisEvent);
+            //ThisEvent = RunPortalEnterSubHSM(ThisEvent);
             if (ThisEvent.EventType != ES_NO_EVENT) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
                         dbprintf("\n Entered PortalEnter. \n");
-
+                        R2Motors(0,0);
                         ThisEvent.EventType = ES_NO_EVENT;
                         break;
 

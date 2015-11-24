@@ -184,7 +184,7 @@ ES_Event RunFindOpponentHSM(ES_Event ThisEvent) {
                         ThisEvent.EventType = ES_NO_EVENT;
                         break;
 
-     
+
                     case ES_TIMEOUT:
                         // drive forward until you hit the center obstacle
                         if (ThisEvent.EventParam == FIND_OPPONENT_TIMER) { // not sure why.. but timer three is causing a timeout event here (SKETCH)
@@ -236,49 +236,49 @@ ES_Event RunFindOpponentHSM(ES_Event ThisEvent) {
             }
             break;
 
-//        case Evade:
-//            if (ThisEvent.EventType != ES_NO_EVENT) {
-//                switch (ThisEvent.EventType) {
-//                    case ES_ENTRY:
-//                        R2Motors(-50, 50);
-//                        ES_Timer_InitTimer(FIND_OPPONENT_TIMER, 750);
-//                        break;
-//
-//                    case ES_EXIT:
-//                        ES_Timer_StopTimer(FIND_OPPONENT_TIMER);
-//                        break;
-//
-//                    case BEACON_FOUND:
-//                        R2Motors(0, 0);
-//                        nextState = EliminateEnemy;
-//                        makeTransition = TRUE;
-//                        ThisEvent.EventType = ES_NO_EVENT;
-//                        break;
-//
-//                    case ES_TIMEOUT:
-//                        if (ThisEvent.EventParam == FIND_OPPONENT_TIMER) {
-//                            R2Motors(50, 50);
-//                            ThisEvent.EventType = ES_NO_EVENT;
-//                        }
-//                        break;
-//
-//                    case BUMPED:
-//                        nextState = WallRide;
-//                        makeTransition = TRUE;
-//                        ThisEvent.EventType = ES_NO_EVENT;
-//                        break;
-//
-//                    case TAPE_FOUND:
-//                        nextState = Evade;
-//                        makeTransition = TRUE;
-//                        ThisEvent.EventType = ES_NO_EVENT;
-//                        break;
-//
-//                    default:
-//                        break;
-//                }
-//            }
-//            break; //end evade
+            //        case Evade:
+            //            if (ThisEvent.EventType != ES_NO_EVENT) {
+            //                switch (ThisEvent.EventType) {
+            //                    case ES_ENTRY:
+            //                        R2Motors(-50, 50);
+            //                        ES_Timer_InitTimer(FIND_OPPONENT_TIMER, 750);
+            //                        break;
+            //
+            //                    case ES_EXIT:
+            //                        ES_Timer_StopTimer(FIND_OPPONENT_TIMER);
+            //                        break;
+            //
+            //                    case BEACON_FOUND:
+            //                        R2Motors(0, 0);
+            //                        nextState = EliminateEnemy;
+            //                        makeTransition = TRUE;
+            //                        ThisEvent.EventType = ES_NO_EVENT;
+            //                        break;
+            //
+            //                    case ES_TIMEOUT:
+            //                        if (ThisEvent.EventParam == FIND_OPPONENT_TIMER) {
+            //                            R2Motors(50, 50);
+            //                            ThisEvent.EventType = ES_NO_EVENT;
+            //                        }
+            //                        break;
+            //
+            //                    case BUMPED:
+            //                        nextState = WallRide;
+            //                        makeTransition = TRUE;
+            //                        ThisEvent.EventType = ES_NO_EVENT;
+            //                        break;
+            //
+            //                    case TAPE_FOUND:
+            //                        nextState = Evade;
+            //                        makeTransition = TRUE;
+            //                        ThisEvent.EventType = ES_NO_EVENT;
+            //                        break;
+            //
+            //                    default:
+            //                        break;
+            //                }
+            //            }
+            //            break; //end evade
 
 
         case LookForEnemy:
@@ -335,7 +335,7 @@ ES_Event RunFindOpponentHSM(ES_Event ThisEvent) {
                         break;
 
                     case ES_EXIT:
-                        //ES_Timer_StopTimer(FIND_OPPONENT_TIMER);
+                        ES_Timer_StopTimer(FIND_OPPONENT_TIMER);
                         break;
 
                     case BEACON_LOST:
@@ -351,6 +351,13 @@ ES_Event RunFindOpponentHSM(ES_Event ThisEvent) {
                         ThisEvent.EventType = ES_NO_EVENT;
                         break;
 
+                    case SHOT_OPPONENT:
+                        printf("I WANT TO DIE\n");
+                        ThisEvent.EventType = SHOT_OPPONENT;
+                        ThisEvent.EventParam = TRUE;
+                        break;
+
+
                     case ES_TIMEOUT:
                         switch (ThisEvent.EventParam) {
                             case FIND_OPPONENT_TIMER:
@@ -361,8 +368,7 @@ ES_Event RunFindOpponentHSM(ES_Event ThisEvent) {
                         }
                         break;
 
-                    default: // all unhandled events pass the event back up to the next level
-                        break;
+                    default: break;
                 }
             }
             break;
