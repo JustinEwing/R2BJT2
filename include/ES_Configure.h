@@ -125,6 +125,7 @@ static const char *EventNames[] = {
 #define ALIGNMENT_TIMER 5   //This is for the Alignment to the tape
 #define FIND_OPPONENT_TIMER 6
 #define GUN_TIMER 7
+#define OPPO 8
 
 
 /****************************************************************************/
