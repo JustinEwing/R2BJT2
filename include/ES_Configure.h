@@ -121,6 +121,9 @@ static const char *EventNames[] = {
 #define BACKUP_TIMER 3      //backup timer used in FindAmmo
 #define R2_BUMPER_TIMER 4   //This is for the Bumper Service
 #define ALIGNMENT_TIMER 5   //This is for the Alignment to the tape
+#define FIND_OPPONENT_TIMER 6
+#define GUN_TIMER 7
+#define OPPO 8
 
         // Timer7 is PORTAL_TEST_TIMER - Ruatta
         // Timer8 is PORTAL_ROACH_TIMER - Ruatta
