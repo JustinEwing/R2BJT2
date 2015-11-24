@@ -151,15 +151,15 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
             if (ThisEvent.EventType != ES_NO_EVENT) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
-                        R2Motors(30, 30); // trying a slower speed...
+                        R2Motors(40, 40);
                         break;
 
-//                    case TAPE_FOUND:
-//                        dbprintf("Found\n");
-//                        nextState = FollowTape;
-//                        makeTransition = TRUE;
-//                        ThisEvent.EventType = ES_NO_EVENT;
-//                        break;
+                    case TAPE_FOUND:
+                        dbprintf("Found\n");
+                        nextState = FollowTape;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;
 
                     case BUMPED:
                         switch (ThisEvent.EventParam) {
@@ -169,9 +169,9 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
                                 ThisEvent.EventType = ES_NO_EVENT;
                                 break;
                             case RIGHT_BUMPER:
-//                                nextState = ReversingLeft;
-//                                makeTransition = TRUE;
-//                                ThisEvent.EventType = ES_NO_EVENT;
+                                nextState = ReversingLeft;
+                                makeTransition = TRUE;
+                                ThisEvent.EventType = ES_NO_EVENT;
                                 break;
                         }
                         break;
@@ -182,11 +182,11 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
             break; // End Searching
 
         case ReversingRight:
-            ThisEvent = RunR2MainCannon(ThisEvent); //FOR TESTING
+            //ThisEvent = RunR2MainCannon(ThisEvent); //FOR TESTING
             if (ThisEvent.EventType != ES_NO_EVENT) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
-                        R2Motors(-20, -50);
+                        R2Motors(-30, -60);
                         ES_Timer_InitTimer(BACKUP_TIMER, 500);
                         break;
 
@@ -210,7 +210,7 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
             if (ThisEvent.EventType != ES_NO_EVENT) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
-                        R2Motors(-50, -20);
+                        R2Motors(-60, -30);
                         ES_Timer_InitTimer(BACKUP_TIMER, 500);
                         break;
 

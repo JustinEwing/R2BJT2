@@ -154,9 +154,10 @@ ES_Event Run_R2_BJT2_HSM(ES_Event ThisEvent) {
                 InitFindAmmoHSM();
                 InitTapeFollowing();
                 InitDumpFollowing();
-                //InitFindOpponentHSM();
+                InitFindOpponentHSM();
+                InitObstacleFollowing();
+                InitR2MainCannon();
                 InitFindPortalHSM();
-                InitPortalEnterSubHSM();
 
                 // now put the machine into the actual initial state
                 nextState = FindPortal; // Should be FindAmmo
@@ -215,30 +216,13 @@ ES_Event Run_R2_BJT2_HSM(ES_Event ThisEvent) {
                         // entry to this state
                         break;
 
-                    case ES_EXIT:
-                        // this is where you would put any actions associated with the
-                        // exit from this state
-                        break;
-
-                    case ES_KEYINPUT:
-                        // this is an example where the state does NOT transition
-                        // do things you need to do in this state
-                        // event consumed
+                    case SHOT_OPPONENT:
+                        nextState = FindPortal;
+                        makeTransition = TRUE;
                         ThisEvent.EventType = ES_NO_EVENT;
                         break;
 
-                    case ES_TIMEOUT:
-                        // create the case statement for all other events that you are
-                        // interested in responding to. This does a transition
-
-                        //Commented out temporarily
-                        //nextState = ;
-                        //makeTransition = TRUE;
-                        //ThisEvent.EventType = ES_NO_EVENT;
-                        break;
-
-                    default: // all unhandled events pass the event back up to the next level
-                        break;
+                    default: break;
                 }
             }
             break;

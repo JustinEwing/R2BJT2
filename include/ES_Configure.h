@@ -55,6 +55,8 @@
     EVENT(TRACK_WIRE_LOST) /* Track Wire Was Detected, is now lost -- Not needed?? */ \
     EVENT(BEACON_FOUND) \
     EVENT(BEACON_LOST)  \
+    EVENT(FOUND_AMMO)  \
+    EVENT(SHOT_OPPONENT) \
     
 // This turns the EVENT_NAMES list into an enum statement
 // To see how it expands, right-click -> navigate -> View macro expansion
@@ -148,7 +150,7 @@ static const char *EventNames[] = {
 // the name of the run function
 #define SERV_0_RUN RunTimerService
 // How big should this service's Queue be?
-#define SERV_0_QUEUE_SIZE 9
+#define SERV_0_QUEUE_SIZE 12
 
 /****************************************************************************/
 // These are the definitions for Service 1
