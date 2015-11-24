@@ -28,6 +28,8 @@
 #include "FindAmmoHSM.h"
 #include "FindOpponentHSM.h"
 #include "FindPortalHSM.h"
+#include "ObstacleFollowing.h"
+#include "R2_MainCannon.h"
 /*******************************************************************************
  * PRIVATE #DEFINES                                                            *
  ******************************************************************************/

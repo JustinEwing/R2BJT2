@@ -4,6 +4,8 @@
 #include "ES_Framework.h"
 #include "serial.h"
 #include "R2Events.h"
+#include "LauncherServo.h"
+#include "LauncherMotor.h"
 //#include "BOARD.h"
 
 
