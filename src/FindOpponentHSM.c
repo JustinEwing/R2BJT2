@@ -34,6 +34,7 @@
 #include "FindOpponentHSM.h"
 #include "ObstacleFollowing.h"
 #include "R2Events.h"
+#include "R2_MainCannon.h"
 
 /*******************************************************************************
  * MODULE #DEFINES                                                             *
@@ -164,8 +165,8 @@ ES_Event RunFindOpponentHSM(ES_Event ThisEvent) {
                         dbprintf("\n Tunring around to hit center. \n");
                         // being used for 180 degree turn.
                         ES_Timer_InitTimer(FIND_OPPONENT_TIMER, 1500);
-                        rightR2Motor(-10);
-                        leftR2Motor(-40);
+                        rightR2Motor(-20);
+                        leftR2Motor(-50);
                         break;
 
                     case BUMPED:
@@ -187,8 +188,8 @@ ES_Event RunFindOpponentHSM(ES_Event ThisEvent) {
                     case ES_TIMEOUT:
                         // drive forward until you hit the center obstacle
                         if (ThisEvent.EventParam == FIND_OPPONENT_TIMER) { // not sure why.. but timer three is causing a timeout event here (SKETCH)
-                            rightR2Motor(30);
-                            leftR2Motor(30);
+                            rightR2Motor(50);
+                            leftR2Motor(50);
                             ThisEvent.EventType = ES_NO_EVENT;
                         }
                         break;
@@ -248,76 +249,86 @@ ES_Event RunFindOpponentHSM(ES_Event ThisEvent) {
         case LookForEnemy:
             // State objective: Makes 360 degree turn scanning for opponent.
             // slower turn should increase resolution...
-            switch (ThisEvent.EventType) {
-                case ES_ENTRY:
-                    dbprintf("\n Looking for the enemy. \n");
-                    rightR2Motor(-15); // tank turn rather slowly looking for opponent
-                    leftR2Motor(15);
-                    ES_Timer_InitTimer(FIND_OPPONENT_TIMER, 5000); // needs to make a 360 turn
-                    ThisEvent.EventType = ES_NO_EVENT;
-                    break;
+            if (ThisEvent.EventType != ES_NO_EVENT) {
+                switch (ThisEvent.EventType) {
+                    case ES_ENTRY:
+                        dbprintf("\n Looking for the enemy. \n");
+                        rightR2Motor(-45); // tank turn rather slowly looking for opponent
+                        leftR2Motor(45);
+                        ES_Timer_InitTimer(FIND_OPPONENT_TIMER, 5000); // needs to make a 360 turn
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;
 
-                case ES_EXIT:
-                    ES_Timer_StopTimer(FIND_OPPONENT_TIMER);
-                    break;
+                    case ES_EXIT:
+                        ES_Timer_StopTimer(FIND_OPPONENT_TIMER);
+                        break;
 
-                case BEACON_FOUND:
-                    rightR2Motor(0); // STOP!
-                    leftR2Motor(0);
-                    nextState = EliminateEnemy;
-                    makeTransition = TRUE;
-                    ThisEvent.EventType = ES_NO_EVENT;
-                    break;
+                    case BEACON_FOUND:
+                        rightR2Motor(0); // STOP!
+                        leftR2Motor(0);
+                        nextState = EliminateEnemy;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;
 
-                case ES_TIMEOUT:
-                    // Didn't find opponent, move farther along on the wall
-                    nextState = WallRide;
-                    makeTransition = TRUE;
-                    ThisEvent.EventType = ES_NO_EVENT;
-                    break;
+                    case ES_TIMEOUT:
+                        // Didn't find opponent, move farther along on the wall
+                        nextState = WallRide;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;
 
-                default:
-                    break;
+                    default:
+                        break;
+                }
             }
             break;
 
         case EliminateEnemy:
             // state objective: (drive closer to enemy?) shoot enemy
-            // TODO: need API for the ball loader/launcher
-            switch (ThisEvent.EventType) {
-                case ES_ENTRY:
-                    dbprintf("\n Going to kill enemy. \n");
-                    rightR2Motor(50);
-                    leftR2Motor(50);
-                    // Drive forward a little to get closer
-                    ES_Timer_InitTimer(FIND_OPPONENT_TIMER, TWO_SECONDS);
-                    ThisEvent.EventType = ES_NO_EVENT;
-                    break;
+            ThisEvent = RunR2MainCannon(ThisEvent);
+            if (ThisEvent.EventType != ES_NO_EVENT) {
+                switch (ThisEvent.EventType) {
+                    case ES_ENTRY:
+                        dbprintf("\n Going to kill enemy. \n");
+                        rightR2Motor(0);
+                        leftR2Motor(0);
+                        //ThisEvent = RunR2MainCannon(ThisEvent);
+                        // Drive forward a little to get closer
+                        //ES_Timer_InitTimer(FIND_OPPONENT_TIMER, ONE_SECOND);
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;
 
-                case ES_EXIT:
-                    ES_Timer_StopTimer(FIND_OPPONENT_TIMER);
-                    break;
+                    case ES_EXIT:
+                        //ES_Timer_StopTimer(FIND_OPPONENT_TIMER);
+                        break;
 
-                case BEACON_LOST:
-                    // Lost the beacon, try to find it again
-                    // Note: might need a HadOpponent state or something along those
-                    //      lines to optimize so we don't try going all the way around
-                    //      the field again trying to find the opponent
-                    rightR2Motor(0); // STOP!
-                    leftR2Motor(0);
-                    nextState = LookForEnemy;
-                    makeTransition = TRUE;
-                    ThisEvent.EventType = ES_NO_EVENT;
-                    break;
+                    case BEACON_LOST:
+                        // Lost the beacon, try to find it again
+                        // Note: might need a HadOpponent state or something along those
+                        //      lines to optimize so we don't try going all the way around
+                        //      the field again trying to find the opponent
+                        rightR2Motor(0); // STOP!
+                        leftR2Motor(0);
+                        R2LauncherMotorSpeed(0);
+                        nextState = LookForEnemy;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;
 
-                case ES_TIMEOUT:
-                    // If we made it here, we should still have the beacon in sight
-                    // and be close enough to shoot
-                    // FireAway();
-                    break;
+                    case ES_TIMEOUT:
+                        switch (ThisEvent.EventParam) {
+                            case FIND_OPPONENT_TIMER:
+                                break;
+                            default:break;
+                                // If we made it here, we should still have the beacon in sight
+                                // and be close enough to shoot
+                        }
+                        break;
 
-                default: // all unhandled events pass the event back up to the next level
-                    break;
+                    default: // all unhandled events pass the event back up to the next level
+                        break;
+                }
             }
             break;
 

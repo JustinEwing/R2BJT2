@@ -28,6 +28,8 @@ void main(void)
     printf("Starting R2-BJT2...\n");
     printf("using the 2nd Generation Events & Services Framework\n");
 
+    printf("BATTERY: %d\n", R2_BJT2_BatteryVoltage());
+
 
 //     now initialize the Events and Services Framework and start it running
     ErrorType = ES_Initialize();

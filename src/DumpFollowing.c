@@ -132,7 +132,7 @@ ES_Event RunDumpFollowing(ES_Event ThisEvent) {
             if (ThisEvent.EventType != ES_NO_EVENT) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
-                        R2Motors(-20, -40);
+                        R2Motors(-30, -50);
                         ES_Timer_InitTimer(BACKUP_TIMER, 400);
                         break;
 
@@ -164,8 +164,8 @@ ES_Event RunDumpFollowing(ES_Event ThisEvent) {
             if (ThisEvent.EventType != ES_NO_EVENT) { // An event is still active
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
-                        R2Motors(-30, 40);
-                        ES_Timer_InitTimer(BACKUP_TIMER, 500);
+                        R2Motors(-40, 50);
+                        ES_Timer_InitTimer(BACKUP_TIMER, 350);
                         break;
 
                     case ES_EXIT:
@@ -197,7 +197,7 @@ ES_Event RunDumpFollowing(ES_Event ThisEvent) {
             if (ThisEvent.EventType != ES_NO_EVENT) { // An event is still active
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
-                        R2Motors(40, 15);
+                        R2Motors(50, 25);
                         break;
 
                     case ES_EXIT:
