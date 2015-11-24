@@ -124,7 +124,7 @@ ES_Event RunObstacleFollowing(ES_Event ThisEvent) {
         case InitObstacleFollowingState: // If current state is initial Psedudo State
             if (ThisEvent.EventType == ES_INIT)// only respond to ES_Init
             {
-                nextState = Reverse;
+                nextState = TankRight;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
             }
@@ -176,8 +176,8 @@ ES_Event RunObstacleFollowing(ES_Event ThisEvent) {
                     case BUMPED:
                         switch (ThisEvent.EventParam) {
                             case RIGHT_BUMPER: //Roach?
-                                nextState = Reverse;
-                                makeTransition = TRUE;
+                                //nextState = Reverse;
+                                //makeTransition = TRUE;
                                 ThisEvent.EventType = ES_NO_EVENT;
                                 break;
                             case LEFT_BUMPER:
@@ -199,7 +199,7 @@ ES_Event RunObstacleFollowing(ES_Event ThisEvent) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
                         R2Motors(50, -55);
-                        ES_Timer_InitTimer(FIND_OPPONENT_TIMER, 900);
+                        ES_Timer_InitTimer(FIND_OPPONENT_TIMER, 1000);
                         break;
 
                     case ES_EXIT:
@@ -212,7 +212,7 @@ ES_Event RunObstacleFollowing(ES_Event ThisEvent) {
                         ThisEvent.EventType = ES_NO_EVENT;
                         break;
 
-                    case BUMPED:
+                    case UNBUMPED:
                         switch (ThisEvent.EventParam) {
                             case RIGHT_BUMPER: //Roach?
                                 //nextState = Reverse;
@@ -220,6 +220,8 @@ ES_Event RunObstacleFollowing(ES_Event ThisEvent) {
                                 ThisEvent.EventType = ES_NO_EVENT;
                                 break;
                             case LEFT_BUMPER:
+                                nextState = TurnLeft;
+                                makeTransition = TRUE;
                                 ThisEvent.EventType = ES_NO_EVENT;
                                 break;
                             default:break;

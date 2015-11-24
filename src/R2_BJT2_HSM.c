@@ -219,9 +219,10 @@ ES_Event Run_R2_BJT2_HSM(ES_Event ThisEvent) {
             break;
 
         case FindPortal:
-            ThisEvent = RunFindPortalHSM(ThisEvent);
+            //ThisEvent = RunFindPortalHSM(ThisEvent);
             switch (ThisEvent.EventType) {
                 case ES_ENTRY:
+                    R2Motors(60, 60);
                     break;
 
                 case ES_EXIT:
