@@ -98,9 +98,6 @@ ES_Event RunFindPortalHSM(ES_Event ThisEvent) {
                 dbprintf("\n. Exiting Init. Should enter ObstacleFollow."
                         "Also initializing PortalEnterSubHSM and"
                         "ObstacleFollowingSubHSM. \n");
-
-
-
                 nextState = ObstacleFollow;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;

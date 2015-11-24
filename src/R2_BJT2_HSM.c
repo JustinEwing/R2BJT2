@@ -224,8 +224,8 @@ ES_Event Run_R2_BJT2_HSM(ES_Event ThisEvent) {
             ThisEvent = RunFindPortalHSM(ThisEvent);
             switch (ThisEvent.EventType) {
                 case ES_ENTRY:
-                     printf("i hate mjkoly life\n");
-                    R2Motors(60, 60);
+                    printf("i hate mjkoly life\n");
+                    //R2Motors(60, 60);
                     break;
 
                 case ES_EXIT:
