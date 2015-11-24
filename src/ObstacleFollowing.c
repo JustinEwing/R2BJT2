@@ -43,6 +43,8 @@
         STATE(InitObstacleFollowingState)           \
         STATE(Reverse)                          \
         STATE(TurnLeft)                        \
+        STATE(TurnRight) \
+        STATE(TankRight) \
 
 #define ENUM_FORM(STATE) STATE, //Enums are reprinted verbatim and comma'd
 
@@ -132,8 +134,8 @@ ES_Event RunObstacleFollowing(ES_Event ThisEvent) {
             if (ThisEvent.EventType != ES_NO_EVENT) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
-                        R2Motors(-20, -50);
-                        ES_Timer_InitTimer(FIND_OPPONENT_TIMER, 400);
+                        R2Motors(-20, -60);
+                        ES_Timer_InitTimer(FIND_OPPONENT_TIMER, 450);
                         break;
 
                     case ES_EXIT:
@@ -165,7 +167,7 @@ ES_Event RunObstacleFollowing(ES_Event ThisEvent) {
             if (ThisEvent.EventType != ES_NO_EVENT) { // An event is still active
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
-                        R2Motors(30, 50);
+                        R2Motors(15, 60);
                         break;
 
                     case ES_EXIT:
@@ -174,6 +176,77 @@ ES_Event RunObstacleFollowing(ES_Event ThisEvent) {
                     case BUMPED:
                         switch (ThisEvent.EventParam) {
                             case RIGHT_BUMPER: //Roach?
+                                nextState = Reverse;
+                                makeTransition = TRUE;
+                                ThisEvent.EventType = ES_NO_EVENT;
+                                break;
+                            case LEFT_BUMPER:
+                                nextState = TankRight;
+                                makeTransition = TRUE;
+                                ThisEvent.EventType = ES_NO_EVENT;
+                                break;
+                            default:break;
+                        }
+                        break;
+
+                    default:break;
+                }
+            }
+            break; //End TurnLeft
+
+        case TankRight:
+            if (ThisEvent.EventType != ES_NO_EVENT) { // An event is still active
+                switch (ThisEvent.EventType) {
+                    case ES_ENTRY:
+                        R2Motors(50, -55);
+                        ES_Timer_InitTimer(FIND_OPPONENT_TIMER, 900);
+                        break;
+
+                    case ES_EXIT:
+                        ES_Timer_StopTimer(FIND_OPPONENT_TIMER);
+                        break;
+
+                    case ES_TIMEOUT:
+                        nextState = TurnLeft;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;
+
+                    case BUMPED:
+                        switch (ThisEvent.EventParam) {
+                            case RIGHT_BUMPER: //Roach?
+                                //nextState = Reverse;
+                                //makeTransition = TRUE;
+                                ThisEvent.EventType = ES_NO_EVENT;
+                                break;
+                            case LEFT_BUMPER:
+                                ThisEvent.EventType = ES_NO_EVENT;
+                                break;
+                            default:break;
+                        }
+                        break;
+
+                    default: // all unhandled events pass the event back up to the next level
+                        break;
+                }
+            }
+            break; //End TankRight
+
+        case TurnRight:
+            if (ThisEvent.EventType != ES_NO_EVENT) { // An event is still active
+                switch (ThisEvent.EventType) {
+                    case ES_ENTRY:
+                        R2Motors(50, 50);
+                        break;
+
+                    case ES_EXIT:
+                        break;
+
+                    case BUMPED:
+                        switch (ThisEvent.EventParam) {
+                            case RIGHT_BUMPER: //Roach?
+                                nextState = Reverse;
+                                makeTransition = TRUE;
                                 ThisEvent.EventType = ES_NO_EVENT;
                                 break;
                             case LEFT_BUMPER:
@@ -189,7 +262,7 @@ ES_Event RunObstacleFollowing(ES_Event ThisEvent) {
                         break;
                 }
             }
-            break; //End TurnLeft
+            break; //End TurnRight
 
         default: // all unhandled states fall into here
             break;

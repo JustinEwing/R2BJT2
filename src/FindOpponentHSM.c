@@ -46,6 +46,7 @@
         STATE(Reverse)       \
         STATE(LookForEnemy)       \
         STATE(EliminateEnemy)  \
+        STATE(Evade) \
 
 #define ENUM_FORM(STATE) STATE, //Enums are reprinted verbatim and comma'd
 
@@ -164,9 +165,8 @@ ES_Event RunFindOpponentHSM(ES_Event ThisEvent) {
                     case ES_ENTRY:
                         dbprintf("\n Tunring around to hit center. \n");
                         // being used for 180 degree turn.
-                        ES_Timer_InitTimer(FIND_OPPONENT_TIMER, 1500);
-                        rightR2Motor(-20);
-                        leftR2Motor(-50);
+                        ES_Timer_InitTimer(FIND_OPPONENT_TIMER, 1000);
+                        R2Motors(-60, 0);
                         break;
 
                     case BUMPED:
@@ -178,18 +178,17 @@ ES_Event RunFindOpponentHSM(ES_Event ThisEvent) {
                         break;
 
                     case BEACON_FOUND:
-                        rightR2Motor(0); // STOP!
-                        leftR2Motor(0);
+                        R2Motors(0, 0);
                         nextState = EliminateEnemy;
                         makeTransition = TRUE;
                         ThisEvent.EventType = ES_NO_EVENT;
                         break;
 
+     
                     case ES_TIMEOUT:
                         // drive forward until you hit the center obstacle
                         if (ThisEvent.EventParam == FIND_OPPONENT_TIMER) { // not sure why.. but timer three is causing a timeout event here (SKETCH)
-                            rightR2Motor(50);
-                            leftR2Motor(50);
+                            R2Motors(50, 50);
                             ThisEvent.EventType = ES_NO_EVENT;
                         }
                         break;
@@ -216,8 +215,7 @@ ES_Event RunFindOpponentHSM(ES_Event ThisEvent) {
                         break;
 
                     case BEACON_FOUND:
-                        rightR2Motor(0); // STOP!
-                        leftR2Motor(0);
+                        R2Motors(0, 0);
                         nextState = EliminateEnemy;
                         makeTransition = TRUE;
                         ThisEvent.EventType = ES_NO_EVENT;
@@ -227,15 +225,52 @@ ES_Event RunFindOpponentHSM(ES_Event ThisEvent) {
                         break;
 
                     case TAPE_FOUND:
-                        switch (ThisEvent.EventParam) {
-                            case TOP_TAPE_SENSOR:
-                                break;
-                            case LEFT_TAPE_SENSOR:
-                                break;
-                            case RIGHT_TAPE_SENSOR:
-                                break;
-                            default:break;
+                        nextState = Evade;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+            break;
+
+        case Evade:
+            if (ThisEvent.EventType != ES_NO_EVENT) {
+                switch (ThisEvent.EventType) {
+                    case ES_ENTRY:
+                        R2Motors(-50, 50);
+                        ES_Timer_InitTimer(FIND_OPPONENT_TIMER, 750);
+                        break;
+
+                    case ES_EXIT:
+                        ES_Timer_StopTimer(FIND_OPPONENT_TIMER);
+                        break;
+
+                    case BEACON_FOUND:
+                        R2Motors(0, 0);
+                        nextState = EliminateEnemy;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;
+
+                    case ES_TIMEOUT:
+                        if (ThisEvent.EventParam == FIND_OPPONENT_TIMER) {
+                            R2Motors(50, 50);
+                            ThisEvent.EventType = ES_NO_EVENT;
                         }
+                        break;
+
+                    case BUMPED:
+                        nextState = WallRide;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;
+
+                    case TAPE_FOUND:
+                        nextState = Evade;
+                        makeTransition = TRUE;
                         ThisEvent.EventType = ES_NO_EVENT;
                         break;
 

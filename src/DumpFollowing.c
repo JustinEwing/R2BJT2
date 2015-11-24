@@ -197,7 +197,7 @@ ES_Event RunDumpFollowing(ES_Event ThisEvent) {
             if (ThisEvent.EventType != ES_NO_EVENT) { // An event is still active
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
-                        R2Motors(50, 25);
+                        R2Motors(55, 25);
                         break;
 
                     case ES_EXIT:

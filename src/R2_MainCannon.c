@@ -256,7 +256,7 @@ ES_Event RunR2MainCannon(ES_Event ThisEvent) {
                     case ES_ENTRY:
                         dbprintf("FIRE!!!\n");
                         R2CloseBarrel();
-                        if (firecount < 5) {
+                        if (firecount < 3) {
                             nextState = InitCannon;
                             makeTransition = TRUE;
                             ThisEvent.EventType = ES_NO_EVENT;

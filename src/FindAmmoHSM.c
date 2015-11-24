@@ -32,6 +32,7 @@
 #include "BOARD.h"
 #include "R2_BJT2_HSM.h"
 #include "FindAmmoHSM.h"
+#include "FindPortalHSM.h"
 #include "TapeFollowing.h"
 #include "DumpFollowing.h"
 #include "R2_MainCannon.h"
