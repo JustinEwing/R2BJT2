@@ -32,6 +32,8 @@
 #include "BOARD.h"
 #include "R2_BJT2_HSM.h"
 #include "FindOpponentHSM.h"
+#include "ObstacleFollowing.h"
+#include "R2Events.h"
 
 /*******************************************************************************
  * MODULE #DEFINES                                                             *
@@ -74,7 +76,6 @@ static const char *StateNames[] = {
 #define FULL_SPEED_BACKWARD -60
 
 // Timers
-#define FIND_OPPONENT_TIMER 6 // Timer6 - Confirm with ES_Config before use
 #define HALF_SECOND 500
 #define ONE_SECOND 1000 // Back up for one second, then continue turning
 #define TWO_SECONDS 2000 // Back up for two seconds, then continue turning
@@ -162,15 +163,15 @@ ES_Event RunFindOpponentHSM(ES_Event ThisEvent) {
                     case ES_ENTRY:
                         dbprintf("\n Tunring around to hit center. \n");
                         // being used for 180 degree turn.
-                        ES_Timer_InitTimer(FIND_OPPONENT_TIMER, HALF_SECOND);
-                        rightR2Motor(0);
+                        ES_Timer_InitTimer(FIND_OPPONENT_TIMER, 1500);
+                        rightR2Motor(-10);
                         leftR2Motor(-40);
                         break;
 
                     case BUMPED:
                         // Transition to start wall following/looking for enemy
                         // Q: what if this comes from hitting a roach?
-                        nextState = LookForEnemy;
+                        nextState = WallRide;
                         makeTransition = TRUE;
                         ThisEvent.EventType = ES_NO_EVENT;
                         break;
@@ -185,9 +186,15 @@ ES_Event RunFindOpponentHSM(ES_Event ThisEvent) {
 
                     case ES_TIMEOUT:
                         // drive forward until you hit the center obstacle
-                        rightR2Motor(30);
-                        leftR2Motor(30);
-                        ThisEvent.EventType = ES_NO_EVENT;
+                        if (ThisEvent.EventParam == FIND_OPPONENT_TIMER) { // not sure why.. but timer three is causing a timeout event here (SKETCH)
+                            rightR2Motor(30);
+                            leftR2Motor(30);
+                            ThisEvent.EventType = ES_NO_EVENT;
+                        }
+                        break;
+
+                    case ES_EXIT:
+                        ES_Timer_StopTimer(FIND_OPPONENT_TIMER);
                         break;
 
                     default:
@@ -198,14 +205,13 @@ ES_Event RunFindOpponentHSM(ES_Event ThisEvent) {
 
         case WallRide:
             // State objective: try to wall follow arround the center obstacle
+            ThisEvent = RunObstacleFollowing(ThisEvent);
             if (ThisEvent.EventType != ES_NO_EVENT) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
                         break;
 
                     case ES_EXIT:
-                        // this is where you would put any actions associated with the
-                        // exit from this state
                         break;
 
                     case BEACON_FOUND:
@@ -217,10 +223,18 @@ ES_Event RunFindOpponentHSM(ES_Event ThisEvent) {
                         break;
 
                     case ES_TIMEOUT:
-                        // create the case statement for all other events that you are
-                        // interested in responding to. This does a transition
-                        nextState = Reverse;
-                        makeTransition = TRUE;
+                        break;
+
+                    case TAPE_FOUND:
+                        switch (ThisEvent.EventParam) {
+                            case TOP_TAPE_SENSOR:
+                                break;
+                            case LEFT_TAPE_SENSOR:
+                                break;
+                            case RIGHT_TAPE_SENSOR:
+                                break;
+                            default:break;
+                        }
                         ThisEvent.EventType = ES_NO_EVENT;
                         break;
 
@@ -230,39 +244,6 @@ ES_Event RunFindOpponentHSM(ES_Event ThisEvent) {
             }
             break;
 
-        case Reverse:
-            switch (ThisEvent.EventType) {
-                case ES_ENTRY:
-                    dbprintf("\n Backup Right. \n");
-                    rightR2Motor(-15);
-                    leftR2Motor(-35);
-                    ES_Timer_InitTimer(FIND_OPPONENT_TIMER, 400);
-                    ThisEvent.EventType = ES_NO_EVENT;
-                    break;
-
-                case ES_EXIT:
-                    // this is where you would put any actions associated with the
-                    // exit from this state
-                    break;
-
-                case BEACON_FOUND:
-                    rightR2Motor(0); // STOP!
-                    leftR2Motor(0);
-                    nextState = EliminateEnemy;
-                    makeTransition = TRUE;
-                    ThisEvent.EventType = ES_NO_EVENT;
-                    break;
-
-                case ES_TIMEOUT:
-                    nextState = LookForEnemy;
-                    makeTransition = TRUE;
-                    ThisEvent.EventType = ES_NO_EVENT;
-                    break;
-
-                default:
-                    break;
-            }
-            break;
 
         case LookForEnemy:
             // State objective: Makes 360 degree turn scanning for opponent.
@@ -277,8 +258,7 @@ ES_Event RunFindOpponentHSM(ES_Event ThisEvent) {
                     break;
 
                 case ES_EXIT:
-                    // this is where you would put any actions associated with the
-                    // exit from this state
+                    ES_Timer_StopTimer(FIND_OPPONENT_TIMER);
                     break;
 
                 case BEACON_FOUND:
@@ -315,8 +295,7 @@ ES_Event RunFindOpponentHSM(ES_Event ThisEvent) {
                     break;
 
                 case ES_EXIT:
-                    // this is where you would put any actions associated with the
-                    // exit from this state
+                    ES_Timer_StopTimer(FIND_OPPONENT_TIMER);
                     break;
 
                 case BEACON_LOST:
