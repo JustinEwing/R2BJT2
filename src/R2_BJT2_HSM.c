@@ -158,7 +158,7 @@ ES_Event Run_R2_BJT2_HSM(ES_Event ThisEvent) {
                 InitFindOpponentHSM();
                 InitObstacleFollowing();
                 InitR2MainCannon();
-                //InitFindPortalHSM();
+                InitFindPortalHSM();
 
                 // now put the machine into the actual initial state
                 nextState = FindAmmo; // Should be FindAmmo
@@ -206,14 +206,10 @@ ES_Event Run_R2_BJT2_HSM(ES_Event ThisEvent) {
                     case ES_ENTRY:
                         break;
 
-                    case ES_EXIT:
-                        break;
-
-                    case ES_KEYINPUT:
+                    case SHOT_OPPONENT:
+                        nextState = FindPortal;
+                        makeTransition = TRUE;
                         ThisEvent.EventType = ES_NO_EVENT;
-                        break;
-
-                    case ES_TIMEOUT:
                         break;
 
                     default:

@@ -58,6 +58,7 @@
     EVENT(BEACON_FOUND) \
     EVENT(BEACON_LOST)  \
     EVENT(FOUND_AMMO)  \
+    EVENT(SHOT_OPPONENT) \
     
 // This turns the EVENT_NAMES list into an enum statement
 // To see how it expands, right-click -> navigate -> View macro expansion
