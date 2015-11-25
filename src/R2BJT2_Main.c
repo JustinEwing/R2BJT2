@@ -4,6 +4,7 @@
 #include "ES_Framework.h"
 #include "serial.h"
 #include "R2Events.h"
+#include "LED.h"
 //#include "BOARD.h"
 
 
@@ -21,6 +22,9 @@ void main(void)
     InitBeacon();
     initLauncherServo();
     initLauncherMotor();
+    LED_Init();
+    LED_AddBanks(LED_BANK3 | LED_BANK2);
+    LED_SetBank(LED_BANK3, 0x00);
     //InitTrackWire();
     // When doing testing, it is usefull to annouce just which program
     // is running.

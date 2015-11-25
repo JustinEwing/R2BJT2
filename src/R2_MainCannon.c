@@ -158,7 +158,7 @@ ES_Event RunR2MainCannon(ES_Event ThisEvent) {
                     case ES_ENTRY:
                         R2CloseBarrel();
                         R2LauncherMotorSpeed(0);
-                        ES_Timer_InitTimer(GUN_TIMER, 200);
+                        ES_Timer_InitTimer(GUN_TIMER, 20);
                         ThisEvent.EventType = ES_NO_EVENT;
                         dbprintf("psudo cannon init\n");
                         break;
@@ -193,8 +193,8 @@ ES_Event RunR2MainCannon(ES_Event ThisEvent) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
                         dbprintf("Spooling motors\n");
-                        R2LauncherMotorSpeed(25);
-                        ES_Timer_InitTimer(GUN_TIMER, 5000);
+                        R2LauncherMotorSpeed(30);
+                        ES_Timer_InitTimer(GUN_TIMER, 2000);
                         ThisEvent.EventType = ES_NO_EVENT;
                         break;
 
@@ -256,7 +256,7 @@ ES_Event RunR2MainCannon(ES_Event ThisEvent) {
                     case ES_ENTRY:
                         dbprintf("FIRE!!!\n");
                         R2CloseBarrel();
-                        if (firecount < 3) {
+                        if (firecount < 2) { //trying to get rid of the fourth shot
                             dbprintf("Fire %d\n", firecount);
                             nextState = InitCannon;
                             makeTransition = TRUE;

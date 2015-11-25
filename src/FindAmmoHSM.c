@@ -152,7 +152,7 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
             if (ThisEvent.EventType != ES_NO_EVENT) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
-                        R2Motors(40, 40);
+                        R2Motors(30, 30);
                         break;
 
                     case TAPE_FOUND:

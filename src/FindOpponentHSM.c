@@ -188,7 +188,7 @@ ES_Event RunFindOpponentHSM(ES_Event ThisEvent) {
                     case ES_TIMEOUT:
                         // drive forward until you hit the center obstacle
                         if (ThisEvent.EventParam == FIND_OPPONENT_TIMER) { // not sure why.. but timer three is causing a timeout event here (SKETCH)
-                            R2Motors(50, 50);
+                            R2Motors(30, 30);
                             ThisEvent.EventType = ES_NO_EVENT;
                         }
                         break;

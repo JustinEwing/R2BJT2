@@ -9,9 +9,10 @@
 #include "BOARD.h"
 #include "R2_BJT2_HSM.h"
 #include "FindPortalHSM.h"
-#include "ObstacleFollowing.h"
+#include "PortalFollowing.h"
 #include "PortalEnterSubHSM.h"
 #include "R2Events.h"
+#include "LED.h"
 #include <stdio.h>
 
 /*******************************************************************************
@@ -19,7 +20,7 @@
  ******************************************************************************/
 #define LIST_OF_FindPortal_STATES(STATE) \
         STATE(InitFindPortal) /* Init: Called at the start of this SubHSM */ \
-        STATE(ObstacleFollow) /* ObstacleFollow: Has its own SubHSM*/ \
+        STATE(PortalFollow) /* ObstacleFollow: Has its own SubHSM*/ \
         STATE(PortalEnter) /* PortalEnter: Has its own SubHSM */\
 
 #define ENUM_FORM(STATE) STATE, //Enums are reprinted verbatim and comma'd
@@ -98,14 +99,14 @@ ES_Event RunFindPortalHSM(ES_Event ThisEvent) {
                 dbprintf("\n. Exiting Init. Should enter ObstacleFollow."
                         "Also initializing PortalEnterSubHSM and"
                         "ObstacleFollowingSubHSM. \n");
-                nextState = ObstacleFollow;
+                nextState = PortalFollow;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
             }
             break;
 
-        case ObstacleFollow:
-            RunObstacleFollowing(ThisEvent);
+        case PortalFollow:
+            RunPortalFollowing(ThisEvent);
             if (ThisEvent.EventType != ES_NO_EVENT) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
@@ -134,12 +135,12 @@ ES_Event RunFindPortalHSM(ES_Event ThisEvent) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
                         dbprintf("\n Entered PortalEnter. \n");
+                        LED_OnBank(LED_BANK3, 0xFF);
                         R2Motors(0,0);
                         ThisEvent.EventType = ES_NO_EVENT;
                         break;
 
-                    default: // all unhandled events pass the event back up to the next level
-                        break;
+                    default: break;
                 }
             }
             break;
