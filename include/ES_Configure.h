@@ -26,7 +26,7 @@
 //#define POSTFUNCTION_FOR_KEYBOARD_INPUT Post_R2_BJT2_HSM
 
 //define for TattleTale
-#define USE_TATTLETALE
+//#define USE_TATTLETALE
 
 //uncomment to supress the entry and exit events
 //#define SUPPRESS_EXIT_ENTRY_IN_TATTLE

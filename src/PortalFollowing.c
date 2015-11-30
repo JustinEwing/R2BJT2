@@ -167,7 +167,7 @@ ES_Event RunPortalFollowing(ES_Event ThisEvent) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
                         R2Motors(0, -55);
-                        ES_Timer_InitTimer(FIND_OPPONENT_TIMER, 800);
+                        ES_Timer_InitTimer(FIND_OPPONENT_TIMER, 600);
                         break;
 
                     case ES_EXIT:

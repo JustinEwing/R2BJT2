@@ -6,8 +6,8 @@
 #include "R2Events.h"
 
 // Analog to Digital Conversion
-#define TRACK_WIRE_FOUND_HYSTERESIS 400 // DIGITAL_ONE
-#define TRACK_WIRE_LOST_HYSTERESIS 300 // DIGITAL_ZERO
+#define TRACK_WIRE_FOUND_HYSTERESIS 200 // DIGITAL_ONE
+#define TRACK_WIRE_LOST_HYSTERESIS 100 // DIGITAL_ZERO
 
 // Hysteresis Cap
 #define HYSTERESIS_CAP 1023
@@ -76,8 +76,9 @@ ES_Event ReadTrackWire(void) {
     }
 
     // Determine if there was an event
-    if (((param & LEFT_TRACKWIRE_SENSOR) && (PrevLeftState == TRACK_WIRE_SEARCHING)) ||
-            ((param & RIGHT_TRACKWIRE_SENSOR) && (PrevRightState == TRACK_WIRE_SEARCHING))) {
+    // going to try only using the left trackwire.  the right might be getting noise from the battery
+    if (((param & LEFT_TRACKWIRE_SENSOR) && (PrevLeftState == TRACK_WIRE_SEARCHING))){// ||
+            //((param & RIGHT_TRACKWIRE_SENSOR) && (PrevRightState == TRACK_WIRE_SEARCHING))) {
         dbprintf("PrevLState: %d\n", PrevLeftState);
         dbprintf("NextLState: %d\n", NewLeftState);
         dbprintf("Param: %d\n", param);

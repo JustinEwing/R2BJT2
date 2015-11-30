@@ -165,7 +165,7 @@ ES_Event RunFindOpponentHSM(ES_Event ThisEvent) {
                     case ES_ENTRY:
                         dbprintf("\n Tunring around to hit center. \n");
                         // being used for 180 degree turn.
-                        ES_Timer_InitTimer(FIND_OPPONENT_TIMER, 1000);
+                        ES_Timer_InitTimer(FIND_OPPONENT_TIMER, 1200);
                         R2Motors(-60, 0);
                         break;
 
@@ -236,50 +236,6 @@ ES_Event RunFindOpponentHSM(ES_Event ThisEvent) {
             }
             break;
 
-            //        case Evade:
-            //            if (ThisEvent.EventType != ES_NO_EVENT) {
-            //                switch (ThisEvent.EventType) {
-            //                    case ES_ENTRY:
-            //                        R2Motors(-50, 50);
-            //                        ES_Timer_InitTimer(FIND_OPPONENT_TIMER, 750);
-            //                        break;
-            //
-            //                    case ES_EXIT:
-            //                        ES_Timer_StopTimer(FIND_OPPONENT_TIMER);
-            //                        break;
-            //
-            //                    case BEACON_FOUND:
-            //                        R2Motors(0, 0);
-            //                        nextState = EliminateEnemy;
-            //                        makeTransition = TRUE;
-            //                        ThisEvent.EventType = ES_NO_EVENT;
-            //                        break;
-            //
-            //                    case ES_TIMEOUT:
-            //                        if (ThisEvent.EventParam == FIND_OPPONENT_TIMER) {
-            //                            R2Motors(50, 50);
-            //                            ThisEvent.EventType = ES_NO_EVENT;
-            //                        }
-            //                        break;
-            //
-            //                    case BUMPED:
-            //                        nextState = WallRide;
-            //                        makeTransition = TRUE;
-            //                        ThisEvent.EventType = ES_NO_EVENT;
-            //                        break;
-            //
-            //                    case TAPE_FOUND:
-            //                        nextState = Evade;
-            //                        makeTransition = TRUE;
-            //                        ThisEvent.EventType = ES_NO_EVENT;
-            //                        break;
-            //
-            //                    default:
-            //                        break;
-            //                }
-            //            }
-            //            break; //end evade
-
 
         case LookForEnemy:
             // State objective: Makes 360 degree turn scanning for opponent.
@@ -338,6 +294,7 @@ ES_Event RunFindOpponentHSM(ES_Event ThisEvent) {
                         ES_Timer_StopTimer(FIND_OPPONENT_TIMER);
                         break;
 
+                    /*
                     case BEACON_LOST:
                         // Lost the beacon, try to find it again
                         // Note: might need a HadOpponent state or something along those
@@ -350,6 +307,7 @@ ES_Event RunFindOpponentHSM(ES_Event ThisEvent) {
                         makeTransition = TRUE;
                         ThisEvent.EventType = ES_NO_EVENT;
                         break;
+                     */
 
                     case SHOT_OPPONENT:
                         printf("I WANT TO DIE\n");
