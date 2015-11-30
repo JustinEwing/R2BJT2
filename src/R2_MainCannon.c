@@ -58,7 +58,7 @@ static const char *StateNames[] = {
     LIST_OF_R2MainCannon_STATES(STRING_FORM)
 };
 
-#define MAINCANNON_DEBUG_VERBOSE
+//#define MAINCANNON_DEBUG_VERBOSE
 #ifdef MAINCANNON_DEBUG_VERBOSE
 #include "serial.h"
 #include <stdio.h>
@@ -194,7 +194,7 @@ ES_Event RunR2MainCannon(ES_Event ThisEvent) {
                     case ES_ENTRY:
                         dbprintf("Spooling motors\n");
                         R2LauncherMotorSpeed(30);
-                        ES_Timer_InitTimer(GUN_TIMER, 2000);
+                        ES_Timer_InitTimer(GUN_TIMER, 3500);
                         ThisEvent.EventType = ES_NO_EVENT;
                         break;
 
@@ -225,7 +225,7 @@ ES_Event RunR2MainCannon(ES_Event ThisEvent) {
                     case ES_ENTRY:
                         dbprintf("Loading Cannon\n");
                         R2OpenBarrel();
-                        ES_Timer_InitTimer(GUN_TIMER, 350);
+                        ES_Timer_InitTimer(GUN_TIMER, 500);
                         ThisEvent.EventType = ES_NO_EVENT;
                         break;
 
@@ -256,7 +256,7 @@ ES_Event RunR2MainCannon(ES_Event ThisEvent) {
                     case ES_ENTRY:
                         dbprintf("FIRE!!!\n");
                         R2CloseBarrel();
-                        if (firecount < 2) { //trying to get rid of the fourth shot
+                        if (firecount < 4) { //Since we aren't firing all the balls
                             dbprintf("Fire %d\n", firecount);
                             nextState = InitCannon;
                             makeTransition = TRUE;
