@@ -184,10 +184,28 @@ ES_Event RunFindOpponentHSM(ES_Event ThisEvent) {
                         ThisEvent.EventType = ES_NO_EVENT;
                         break;
 
+                    case TAPE_FOUND:
+                        switch (ThisEvent.EventParam) {
+                            case TOP_TAPE_SENSOR:
+                                ES_Timer_InitTimer(FIND_OPPONENT_TIMER, 800);
+                                R2Motors(-60, 0);
+                                break;
+                            case LEFT_TAPE_SENSOR:
+                                //ES_Timer_InitTimer(FIND_OPPONENT_TIMER, 1200);
+                                //R2Motors(-40, 40);
+                                break;
+                            case RIGHT_TAPE_SENSOR:
+                                //Ignore
+                                break;
+                            default:break;
+                        }
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;
+
 
                     case ES_TIMEOUT:
                         // drive forward until you hit the center obstacle
-                        if (ThisEvent.EventParam == FIND_OPPONENT_TIMER) { // not sure why.. but timer three is causing a timeout event here (SKETCH)
+                        if (ThisEvent.EventParam == FIND_OPPONENT_TIMER) { 
                             R2Motors(30, 30);
                             ThisEvent.EventType = ES_NO_EVENT;
                         }
@@ -294,20 +312,20 @@ ES_Event RunFindOpponentHSM(ES_Event ThisEvent) {
                         ES_Timer_StopTimer(FIND_OPPONENT_TIMER);
                         break;
 
-                    /*
-                    case BEACON_LOST:
-                        // Lost the beacon, try to find it again
-                        // Note: might need a HadOpponent state or something along those
-                        //      lines to optimize so we don't try going all the way around
-                        //      the field again trying to find the opponent
-                        rightR2Motor(0); // STOP!
-                        leftR2Motor(0);
-                        R2LauncherMotorSpeed(0);
-                        nextState = LookForEnemy;
-                        makeTransition = TRUE;
-                        ThisEvent.EventType = ES_NO_EVENT;
-                        break;
-                     */
+                        /*
+                        case BEACON_LOST:
+                            // Lost the beacon, try to find it again
+                            // Note: might need a HadOpponent state or something along those
+                            //      lines to optimize so we don't try going all the way around
+                            //      the field again trying to find the opponent
+                            rightR2Motor(0); // STOP!
+                            leftR2Motor(0);
+                            R2LauncherMotorSpeed(0);
+                            nextState = LookForEnemy;
+                            makeTransition = TRUE;
+                            ThisEvent.EventType = ES_NO_EVENT;
+                            break;
+                         */
 
                     case SHOT_OPPONENT:
                         printf("I WANT TO DIE\n");
