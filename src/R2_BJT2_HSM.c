@@ -170,7 +170,6 @@ ES_Event Run_R2_BJT2_HSM(ES_Event ThisEvent) {
             break;
 
         case FindAmmo: // in the first state, replace this with correct names
-
             ThisEvent = RunFindAmmoHSM(ThisEvent);
             if (ThisEvent.EventType != ES_NO_EVENT) { // An event is still active
                 switch (ThisEvent.EventType) {
@@ -209,7 +208,7 @@ ES_Event Run_R2_BJT2_HSM(ES_Event ThisEvent) {
                         break;
 
                     case SHOT_OPPONENT:
-                        printf("i hate my life\n");
+                        dbprintf("i hate my life\n");
                         nextState = FindPortal;
                         makeTransition = TRUE;
                         ThisEvent.EventType = ES_NO_EVENT;
@@ -225,15 +224,10 @@ ES_Event Run_R2_BJT2_HSM(ES_Event ThisEvent) {
             ThisEvent = RunFindPortalHSM(ThisEvent);
             switch (ThisEvent.EventType) {
                 case ES_ENTRY:
-                    printf("i hate mjkoly life\n");
-                    //R2Motors(60, 60);
+                    dbprintf("i hate mjkoly life\n");
                     break;
 
                 case ES_EXIT:
-                    break;
-
-                case ES_KEYINPUT:
-                    ThisEvent.EventType = ES_NO_EVENT;
                     break;
 
                 case ES_TIMEOUT:
@@ -251,9 +245,9 @@ ES_Event Run_R2_BJT2_HSM(ES_Event ThisEvent) {
 
     if (makeTransition == TRUE) { // making a state transition, send EXIT and ENTRY
         // recursively call the current state with an exit event
-        Run_R2_BJT2_HSM(EXIT_EVENT); // <- rename to your own Run function
+        Run_R2_BJT2_HSM(EXIT_EVENT);
         CurrentState = nextState;
-        Run_R2_BJT2_HSM(ENTRY_EVENT); // <- rename to your own Run function
+        Run_R2_BJT2_HSM(ENTRY_EVENT);
     }
 
     ES_Tail(); // trace call stack end

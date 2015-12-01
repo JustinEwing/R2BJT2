@@ -50,6 +50,7 @@ STATE(FollowTape)       \
 STATE(Verify)           \
 STATE(FollowDump)       \
 STATE(AlignOnT)         \
+STATE(Wait)         \
 
 #define ENUM_FORM(STATE) STATE, //Enums are reprinted verbatim and comma'd
 
@@ -144,17 +145,39 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
     switch (CurrentState) {
         case InitFindAmmoState: // If current state is initial Psedudo State
             if (ThisEvent.EventType == ES_INIT) {
-                nextState = SearchingForTape;
+                nextState = Wait;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
             }
             break;
 
+        case Wait:
+            if (ThisEvent.EventType != ES_NO_EVENT) {
+                switch (ThisEvent.EventType) {
+                    case ES_ENTRY:
+                        ES_Timer_InitTimer(BACKUP_TIMER, 5);
+                        break;
+
+                    case ES_TIMEOUT:
+                        nextState = SearchingForTape;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;
+
+                    case ES_EXIT:
+                        break;
+
+                    default: break;
+                }
+            }
+            break; // End Wait
+
         case SearchingForTape:
             if (ThisEvent.EventType != ES_NO_EVENT) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
-                        R2Motors(30, 30);
+                        //R2Motors(30, 30);
+                        ES_Timer_InitTimer(BACKUP_TIMER, 500);
                         break;
 
                     case TAPE_FOUND:
@@ -179,13 +202,21 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
                         }
                         break;
 
+                    case ES_TIMEOUT:
+                        R2Motors(30, 30);
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        ES_Timer_StopTimer(BACKUP_TIMER);
+                        break;
+
+                    case ES_EXIT:
+                        break;
+
                     default: break;
                 }
             }
             break; // End Searching
 
         case ReversingRight:
-            //ThisEvent = RunR2MainCannon(ThisEvent); //FOR TESTING
             if (ThisEvent.EventType != ES_NO_EVENT) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
@@ -258,6 +289,10 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
                         ThisEvent.EventType = ES_NO_EVENT;
                         break;
 
+                    case ES_EXIT:
+                        InitTapeFollowing();
+                        break;
+
                     default: break;
                 }
             }
@@ -297,7 +332,7 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
             if (ThisEvent.EventType != ES_NO_EVENT) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
-                        ES_Timer_InitTimer(OH_SHIIIIIIIIIT, 7000); // going to try 7 seconds...
+                        ES_Timer_InitTimer(OH_SHIIIIIIIIIT, 10000); // going to try 7 seconds...
                         break;
 
                     case BUMPED:
@@ -322,6 +357,7 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
 
                     case ES_EXIT:
                         ES_Timer_StopTimer(OH_SHIIIIIIIIIT);
+                        InitDumpFollowing();
                         break;
 
                     default: break;
@@ -333,17 +369,20 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
             if (ThisEvent.EventType != ES_NO_EVENT) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
-                        //R2FullStop();
-                        ES_Timer_InitTimer(OH_SHIIIIIIIIIT, 10000);
+                        ES_Timer_InitTimer(OH_SHIIIIIIIIIT, 15000);
                         R2Motors(-10, -20);
                         break;
 
                     case BUMPED:
-                        ammoBumps++;
-                        if (ammoBumps >= 3) {
-                            R2FullStop();
-                            ES_Timer_InitTimer(BACKUP_TIMER, 2000);
-                        }
+                        R2FullStop();
+                        ES_Timer_InitTimer(BACKUP_TIMER, 2000);
+                        ES_Timer_StopTimer(OH_SHIIIIIIIIIT);
+                        break;
+
+                    case UNBUMPED:
+                        R2Motors(-10, -30);
+                        ES_Timer_StopTimer(BACKUP_TIMER);
+                        ES_Timer_InitTimer(OH_SHIIIIIIIIIT, 6000);
                         break;
 
                     case TAPE_FOUND:

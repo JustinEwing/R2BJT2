@@ -43,6 +43,7 @@
         STATE(InitObstacleFollowingState)           \
         STATE(TurnLeft)                        \
         STATE(TankRight) \
+        STATE(Reverse) \
 
 #define ENUM_FORM(STATE) STATE, //Enums are reprinted verbatim and comma'd
 
@@ -141,8 +142,7 @@ ES_Event RunObstacleFollowing(ES_Event ThisEvent) {
                     case BUMPED:
                         switch (ThisEvent.EventParam) {
                             case RIGHT_BUMPER: //Roach?
-                                //nextState = Reverse;
-                                //makeTransition = TRUE;
+                                ES_Timer_InitTimer(OH_SHIIIIIIIIIT, 2000);
                                 ThisEvent.EventType = ES_NO_EVENT;
                                 break;
                             case LEFT_BUMPER:
@@ -152,6 +152,22 @@ ES_Event RunObstacleFollowing(ES_Event ThisEvent) {
                                 break;
                             default:break;
                         }
+                        break;
+
+                    case UNBUMPED:
+                        switch (ThisEvent.EventParam) {
+                            case RIGHT_BUMPER: //Roach?
+                                ES_Timer_StopTimer(OH_SHIIIIIIIIIT);
+                                ThisEvent.EventType = ES_NO_EVENT;
+                                break;
+                            default:break;
+                        }
+                        break;
+
+                    case ES_TIMEOUT:
+                        nextState = Reverse;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
                         break;
 
                     default:break;
@@ -198,6 +214,28 @@ ES_Event RunObstacleFollowing(ES_Event ThisEvent) {
                 }
             }
             break; //End TankRight
+
+        case Reverse:
+            if (ThisEvent.EventType != ES_NO_EVENT) { // An event is still active
+                switch (ThisEvent.EventType) {
+                    case ES_ENTRY:
+                        R2Motors(-40, -40);
+                        ES_Timer_InitTimer(OH_SHIIIIIIIIIT, 500);
+                        break;
+
+                    case ES_TIMEOUT:
+                        nextState = TurnLeft;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;
+
+                    case ES_EXIT:
+                        break;
+
+                    default:break;
+                }
+            }
+            break; //End Reverse
 
         default: // all unhandled states fall into here
             break;
