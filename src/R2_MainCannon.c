@@ -45,6 +45,8 @@
         STATE(Spooling) \
         STATE(Load) \
         STATE(FIRE) \
+        STATE(WiggleLeft) \
+        STATE(WiggleRight) \
 
 
 #define ENUM_FORM(STATE) STATE, //Enums are reprinted verbatim and comma'd
@@ -136,6 +138,7 @@ ES_Event RunR2MainCannon(ES_Event ThisEvent) {
     uint8_t makeTransition = FALSE; // use to flag transition
     R2MainCannonState_t nextState;
     static uint8_t firecount = 0;
+    static uint8_t wiggleCount = 0;
 
     ES_Tattle(); // trace call stack
 
@@ -219,6 +222,66 @@ ES_Event RunR2MainCannon(ES_Event ThisEvent) {
             }
             break;
 
+        case WiggleRight:
+            if (ThisEvent.EventType != ES_NO_EVENT) {
+                switch (ThisEvent.EventType) {
+                    case ES_ENTRY:
+                        ES_Timer_InitTimer(GUN_TIMER, 3500);
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;
+
+                    case ES_TIMEOUT:
+                        switch (ThisEvent.EventParam) {
+                            case GUN_TIMER:
+                                nextState = Load;
+                                makeTransition = TRUE;
+                                ThisEvent.EventType = ES_NO_EVENT;
+                                break;
+                            default:break;
+                        }
+                        break;
+
+                    case ES_EXIT:
+                        ES_Timer_StopTimer(GUN_TIMER);
+                        break;
+
+
+                    default: break;
+                }
+            }
+            break;
+
+        case WiggleLeft:
+            if (ThisEvent.EventType != ES_NO_EVENT) {
+                switch (ThisEvent.EventType) {
+                    case ES_ENTRY:
+                        dbprintf("Spooling motors\n");
+                        R2LauncherMotorSpeed(30);
+                        ES_Timer_InitTimer(GUN_TIMER, 3500);
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;
+
+                    case ES_TIMEOUT:
+                        switch (ThisEvent.EventParam) {
+                            case GUN_TIMER:
+                                nextState = Load;
+                                makeTransition = TRUE;
+                                ThisEvent.EventType = ES_NO_EVENT;
+                                break;
+                            default:break;
+                        }
+                        break;
+
+                    case ES_EXIT:
+                        ES_Timer_StopTimer(GUN_TIMER);
+                        break;
+
+
+                    default: break;
+                }
+            }
+            break;
+
         case Load:
             if (ThisEvent.EventType != ES_NO_EVENT) {
                 switch (ThisEvent.EventType) {
@@ -256,7 +319,7 @@ ES_Event RunR2MainCannon(ES_Event ThisEvent) {
                     case ES_ENTRY:
                         dbprintf("FIRE!!!\n");
                         R2CloseBarrel();
-                        if (firecount < 4) { //Since we aren't firing all the balls
+                        if (firecount < 5) { //Since we aren't firing all the balls
                             dbprintf("Fire %d\n", firecount);
                             nextState = InitCannon;
                             makeTransition = TRUE;
@@ -264,7 +327,7 @@ ES_Event RunR2MainCannon(ES_Event ThisEvent) {
                             firecount++;
                         } else {
                             dbprintf("shot opponent\n");
-                             R2LauncherMotorSpeed(0);
+                            R2LauncherMotorSpeed(0);
                             ThisEvent.EventType = SHOT_OPPONENT;
                             ThisEvent.EventParam = TRUE;
                             Post_R2_BJT2_HSM(ThisEvent);

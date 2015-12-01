@@ -332,7 +332,7 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
             if (ThisEvent.EventType != ES_NO_EVENT) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
-                        ES_Timer_InitTimer(OH_SHIIIIIIIIIT, 10000); // going to try 7 seconds...
+                        ES_Timer_InitTimer(OH_SHIIIIIIIIIT, 8000); // going to try 7 seconds...
                         break;
 
                     case BUMPED:
@@ -369,7 +369,7 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
             if (ThisEvent.EventType != ES_NO_EVENT) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
-                        ES_Timer_InitTimer(OH_SHIIIIIIIIIT, 15000);
+                        ES_Timer_InitTimer(OH_SHIIIIIIIIIT, 10000);
                         R2Motors(-10, -20);
                         break;
 
