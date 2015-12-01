@@ -182,7 +182,7 @@ ES_Event RunDumpFollowing(ES_Event ThisEvent) {
                         ThisEvent.EventType = ES_NO_EVENT;
                         break;
 
-                        case TAPE_LOST:
+                    case TAPE_LOST:
                         ThisEvent.EventType = ES_NO_EVENT;
                         break;
 

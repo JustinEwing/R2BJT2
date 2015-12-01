@@ -187,12 +187,14 @@ ES_Event RunTapeFollowing(ES_Event ThisEvent) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
                         R2Motors(35, 30);// drive slightly right
+                        ES_Timer_InitTimer(OH_SHIIIIIIIIIT, 3000);
                         break;
 
                     case TAPE_FOUND:
                         switch (ThisEvent.EventParam) {
                             case TOP_TAPE_SENSOR:
                                 R2Motors(-30, 20);
+                                ES_Timer_InitTimer(OH_SHIIIIIIIIIT, 3000);
                                 break;
                         }
                         ThisEvent.EventType = ES_NO_EVENT;
@@ -202,6 +204,7 @@ ES_Event RunTapeFollowing(ES_Event ThisEvent) {
                         switch (ThisEvent.EventParam) {
                             case TOP_TAPE_SENSOR:
                                 R2Motors(35, 30);
+                                ES_Timer_InitTimer(OH_SHIIIIIIIIIT, 3000);
                                 break;
                             default:break;
                         }

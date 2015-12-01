@@ -62,6 +62,8 @@ static const char *StateNames[] = {
     LIST_OF_FindAmmo_STATES(STRING_FORM)
 };
 
+int ammoBumps = 0;
+
 //#define FINDAMMO_HSM_DEBUG_VERBOSE
 #ifdef FINDAMMO_HSM_DEBUG_VERBOSE
 #include "serial.h"
@@ -164,7 +166,7 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
 
                     case BUMPED:
                         switch (ThisEvent.EventParam) {
-                            case LEFT_BUMPER:                                 
+                            case LEFT_BUMPER:
                                 nextState = ReversingRight;
                                 makeTransition = TRUE;
                                 ThisEvent.EventType = ES_NO_EVENT;
@@ -238,6 +240,18 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
                     case ES_ENTRY:
                         break;
 
+                    case ES_TIMEOUT:
+                        switch (ThisEvent.EventParam) {
+                            case OH_SHIIIIIIIIIT:
+                                nextState = SearchingForTape;
+                                makeTransition = TRUE;
+                                ThisEvent.EventType = ES_NO_EVENT;
+                                ES_Timer_StopTimer(OH_SHIIIIIIIIIT);
+                                break;
+                            default:break;
+                        }
+                        break;
+
                     case BUMPED:
                         nextState = Verify;
                         makeTransition = TRUE;
@@ -283,12 +297,16 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
             if (ThisEvent.EventType != ES_NO_EVENT) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
+                        ES_Timer_InitTimer(OH_SHIIIIIIIIIT, 7000); // going to try 7 seconds...
                         break;
 
                     case BUMPED:
                         break;
 
                     case ES_TIMEOUT:
+                        nextState = SearchingForTape;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
                         break;
 
                     case TAPE_LOST:
@@ -302,6 +320,10 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
                         }
                         break;
 
+                    case ES_EXIT:
+                        ES_Timer_StopTimer(OH_SHIIIIIIIIIT);
+                        break;
+
                     default: break;
                 }
             }
@@ -312,12 +334,16 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
                 switch (ThisEvent.EventType) {
                     case ES_ENTRY:
                         //R2FullStop();
+                        ES_Timer_InitTimer(OH_SHIIIIIIIIIT, 10000);
                         R2Motors(-10, -20);
                         break;
 
                     case BUMPED:
-                        R2FullStop();
-                        ES_Timer_InitTimer(BACKUP_TIMER, 2000);
+                        ammoBumps++;
+                        if (ammoBumps >= 3) {
+                            R2FullStop();
+                            ES_Timer_InitTimer(BACKUP_TIMER, 2000);
+                        }
                         break;
 
                     case TAPE_FOUND:
@@ -340,9 +366,22 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
                         break;
 
                     case ES_TIMEOUT:
-                        ES_Timer_StopTimer(BACKUP_TIMER);
-                        ThisEvent.EventType = FOUND_AMMO;
-                        ThisEvent.EventParam = TRUE;
+                        switch (ThisEvent.EventParam) {
+                            case BACKUP_TIMER:
+                                ES_Timer_StopTimer(BACKUP_TIMER);
+                                ES_Timer_StopTimer(OH_SHIIIIIIIIIT); // have to stop other timer too!!!!
+                                ThisEvent.EventType = FOUND_AMMO;
+                                ThisEvent.EventParam = TRUE;
+                                break;
+
+                            case OH_SHIIIIIIIIIT:
+                                nextState = SearchingForTape;
+                                makeTransition = TRUE;
+                                ThisEvent.EventType = ES_NO_EVENT;
+                                ES_Timer_StopTimer(OH_SHIIIIIIIIIT);
+                                break;
+                            default:break;
+                        }
                         break;
 
                     default: break;

@@ -188,7 +188,7 @@ ES_Event RunFindOpponentHSM(ES_Event ThisEvent) {
                         switch (ThisEvent.EventParam) {
                             case TOP_TAPE_SENSOR:
                                 ES_Timer_InitTimer(FIND_OPPONENT_TIMER, 800);
-                                R2Motors(-60, 0);
+                                R2Motors(-60, -10);
                                 break;
                             case LEFT_TAPE_SENSOR:
                                 //ES_Timer_InitTimer(FIND_OPPONENT_TIMER, 1200);
@@ -205,7 +205,7 @@ ES_Event RunFindOpponentHSM(ES_Event ThisEvent) {
 
                     case ES_TIMEOUT:
                         // drive forward until you hit the center obstacle
-                        if (ThisEvent.EventParam == FIND_OPPONENT_TIMER) { 
+                        if (ThisEvent.EventParam == FIND_OPPONENT_TIMER) {
                             R2Motors(30, 30);
                             ThisEvent.EventType = ES_NO_EVENT;
                         }
@@ -243,8 +243,18 @@ ES_Event RunFindOpponentHSM(ES_Event ThisEvent) {
                         break;
 
                     case TAPE_FOUND:
-                        //nextState = Evade;
-                        //makeTransition = TRUE;
+                        switch (ThisEvent.EventParam) {
+                            case TOP_TAPE_SENSOR:
+                                break;
+                            case LEFT_TAPE_SENSOR:
+                                nextState = HitCenter;
+                                makeTransition = TRUE;
+                                ThisEvent.EventType = ES_NO_EVENT;
+                                break;
+                            case RIGHT_TAPE_SENSOR:
+                                break;
+                            default:break;
+                        }
                         ThisEvent.EventType = ES_NO_EVENT;
                         break;
 

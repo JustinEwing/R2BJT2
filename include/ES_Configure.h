@@ -104,7 +104,7 @@ static const char *EventNames[] = {
 #define TIMER5_RESP_FUNC Post_R2_BJT2_HSM    //Alignment timer
 #define TIMER6_RESP_FUNC Post_R2_BJT2_HSM    //Find Opponent Timer
 #define TIMER7_RESP_FUNC Post_R2_BJT2_HSM    //Cannon Timer
-#define TIMER8_RESP_FUNC TIMER_UNUSED
+#define TIMER8_RESP_FUNC Post_R2_BJT2_HSM    //oh shit->ammo
 #define TIMER9_RESP_FUNC TIMER_UNUSED
 #define TIMER10_RESP_FUNC TIMER_UNUSED
 #define TIMER11_RESP_FUNC TIMER_UNUSED
@@ -125,7 +125,7 @@ static const char *EventNames[] = {
 #define ALIGNMENT_TIMER 5   //This is for the Alignment to the tape
 #define FIND_OPPONENT_TIMER 6
 #define GUN_TIMER 7
-#define OPPO 8
+#define OH_SHIIIIIIIIIT 8
 
 
 /****************************************************************************/
