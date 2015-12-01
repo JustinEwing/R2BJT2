@@ -70,5 +70,6 @@ uint8_t InitObstacleFollowing(void);
  * @author Gabriel H Elkaim, 2011.10.23 19:25 */
 ES_Event RunObstacleFollowing(ES_Event ThisEvent);
 
+
 #endif /* OBSTACLE_FOLLOWING_H */
 

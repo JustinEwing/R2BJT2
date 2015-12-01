@@ -290,7 +290,7 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
                         break;
 
                     case ES_EXIT:
-                        //InitTapeFollowing();
+                        ResetTapeFollowing();
                         break;
 
                     default: break;
@@ -357,7 +357,7 @@ ES_Event RunFindAmmoHSM(ES_Event ThisEvent) {
 
                     case ES_EXIT:
                         ES_Timer_StopTimer(OH_SHIIIIIIIIIT);
-                        //InitDumpFollowing();
+                        ResetDumpFollowing();
                         break;
 
                     default: break;

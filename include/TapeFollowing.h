@@ -70,5 +70,7 @@ uint8_t InitTapeFollowing(void);
  * @author Gabriel H Elkaim, 2011.10.23 19:25 */
 ES_Event RunTapeFollowing(ES_Event ThisEvent);
 
+void ResetTapeFollowing(void);
+
 #endif /* TAPE_FOLLOWING_H */
 

@@ -235,6 +235,10 @@ ES_Event RunTapeFollowing(ES_Event ThisEvent) {
     return ThisEvent;
 }
 
+void ResetTapeFollowing(void)
+{
+    CurrentState = Align;
+}
 
 /*******************************************************************************
  * PRIVATE FUNCTIONS                                                           *

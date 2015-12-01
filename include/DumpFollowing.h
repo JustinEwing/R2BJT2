@@ -70,5 +70,7 @@ uint8_t InitDumpFollowing(void);
  * @author Gabriel H Elkaim, 2011.10.23 19:25 */
 ES_Event RunDumpFollowing(ES_Event ThisEvent);
 
+void ResetTapeFollowing(void);
+
 #endif /* DUMP_FOLLOWING_H */
 

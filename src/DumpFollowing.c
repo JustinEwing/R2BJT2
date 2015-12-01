@@ -230,7 +230,10 @@ ES_Event RunDumpFollowing(ES_Event ThisEvent) {
     return ThisEvent;
 }
 
-
+void ResetDumpFollowing(void)
+{
+    CurrentState = Reverse;
+}
 /*******************************************************************************
  * PRIVATE FUNCTIONS                                                           *
  ******************************************************************************/
